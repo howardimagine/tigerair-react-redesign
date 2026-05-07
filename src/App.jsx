@@ -13,6 +13,7 @@ import Orders from './pages/Orders';
 import Tasks from './pages/Tasks';
 import CheckIn from './pages/CheckIn';
 import Support from './pages/Support';
+import LowFareMap from './pages/LowFareMap';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/checkin" element={<CheckIn />} />
             <Route path="/support" element={<Support />} />
+            <Route path="/fare-map" element={<LowFareMap />} />
           </Routes>
         </Layout>
       </BrowserRouter>

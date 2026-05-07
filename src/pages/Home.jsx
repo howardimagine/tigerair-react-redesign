@@ -29,6 +29,21 @@ const Home = () => {
     { icon: Plane, title: '準點起飛', sub: 'On-time', desc: '高準點率保證' },
   ];
 
+  const bannerAds = [
+    {
+      title: 'Early Bird Sale 早鳥優惠',
+      subtitle: '日本、韓國熱門航線限時開搶',
+      cta: '立即訂票',
+      img: 'https://strapi-assets.tigerairtw.com/HRBN_team_Tiger_2880x600_3758637ac4.jpg',
+    },
+    {
+      title: 'Weekend Getaway 週末輕旅行',
+      subtitle: '亞洲城市短航線，說走就走',
+      cta: '探索航線',
+      img: 'https://strapi-assets.tigerairtw.com/W26_HERO_Banner_2880_X600_431aaa59d7.jpg',
+    },
+  ];
+
   return (
     <div>
       {/* Hero */}
@@ -121,6 +136,30 @@ const Home = () => {
         </div>
       </div>
 
+      {/* Banner Ads */}
+      <div className="max-w-7xl mx-auto px-4 mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          {bannerAds.map((banner) => (
+            <button
+              key={banner.title}
+              type="button"
+              onClick={() => navigate('/search')}
+              className="relative h-48 sm:h-56 overflow-hidden rounded-xl text-left shadow-sm transition hover:shadow-md group"
+            >
+              <img src={banner.img} alt={banner.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-black/45" />
+              <div className="relative z-10 flex h-full flex-col justify-end p-5 sm:p-6 text-white">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">{banner.title}</h2>
+                <p className="text-sm sm:text-base opacity-90 mb-4">{banner.subtitle}</p>
+                <span className="inline-flex w-fit items-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold transition group-hover:bg-primary-dark">
+                  {banner.cta}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Features */}
       <div className="bg-gray-50 py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4">
@@ -142,10 +181,10 @@ const Home = () => {
         <div className="relative rounded-xl overflow-hidden h-48 sm:h-60" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1200&h=400&fit=crop)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
           <div className="absolute inset-0 bg-primary/80"></div>
           <div className="relative h-full flex flex-col items-center justify-center text-white text-center px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-2">Summer Sale 夏季特惠</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">低價航點地圖</h2>
             <p className="text-base sm:text-lg mb-4 opacity-90">全航線最低 NT$ 1,999 起</p>
-            <button onClick={() => navigate('/search')} className="bg-white text-primary px-6 py-2.5 rounded-lg font-medium hover:bg-gray-100 transition">
-              立即搶購 Book Now
+            <button onClick={() => navigate('/fare-map')} className="bg-white text-primary px-6 py-2.5 rounded-lg font-medium hover:bg-gray-100 transition">
+              立即搶購
             </button>
           </div>
         </div>

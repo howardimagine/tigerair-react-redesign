@@ -1,107 +1,107 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
 
 const ExpandedPriceCalendar = ({ value, onChange, monthCount = 3 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const scrollRef = useRef(null);
 
-  // 生成示例价格数据
   const getPriceForDate = (date) => {
     const day = date.getDate();
-    const basePrice = 3999;
-    const variation = (day * 123) % 2000;
+    const month = date.getMonth() + 1;
+    const basePrice = 2999;
+    const variation = ((day * 173) + (month * 311)) % 4200;
     return basePrice + variation;
   };
 
-  const getDaysInMonth = (date) => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  const getDaysInMonth = (date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  const getFirstDayOfMonth = (date) => new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
-  const getFirstDayOfMonth = (date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-  };
-
-  const handleDateClick = (day, month) => {
-    const selectedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + month, day);
-    const formattedDate = selectedDate.toISOString().split('T')[0];
-    onChange(formattedDate);
+  const handleDateClick = (day, monthOffset) => {
+    const selectedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthOffset, day);
+    onChange(formatDate(selectedDate));
   };
 
   const handlePrevMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+    scrollRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
   };
 
   const handleNextMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+    scrollRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
   };
 
   const generateMonth = (monthOffset) => {
-    const month = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthOffset);
-    const daysInMonth = getDaysInMonth(month);
-    const firstDay = getFirstDayOfMonth(month);
-    const days = [];
+    const month = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthOffset, 1);
+    const days = Array.from({ length: getFirstDayOfMonth(month) }, () => null);
 
-    for (let i = 0; i < firstDay; i++) {
-      days.push(null);
-    }
-
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push(i);
+    for (let day = 1; day <= getDaysInMonth(month); day += 1) {
+      days.push(day);
     }
 
     return { month, days };
   };
 
-  const getMonthName = (date) => {
-    return date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long' });
-  };
+  const getMonthName = (date) => date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long' });
 
   const renderCalendar = (monthData, monthOffset) => {
     const { month, days } = monthData;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     return (
-      <div key={monthOffset} className="flex-1">
-        <h4 className="font-bold text-gray-800 text-center mb-3">{getMonthName(month)}</h4>
-        
-        {/* Weekday Headers */}
-        <div className="grid grid-cols-7 gap-2 mb-2">
-          {['日', '一', '二', '三', '四', '五', '六'].map(day => (
-            <div key={day} className="text-center text-xs font-semibold text-gray-500 py-2">
-              {day}
+      <div key={`${month.getFullYear()}-${month.getMonth()}`} className="min-w-[320px] flex-1 snap-start rounded-lg border border-gray-100 bg-white p-4">
+        <h4 className="mb-4 text-center text-base font-bold text-gray-900">{getMonthName(month)}</h4>
+
+        <div className="mb-2 grid grid-cols-7 gap-1">
+          {weekdays.map((weekday) => (
+            <div key={weekday} className="py-1 text-center text-xs font-semibold text-gray-500">
+              {weekday}
             </div>
           ))}
         </div>
 
-        {/* Calendar Days */}
-        <div className="grid grid-cols-7 gap-2">
-          {days.map((day, idx) => {
+        <div className="grid grid-cols-7 gap-1.5">
+          {days.map((day, index) => {
             if (day === null) {
-              return <div key={`empty-${idx}`} className="aspect-square"></div>;
+              return <div key={`empty-${index}`} className="min-h-16" />;
             }
 
             const date = new Date(month.getFullYear(), month.getMonth(), day);
-            const formattedDate = date.toISOString().split('T')[0];
+            const formattedDate = formatDate(date);
             const isSelected = formattedDate === value;
+            const isToday = today.toDateString() === date.toDateString();
+            const isPast = date < today;
             const price = getPriceForDate(date);
-            const isToday = new Date().toDateString() === date.toDateString();
-            const isPast = date < new Date();
 
             return (
               <button
-                key={day}
+                key={formattedDate}
+                type="button"
                 onClick={() => handleDateClick(day, monthOffset)}
                 disabled={isPast}
-                className={`aspect-square rounded-lg p-2 text-xs font-medium transition flex flex-col items-center justify-center gap-1 ${
+                className={`min-h-16 rounded-lg border p-1.5 text-center transition ${
                   isSelected
-                    ? 'bg-primary text-white shadow-lg'
+                    ? 'border-primary bg-primary text-white shadow-md'
                     : isToday
-                    ? 'border-2 border-primary text-primary'
+                    ? 'border-primary bg-white text-gray-900'
                     : isPast
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-50 text-gray-700 hover:bg-orange-100'
+                    ? 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
+                    : 'border-gray-100 bg-gray-50 text-gray-700 hover:border-primary/40 hover:bg-orange-50'
                 }`}
               >
-                <span className="font-bold">{day}</span>
-                <span className={`text-[9px] font-bold ${isSelected ? 'text-white' : 'text-primary'}`}>
-                  NT${Math.floor(price / 1000)}K
+                <span className="block text-sm font-bold">{day}</span>
+                <span className={`mt-1 block text-[10px] font-semibold ${isSelected ? 'text-white' : isPast ? 'text-gray-300' : 'text-primary'}`}>
+                  {price.toLocaleString()}
                 </span>
               </button>
             );
@@ -113,23 +113,20 @@ const ExpandedPriceCalendar = ({ value, onChange, monthCount = 3 }) => {
 
   return (
     <div className="w-full">
-      {/* Month Navigation */}
-      <div className="flex justify-between items-center mb-6">
-        <button onClick={handlePrevMonth} className="p-2 hover:bg-gray-100 rounded-lg transition">
-          <ChevronLeft className="h-6 w-6 text-gray-600" />
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <button type="button" onClick={handlePrevMonth} className="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100">
+          <ChevronLeft className="h-5 w-5" />
         </button>
-        <h3 className="font-bold text-gray-800 text-lg flex-1 text-center">
-          {getMonthName(new Date(currentMonth.getFullYear(), currentMonth.getMonth()))} 
-          {monthCount > 1 && ` - ${getMonthName(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthCount - 1))}`}
+        <h3 className="flex-1 text-center text-base font-bold text-gray-900 sm:text-lg">
+          {getMonthName(currentMonth)} - {getMonthName(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthCount - 1))}
         </h3>
-        <button onClick={handleNextMonth} className="p-2 hover:bg-gray-100 rounded-lg transition">
-          <ChevronRight className="h-6 w-6 text-gray-600" />
+        <button type="button" onClick={handleNextMonth} className="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100">
+          <ChevronRight className="h-5 w-5" />
         </button>
       </div>
 
-      {/* Multiple Months */}
-      <div className={`grid gap-6 ${monthCount === 2 ? 'grid-cols-2' : monthCount === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
-        {Array.from({ length: monthCount }).map((_, idx) => renderCalendar(generateMonth(idx), idx))}
+      <div ref={scrollRef} className="flex snap-x gap-4 overflow-x-auto pb-2">
+        {Array.from({ length: monthCount }).map((_, index) => renderCalendar(generateMonth(index), index))}
       </div>
     </div>
   );
