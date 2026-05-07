@@ -60,15 +60,14 @@ const Home = () => {
       {/* Search Card */}
       <div className="max-w-7xl mx-auto px-4 -mt-16 sm:-mt-24 relative z-10 mb-12">
         <div className="bg-white rounded-xl shadow-lg p-5 sm:p-6 md:p-8">
-          <div className="flex gap-3 mb-5">
-            <button onClick={() => setTripType('roundtrip')} className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition ${tripType === 'roundtrip' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-              來回 Round Trip
-            </button>
-            <button onClick={() => setTripType('oneway')} className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition ${tripType === 'oneway' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-              單程 One Way
-            </button>
-          </div>
-          <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
+          <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">航程 Trip</label>
+              <select value={tripType} onChange={e => setTripType(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                <option value="roundtrip">來回 Round Trip</option>
+                <option value="oneway">單程 One Way</option>
+              </select>
+            </div>
             <div>
               <label className="block text-xs text-gray-500 mb-1">出發地 From</label>
               <select value={form.from} onChange={e => setForm({...form, from: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
