@@ -68,9 +68,9 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="text-sm text-gray-600 hover:text-primary">登入 Login</Link>
-                <Link to="/register" className="text-sm bg-primary text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition">
-                  註冊 Register
+                <Link to="/login" className="text-sm text-gray-600 px-4 py-2 hover:text-primary">登入</Link>
+                <Link to="/register" className="text-sm text-gray-600 py-2 rounded-lg hover:bg-orange-600 transition">
+                  註冊
                 </Link>
               </>
             )}

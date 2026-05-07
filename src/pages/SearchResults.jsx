@@ -36,7 +36,6 @@ const destinations = [
 const SearchResults = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('price');
   const [tripType, setTripType] = useState('roundtrip');
   const [form, setForm] = useState({
     from: 'TPE',
@@ -56,14 +55,12 @@ const SearchResults = () => {
     setForm((current) => ({ ...current, depart: date }));
   };
 
-  const filtered = flights
-    .filter((flight) => filter === 'all' || flight.period === filter)
-    .sort((a, b) => (sortBy === 'price' ? a.price - b.price : a.depart.localeCompare(b.depart)));
+  const filtered = flights.filter((flight) => filter === 'all' || flight.period === filter);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-4">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-6 rounded-xl bg-white p-5 shadow-sm sm:p-6">
+        <div className="mb-4 rounded-xl bg-white p-4 shadow-sm sm:p-6">
           <form onSubmit={handleSearch} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
             <div>
               <label className="mb-1 block text-xs text-gray-500">航程 Trip</label>
@@ -136,43 +133,18 @@ const SearchResults = () => {
             <div className="flex items-end">
               <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 font-medium text-white transition hover:bg-primary-dark">
                 <Search className="h-4 w-4" />
-                搜尋航班
+                重新搜尋
               </button>
             </div>
           </form>
         </div>
 
         <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
-          <div className="mb-5">
+          <div className="mb-5 columns-2 ">
             <h3 className="text-lg font-bold text-gray-800">選擇出發日期 Select Departure Date</h3>
-            <p className="mt-1 text-sm text-gray-500">每個日期皆顯示當日最低票價，可左右滑動查看更多月份。</p>
+            <p className="mt-1 text-sm text-gray-300 text-right">每個日期皆顯示當日最低票價，可左右滑動查看更多月份。</p>
           </div>
           <ExpandedPriceCalendar value={selectedDate} onChange={handleDepartChange} monthCount={3} />
-        </div>
-
-        <div className="mb-6 flex flex-col gap-3 rounded-xl bg-white p-4 shadow-sm sm:flex-row sm:items-center">
-          <div className="flex flex-wrap gap-2">
-            {filters.map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => setFilter(item.key)}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-                  filter === item.key ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-2 sm:ml-auto">
-            <span className="text-xs text-gray-500">排序</span>
-            <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="rounded-lg border border-gray-200 px-2 py-1 text-sm">
-              <option value="price">價格由低到高</option>
-              <option value="time">時間由早到晚</option>
-            </select>
-            <span className="ml-2 text-sm text-gray-500">共 {filtered.length} 班</span>
-          </div>
         </div>
 
         <div className="space-y-4">
