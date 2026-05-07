@@ -1,55 +1,51 @@
-import { Plane, Share2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import sitemap from '../assets/sitemap.json';
 
 const Footer = () => (
-  <footer className="bg-gray-800 text-gray-300">
+  <footer className="bg-gray-900 text-gray-300">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Brand */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <Plane className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold text-white">Tigerair Taiwan</span>
-          </div>
-          <p className="text-sm text-gray-400">台灣虎航 — 探索亞洲最便捷的方式</p>
-          <div className="flex gap-4 mt-4">
-            <Share2 className="h-5 w-5 hover:text-primary cursor-pointer transition" />
-            <Share2 className="h-5 w-5 hover:text-primary cursor-pointer transition" />
-            <Share2 className="h-5 w-5 hover:text-primary cursor-pointer transition" />
-          </div>
+      {/* Brand Section */}
+      <div className="mb-12">
+        <div className="mb-4">
+          <img src="https://www.tigerairtw.com/assets/zh-TW.8eb62b76.svg" alt="Tiger Air Taiwan" className="h-10" />
         </div>
-
-        {/* Links */}
-        <div>
-          <h4 className="text-white font-semibold mb-3">Flight 航班</h4>
-          <ul className="space-y-2 text-sm">
-            <li><Link to="/search" className="hover:text-primary transition">訂票 Book</Link></li>
-            <li><Link to="/checkin" className="hover:text-primary transition">報到 Check-in</Link></li>
-            <li><Link to="/orders" className="hover:text-primary transition">訂單查詢 My Trips</Link></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="text-white font-semibold mb-3">Service 服務</h4>
-          <ul className="space-y-2 text-sm">
-            <li><Link to="/support" className="hover:text-primary transition">常見問題 FAQ</Link></li>
-            <li><Link to="/support" className="hover:text-primary transition">聯絡我們 Contact</Link></li>
-            <li><Link to="/tasks" className="hover:text-primary transition">會員任務 Tasks</Link></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="text-white font-semibold mb-3">About 關於</h4>
-          <ul className="space-y-2 text-sm">
-            <li><span className="hover:text-primary cursor-pointer transition">關於虎航</span></li>
-            <li><span className="hover:text-primary cursor-pointer transition">隱私權政策</span></li>
-            <li><span className="hover:text-primary cursor-pointer transition">使用條款</span></li>
-          </ul>
+        <p className="text-sm text-gray-400">台灣虎航 — 探索亞洲最便捷的方式</p>
+        <div className="flex gap-4 mt-4">
+          <Share2 className="h-5 w-5 hover:text-primary cursor-pointer transition" />
+          <Share2 className="h-5 w-5 hover:text-primary cursor-pointer transition" />
+          <Share2 className="h-5 w-5 hover:text-primary cursor-pointer transition" />
         </div>
       </div>
 
-      <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-500">
-        © 2026 Tigerair Taiwan. All rights reserved. | 台灣虎航股份有限公司
+      {/* Navigation Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        {sitemap.navigation.map((category, idx) => (
+          <div key={idx}>
+            <h4 className="text-white font-bold text-sm mb-4">{category.category}</h4>
+            <div className="space-y-4">
+              {category.subcategories.map((sub, sidx) => (
+                <div key={sidx}>
+                  <h5 className="text-gray-400 text-xs font-semibold mb-2">{sub.name}</h5>
+                  <ul className="space-y-1 text-xs">
+                    {sub.items.map((item, iidx) => (
+                      <li key={iidx}>
+                        <a href="#" className="text-gray-500 hover:text-primary transition">
+                          {item}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer Bottom */}
+      <div className="border-t border-gray-800 pt-8 text-center text-sm text-gray-500">
+        <p>© 2026 {sitemap.site_name}. All rights reserved. | 台灣虎航股份有限公司</p>
       </div>
     </div>
   </footer>
