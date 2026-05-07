@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Lock, Phone } from 'lucide-react';
+import { UserIcon, EnvelopeIcon, LockClosedIcon, PhoneIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
@@ -31,7 +31,7 @@ const Register = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">姓名 Full Name</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})}
                   placeholder="陳明偉" className="w-full border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
               </div>
@@ -39,7 +39,7 @@ const Register = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email 電子郵件</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <EnvelopeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})}
                   placeholder="your@email.com" className="w-full border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
               </div>
@@ -47,7 +47,7 @@ const Register = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">手機 Phone</label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input type="tel" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})}
                   placeholder="0912-345-678" className="w-full border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
               </div>
@@ -55,7 +55,7 @@ const Register = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">密碼 Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <LockClosedIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})}
                   placeholder="至少 8 碼" className="w-full border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
               </div>
@@ -63,7 +63,7 @@ const Register = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">確認密碼 Confirm</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <LockClosedIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input type="password" value={form.confirm} onChange={e => setForm({...form, confirm: e.target.value})}
                   placeholder="再次輸入密碼" className="w-full border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
               </div>

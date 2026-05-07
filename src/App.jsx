@@ -14,6 +14,8 @@ import Tasks from './pages/Tasks';
 import CheckIn from './pages/CheckIn';
 import Support from './pages/Support';
 import LowFareMap from './pages/LowFareMap';
+import Schedule from './pages/Schedule';
+import FlightStatus from './pages/FlightStatus';
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
             <Route path="/checkin" element={<CheckIn />} />
             <Route path="/support" element={<Support />} />
             <Route path="/fare-map" element={<LowFareMap />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/flight-status" element={<FlightStatus />} />
           </Routes>
         </Layout>
       </BrowserRouter>

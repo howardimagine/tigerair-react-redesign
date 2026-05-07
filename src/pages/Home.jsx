@@ -1,6 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plane, Tag, Globe, Shield, Users } from 'lucide-react';
+import {
+  MagnifyingGlassIcon,
+  PaperAirplaneIcon,
+  TagIcon,
+  GlobeAltIcon,
+  ShieldCheckIcon,
+  UserGroupIcon,
+  CheckCircleIcon,
+  InformationCircleIcon,
+  SignalIcon,
+} from '@heroicons/react/24/solid';
 import PriceCalendar from '../components/PriceCalendar';
 
 const Home = () => {
@@ -23,10 +33,10 @@ const Home = () => {
   ];
 
   const features = [
-    { icon: Tag, title: '超值票價', sub: 'Low Fares', desc: '最優惠的機票價格' },
-    { icon: Globe, title: '多元航線', sub: 'Routes', desc: '飛往亞洲各大城市' },
-    { icon: Shield, title: '安全保障', sub: 'Safety', desc: '嚴格的安全標準' },
-    { icon: Plane, title: '準點起飛', sub: 'On-time', desc: '高準點率保證' },
+    { icon: TagIcon, title: '超值票價', sub: 'Low Fares', desc: '最優惠的機票價格' },
+    { icon: GlobeAltIcon, title: '多元航線', sub: 'Routes', desc: '飛往亞洲各大城市' },
+    { icon: ShieldCheckIcon, title: '安全保障', sub: 'Safety', desc: '嚴格的安全標準' },
+    { icon: PaperAirplaneIcon, title: '準點起飛', sub: 'On-time', desc: '高準點率保證' },
   ];
 
   const bannerAds = [
@@ -44,6 +54,13 @@ const Home = () => {
     },
   ];
 
+  const quickActions = [
+    { icon: PaperAirplaneIcon, label: '訂位購票', path: '/search' },
+    { icon: CheckCircleIcon, label: '確認定位', path: '/orders' },
+    { icon: InformationCircleIcon, label: '自助報到', path: '/checkin' },
+    { icon: SignalIcon, label: '航班動態', path: '/flight-status' },
+  ];
+
   return (
     <div>
       {/* Hero */}
@@ -58,58 +75,78 @@ const Home = () => {
       </div>
 
       {/* Search Card */}
+
       <div className="max-w-7xl mx-auto px-4 -mt-16 sm:-mt-24 relative z-10 mb-12">
-        <div className="bg-white rounded-xl shadow-lg p-5 sm:p-6 md:p-8">
-          <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">航程 Trip</label>
-              <select value={tripType} onChange={e => setTripType(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
-                <option value="roundtrip">來回 Round Trip</option>
-                <option value="oneway">單程 One Way</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">出發地 From</label>
-              <select value={form.from} onChange={e => setForm({...form, from: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
-                <option value="TPE">台北桃園 TPE</option>
-                <option value="KHH">高雄 KHH</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">目的地 To</label>
-              <select value={form.to} onChange={e => setForm({...form, to: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
-                <option value="NRT">東京成田 NRT</option>
-                <option value="KIX">大阪關西 KIX</option>
-                <option value="ICN">首爾仁川 ICN</option>
-                <option value="BKK">曼谷 BKK</option>
-                <option value="SIN">新加坡 SIN</option>
-                <option value="MFM">澳門 MFM</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">去程 Depart</label>
-              <PriceCalendar value={form.depart} onChange={e => setForm({...form, depart: e})} placeholder="選擇出發日期" />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">回程 Return</label>
-              <PriceCalendar value={form.returnDate} onChange={e => setForm({...form, returnDate: e})} placeholder="選擇回程日期" />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">旅客 Passengers</label>
-              <div className="relative">
-                <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <select value={form.passengers} onChange={e => setForm({...form, passengers: Number(e.target.value)})} className="w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
-                  {[1,2,3,4,5,6].map(n => <option key={n} value={n}>{n} 位</option>)}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 border-b border-gray-200">
+            {quickActions.map((action, idx) => (
+              <button
+                key={idx}
+                onClick={() => navigate(action.path)}
+                className="relative px-4 py-4 group overflow-hidden transition hover:bg-orange-50 border-r border-gray-100 last:border-r-0"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <action.icon className="h-5 w-5 text-primary flex-shrink-0 group-hover:scale-110 transition-transform" />
+                  <p className="font-medium text-sm text-gray-900">{action.label}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Search Form */}
+          <div className="p-5 sm:p-6 md:p-8">
+            <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">航程 Trip</label>
+                <select value={tripType} onChange={e => setTripType(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  <option value="roundtrip">來回 Round Trip</option>
+                  <option value="oneway">單程 One Way</option>
                 </select>
               </div>
-            </div>
-            <div className="flex items-end">
-              <button type="submit" className="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-dark transition flex items-center justify-center gap-2">
-                <Search className="h-4 w-4" />
-                搜尋航班
-              </button>
-            </div>
-          </form>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">出發地 From</label>
+                <select value={form.from} onChange={e => setForm({...form, from: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  <option value="TPE">台北桃園 TPE</option>
+                  <option value="KHH">高雄 KHH</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">目的地 To</label>
+                <select value={form.to} onChange={e => setForm({...form, to: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  <option value="NRT">東京成田 NRT</option>
+                  <option value="KIX">大阪關西 KIX</option>
+                  <option value="ICN">首爾仁川 ICN</option>
+                  <option value="BKK">曼谷 BKK</option>
+                  <option value="SIN">新加坡 SIN</option>
+                  <option value="MFM">澳門 MFM</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">去程 Depart</label>
+                <PriceCalendar value={form.depart} onChange={e => setForm({...form, depart: e})} placeholder="選擇出發日期" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">回程 Return</label>
+                <PriceCalendar value={form.returnDate} onChange={e => setForm({...form, returnDate: e})} placeholder="選擇回程日期" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">旅客 Passengers</label>
+                <div className="relative">
+                  <UserGroupIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <select value={form.passengers} onChange={e => setForm({...form, passengers: Number(e.target.value)})} className="w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                    {[1,2,3,4,5,6].map(n => <option key={n} value={n}>{n} 位</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="flex items-end">
+                <button type="submit" className="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-dark transition flex items-center justify-center gap-2">
+                  <MagnifyingGlassIcon className="h-4 w-4" />
+                  搜尋航班
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, User, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { Bars3Icon, XMarkIcon, UserIcon, ChevronDownIcon, ArrowRightOnRectangleIcon, UserPlusIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/AuthContext';
 import sitemap from '../assets/sitemap.json';
 
@@ -14,6 +14,14 @@ const Navbar = () => {
     logout();
     navigate('/');
     setIsOpen(false);
+  };
+
+  const getItemLink = (item) => {
+    const linkMap = {
+      '時刻表': '/schedule',
+      '低價航點地圖': '/fare-map',
+    };
+    return linkMap[item] || '#';
   };
 
   const navLinks = sitemap.navigation;
@@ -33,7 +41,7 @@ const Navbar = () => {
               <div key={idx} className="relative group">
                 <button className="flex items-center gap-1 text-sm text-gray-600 hover:text-primary transition py-2">
                   {link.category}
-                  <ChevronDown className="h-4 w-4 group-hover:rotate-180 transition" />
+                  <ChevronDownIcon className="h-4 w-4 group-hover:rotate-180 transition" />
                 </button>
                 {/* Dropdown Menu */}
                 <div className="hidden group-hover:block absolute left-0 top-full pt-2 bg-white rounded-lg shadow-lg min-w-48 z-50">
@@ -43,9 +51,15 @@ const Navbar = () => {
                         {sub.name}
                       </div>
                       {sub.items.map((item, iidx) => (
-                        <a key={iidx} href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-primary transition">
-                          {item}
-                        </a>
+                        getItemLink(item) === '#' ? (
+                          <a key={iidx} href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-primary transition">
+                            {item}
+                          </a>
+                        ) : (
+                          <Link key={iidx} to={getItemLink(item)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-primary transition">
+                            {item}
+                          </Link>
+                        )
                       ))}
                     </div>
                   ))}
@@ -59,17 +73,22 @@ const Navbar = () => {
             {user ? (
               <>
                 <Link to="/member" className="flex items-center gap-1 text-sm text-gray-600 hover:text-primary">
-                  <User className="h-4 w-4" />
+                  <UserIcon className="h-4 w-4" />
                   {user.name}
                 </Link>
-                <button onClick={handleLogout} className="text-sm text-gray-600 hover:text-primary">
+                <button onClick={handleLogout} className="flex items-center gap-1 text-sm text-gray-600 hover:text-primary">
+                  <ArrowRightOnRectangleIcon className="h-4 w-4" />
                   登出
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-sm text-gray-600 px-4 py-2 hover:text-primary">登入</Link>
-                <Link to="/register" className="text-sm text-gray-600 py-2 rounded-lg hover:bg-orange-600 transition">
+                <Link to="/login" className="flex items-center gap-1 text-sm text-gray-600 px-4 py-2 hover:text-primary">
+                  <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                  登入
+                </Link>
+                <Link to="/register" className="flex items-center gap-1 text-sm text-gray-600 py-2 px-4 rounded-lg hover:bg-orange-100 hover:text-primary transition">
+                  <UserPlusIcon className="h-4 w-4" />
                   註冊
                 </Link>
               </>
@@ -78,7 +97,7 @@ const Navbar = () => {
 
           {/* Mobile Toggle */}
           <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-gray-600">
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
           </button>
         </div>
 
@@ -92,7 +111,7 @@ const Navbar = () => {
                   className="flex items-center justify-between w-full text-gray-600 hover:text-primary py-2 font-medium"
                 >
                   {link.category}
-                  <ChevronDown className={`h-4 w-4 transition ${openDropdown === idx ? 'rotate-180' : ''}`} />
+                  <ChevronDownIcon className={`h-4 w-4 transition ${openDropdown === idx ? 'rotate-180' : ''}`} />
                 </button>
                 {openDropdown === idx && (
                   <div className="pl-4 space-y-2">
@@ -100,9 +119,15 @@ const Navbar = () => {
                       <div key={sidx}>
                         <div className="text-xs font-semibold text-gray-500 uppercase py-1">{sub.name}</div>
                         {sub.items.map((item, iidx) => (
-                          <a key={iidx} href="#" className="block text-sm text-gray-600 hover:text-primary py-1">
-                            {item}
-                          </a>
+                          getItemLink(item) === '#' ? (
+                            <a key={iidx} href="#" className="block text-sm text-gray-600 hover:text-primary py-1">
+                              {item}
+                            </a>
+                          ) : (
+                            <Link key={iidx} to={getItemLink(item)} onClick={() => setIsOpen(false)} className="block text-sm text-gray-600 hover:text-primary py-1">
+                              {item}
+                            </Link>
+                          )
                         ))}
                       </div>
                     ))}
