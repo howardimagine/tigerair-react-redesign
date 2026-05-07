@@ -24,7 +24,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <img src="https://www.tigerairtw.com/assets/zh-TW.8eb62b76.svg" alt="Tiger Air Taiwan" className="h-12" />
+            <img src="https://www.tigerairtw.com/assets/zh-TW.8eb62b76.svg" alt="Tiger Air Taiwan" className="h-9" />
           </Link>
 
           {/* Desktop Nav */}

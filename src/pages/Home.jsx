@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plane, Tag, Globe, Shield, Users } from 'lucide-react';
+import PriceCalendar from '../components/PriceCalendar';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -73,11 +74,11 @@ const Home = () => {
             </div>
             <div>
               <label className="block text-xs text-gray-500 mb-1">去程 Depart</label>
-              <input type="date" value={form.depart} onChange={e => setForm({...form, depart: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <PriceCalendar value={form.depart} onChange={e => setForm({...form, depart: e})} placeholder="選擇出發日期" />
             </div>
             <div>
               <label className="block text-xs text-gray-500 mb-1">回程 Return</label>
-              <input type="date" value={form.returnDate} onChange={e => setForm({...form, returnDate: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" disabled={tripType === 'oneway'} />
+              <PriceCalendar value={form.returnDate} onChange={e => setForm({...form, returnDate: e})} placeholder="選擇回程日期" />
             </div>
             <div>
               <label className="block text-xs text-gray-500 mb-1">旅客 Passengers</label>

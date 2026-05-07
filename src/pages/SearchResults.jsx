@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plane, ArrowRight } from 'lucide-react';
+import PriceCalendar from '../components/PriceCalendar';
 
 const SearchResults = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('price');
+  const [selectedDate, setSelectedDate] = useState('2026-06-15');
 
   const flights = [
     { id: 'IT210', from: 'TPE', to: 'NRT', depart: '08:30', arrive: '12:45', duration: '3h 15m', price: 5999, type: '直飛 Direct', period: 'morning' },
@@ -28,14 +30,25 @@ const SearchResults = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen py-8">
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Price Calendar */}
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 className="text-lg font-bold text-gray-800 mb-4">選擇出發日期 Select Departure Date</h3>
+          <PriceCalendar 
+            value={selectedDate} 
+            onChange={setSelectedDate} 
+            placeholder="選擇出發日期"
+            monthCount={3}
+          />
+        </div>
+
         {/* Search Summary */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="font-bold text-lg">TPE</span>
             <ArrowRight className="h-5 w-5 text-primary" />
             <span className="font-bold text-lg">NRT</span>
-            <span className="text-sm text-gray-500 ml-3">2026-06-15 | 1 位旅客</span>
+            <span className="text-sm text-gray-500 ml-3">{selectedDate} | 1 位旅客</span>
           </div>
           <button onClick={() => navigate('/')} className="text-sm text-primary font-medium hover:underline">修改搜尋 Edit</button>
         </div>
