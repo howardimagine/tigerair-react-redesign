@@ -15,11 +15,10 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { to: '/', label: 'Home 首頁' },
-    { to: '/search', label: 'Book 訂票' },
-    { to: '/checkin', label: 'Check-in 報到' },
-    { to: '/orders', label: 'My Trips 訂單' },
-    { to: '/support', label: 'Help 客服' },
+    { to: '/search', label: '訂票與優惠' },
+    { to: '/orders', label: '行程管理' },
+    { to: '/checkin', label: '準備出發' },
+    { to: '/member', label: '探索虎航' },
   ];
 
   return (
