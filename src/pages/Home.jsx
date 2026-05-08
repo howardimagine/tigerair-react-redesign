@@ -355,7 +355,7 @@ const Home = () => {
                 <h3 className="font-bold text-base sm:text-lg">{d.city}</h3>
                 <p className="text-sm text-gray-500">{d.country}</p>
                 <div className="mt-2 flex items-end justify-between">
-                  <span className="text-xl font-bold leading-none text-primary sm:text-2xl">{d.price} 起</span>
+                  <span className="text-xl font-bold leading-none text-primary sm:text-xl">{d.price} 起</span>
                   <span className="text-xs text-gray-400">單程 / 含稅</span>
                 </div>
               </div>
