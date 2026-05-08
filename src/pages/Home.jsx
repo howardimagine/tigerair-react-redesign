@@ -178,18 +178,18 @@ const Home = () => {
       {/* Search Card */}
 
       <div className="max-w-8xl mx-auto px-4 -mt-16 sm:-mt-20 relative z-10 mb-12">
-        <div className="bg-white rounded-xl shadow-lg">
+        <div className="bg-white rounded-xl shadow-lg shadow-gray-300/30">
           {/* Quick Actions */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 border-b border-gray-200">
+          <div className="grid grid-cols-4 gap-0 border-b border-gray-200">
             {quickActions.map((action, idx) => (
               <button
                 key={idx}
                 onClick={() => navigate(action.path)}
-                className="relative px-4 py-4 group overflow-hidden transition hover:bg-orange-50 border-r border-gray-100 last:border-r-0"
+                className="relative overflow-hidden border-r border-gray-200 px-2 py-3 transition last:border-r-0 sm:px-4 sm:py-4 group"
               >
-                <div className="flex items-center justify-center gap-2">
+                <div className="flex flex-col items-center justify-center gap-1.5 text-center sm:flex-row sm:gap-2 sm:text-left">
                   <action.icon className="h-5 w-5 text-primary flex-shrink-0 group-hover:scale-110 transition-transform" />
-                  <p className="font-medium text-sm text-gray-900">{action.label}</p>
+                  <p className="text-xs font-medium leading-tight text-gray-900 sm:text-sm">{action.label}</p>
                 </div>
               </button>
             ))}
@@ -198,8 +198,8 @@ const Home = () => {
           {/* Search Form */}
           <div className="p-5 sm:p-6 md:px-8 py-5">
             <form onSubmit={handleSearch}>
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr] lg:items-end">
-                <div className="relative rounded-lg border border-gray-200 bg-white focus-within:ring-2 focus-within:ring-primary/30">
+              <div className="grid grid-cols-1 gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr] lg:items-end">
+                <div className="relative rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
                   <label className="absolute left-9 top-1.5 text-xs text-gray-400">航程</label>
                   <ArrowsRightLeftIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <div className="relative mt-1">
@@ -211,7 +211,7 @@ const Home = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-0">
-                  <div className="relative rounded-l-lg border border-gray-200 bg-white focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
+                  <div className="relative rounded-l-lg border border-gray-200 bg-white transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
                     <label className="absolute left-9 top-1.5 text-xs text-gray-400">出發地 From</label>
                     <MapPinIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <div className="relative mt-1">
@@ -221,7 +221,7 @@ const Home = () => {
                       </select>
                     </div>
                   </div>
-                  <div className="relative -ml-px rounded-r-lg border border-gray-200 bg-white focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
+                  <div className="relative -ml-px rounded-r-lg border border-gray-200 bg-white transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
                     <label className="absolute left-9 top-1.5 text-xs text-gray-400">目的地 To</label>
                     <PaperAirplaneIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <div className="relative mt-1">
@@ -238,14 +238,14 @@ const Home = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-0">
-                  <div className="relative rounded-l-lg border border-gray-200 bg-white focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
+                  <div className="relative rounded-l-lg border border-gray-200 bg-white transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
                     <label className="absolute left-9 top-1.5 z-10 text-xs text-gray-400">去程</label>
                     <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400 " />
                     <div className="relative [&_input]:rounded-l-lg [&_input]:rounded-r-none [&_input]:border-0 [&_input]:bg-transparent [&_input]:pb-1.5 [&_input]:pl-9 [&_input]:pt-5 [&_input]:text-base [&_input]:font-medium [&_input]:focus:ring-0">
                       <PriceCalendar value={form.depart} onChange={e => setForm({...form, depart: e})} placeholder="選擇出發日期"/>
                     </div>
                   </div>
-                  <div className="relative -ml-px rounded-r-lg border border-gray-200 bg-white focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
+                  <div className="relative -ml-px rounded-r-lg border border-gray-200 bg-white transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
                     <label className="absolute left-9 top-1.5 z-10 text-xs text-gray-400">回程</label>
                     <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <div className="relative [&_input]:rounded-l-none [&_input]:rounded-r-lg [&_input]:border-0 [&_input]:bg-transparent [&_input]:pb-1.5 [&_input]:pl-9 [&_input]:pt-5 [&_input]:text-base [&_input]:font-medium [&_input]:focus:ring-0">
@@ -254,7 +254,7 @@ const Home = () => {
                   </div>
                 </div>
 
-                <div className="relative rounded-lg border border-gray-200 bg-white focus-within:ring-2 focus-within:ring-primary/30">
+                <div className="relative rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
                   <label className="absolute left-9 top-1.5 text-xs text-gray-400">旅客 Passengers</label>
                   <UserGroupIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <div className="relative mt-1">
@@ -348,18 +348,18 @@ const Home = () => {
       {/* Popular Destinations */}
       <div className="max-w-8xl mx-auto px-4 mb-16">
         <h2 className="text-xl sm:text-2xl font-bold mb-6">Popular Destinations 熱門航線</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
           {destinations.map(d => (
             <div key={d.city} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition cursor-pointer group" onClick={() => navigate('/search')}>
               <div className="overflow-hidden">
-                <img src={d.img} alt={d.city} className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
+                <img src={d.img} alt={d.city} className="h-28 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-48" />
               </div>
-              <div className="px-5 py-5">
-                <h3 className="font-bold text-base sm:text-lg">{d.city}</h3>
-                <p className="text-sm text-gray-500">{d.country}</p>
-                <div className="mt-2 flex items-end justify-between">
-                  <span className="text-xl font-bold leading-none text-primary sm:text-xl">{d.price} 起</span>
-                  <span className="text-xs text-gray-400">單程 / 含稅</span>
+              <div className="px-3 py-3 sm:px-5 sm:py-5">
+                <h3 className="text-sm font-bold leading-tight sm:text-lg">{d.city}</h3>
+                <p className="mt-0.5 text-xs text-gray-500 sm:text-sm">{d.country}</p>
+                <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                  <span className="text-base font-bold leading-none text-primary sm:text-xl">{d.price} 起</span>
+                  <span className="text-[10px] text-gray-400 sm:text-xs">單程 / 含稅</span>
                 </div>
               </div>
             </div>

@@ -69,9 +69,10 @@ const ExpandedPriceCalendar = ({ value, onChange, monthCount = 3 }) => {
     const { month, days } = monthData;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const responsiveVisibility = monthOffset === 0 ? '' : monthOffset === 1 ? 'hidden sm:block' : 'hidden lg:block';
 
     return (
-      <div key={`${month.getFullYear()}-${month.getMonth()}`} className="min-w-[320px] flex-1 snap-start rounded-lg border border-gray-100 bg-white p-4">
+      <div key={`${month.getFullYear()}-${month.getMonth()}`} className={`min-w-[320px] flex-1 snap-start rounded-lg border border-gray-100 bg-white p-3 ${responsiveVisibility}`}>
         <h4 className="mb-4 text-center text-base font-bold text-gray-900">{getMonthName(month)}</h4>
 
         <div className="mb-2 grid grid-cols-7 gap-1">
@@ -132,22 +133,28 @@ const ExpandedPriceCalendar = ({ value, onChange, monthCount = 3 }) => {
   };
 
   return (
-    <div className="w-full">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <button type="button" onClick={handlePrevMonth} className="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100">
+    <div className="relative w-full">
+      <button
+        type="button"
+        onClick={handlePrevMonth}
+        className="absolute left-0 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-2 text-gray-600 shadow-md transition hover:border-primary hover:text-primary"
+        aria-label="上一個月"
+      >
           <ChevronLeft className="h-5 w-5" />
-        </button>
-        <h3 className="flex-1 text-center text-base font-bold text-gray-900 sm:text-lg">
-          {getMonthName(currentMonth)} - {getMonthName(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthCount - 1))}
-        </h3>
-        <button type="button" onClick={handleNextMonth} className="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100">
-          <ChevronRight className="h-5 w-5" />
-        </button>
-      </div>
+      </button>
 
-      <div ref={scrollRef} className="flex snap-x gap-4 overflow-x-auto pb-2">
+      <div ref={scrollRef} className="flex snap-x gap-4 overflow-x-auto">
         {Array.from({ length: monthCount }).map((_, index) => renderCalendar(generateMonth(index), index))}
       </div>
+
+      <button
+        type="button"
+        onClick={handleNextMonth}
+        className="absolute right-0 top-1/2 z-20 translate-x-1/2 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-2 text-gray-600 shadow-md transition hover:border-primary hover:text-primary"
+        aria-label="下一個月"
+      >
+        <ChevronRight className="h-5 w-5" />
+      </button>
     </div>
   );
 };
