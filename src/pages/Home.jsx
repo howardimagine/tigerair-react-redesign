@@ -64,7 +64,7 @@ const Home = () => {
   return (
     <div>
       {/* Hero */}
-      <div className="relative h-[380px] sm:h-[480px] bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920&h=800&fit=crop)' }}>
+      <div className="relative h-[380px] sm:h-[400px] bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920&h=800&fit=crop)' }}>
         <div className="absolute inset-0 bg-black/40"></div>
         <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center">
           <div className="text-white">
@@ -76,7 +76,7 @@ const Home = () => {
 
       {/* Search Card */}
 
-      <div className="max-w-7xl mx-auto px-4 -mt-16 sm:-mt-24 relative z-10 mb-12">
+      <div className="max-w-8xl mx-auto px-4 -mt-16 sm:-mt-20 relative z-10 mb-12">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           {/* Quick Actions */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 border-b border-gray-200">

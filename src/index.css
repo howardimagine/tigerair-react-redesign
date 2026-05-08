@@ -4,6 +4,8 @@
   --color-primary: #faa836;
   --color-primary-dark: #e88c1f;
   --color-primary-light: #fbb959;
+  --container-7xl: 80rem;
+  --container-8xl: 90rem;
 }
 
 body {

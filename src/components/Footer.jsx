@@ -4,7 +4,7 @@ import sitemap from '../assets/sitemap.json';
 
 const Footer = () => (
   <footer className="bg-white text-gray-700">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Brand Section */}
       <div className="mb-12">
         <div className="mb-4">
