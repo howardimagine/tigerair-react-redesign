@@ -139,16 +139,16 @@ const SearchResults = () => {
           </form>
         </div>
 
-        <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
+        <div className="mb-6 animate-fade-in-delay-2 rounded-xl bg-white p-6 shadow-sm">
           <div className="mb-5 columns-2 ">
             <h3 className="text-lg font-bold text-gray-800">選擇出發日期 Select Departure Date</h3>
-            <p className="mt-1 text-sm text-gray-300 text-right">每個日期皆顯示當日最低票價，可左右滑動查看更多月份。</p>
+            <p className="mt-1 text-sm text-gray-400 text-right">每個日期皆顯示當日最低票價，可左右滑動查看更多月份。</p>
           </div>
           <ExpandedPriceCalendar value={selectedDate} onChange={handleDepartChange} monthCount={3} />
         </div>
 
         <div className="space-y-4">
-          {filtered.map((flight) => (
+          {filtered.map((flight, index) => (
             <div
               key={flight.id}
               role="button"
@@ -157,7 +157,11 @@ const SearchResults = () => {
               onKeyDown={(event) => {
                 if (event.key === 'Enter') navigate(`/flight/${flight.id}`);
               }}
-              className="cursor-pointer rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md sm:p-6"
+              className={`cursor-pointer rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md sm:p-6 ${
+                index === 0 ? 'animate-fade-in-delay-3' :
+                index === 1 ? 'animate-fade-in-delay-4' :
+                'animate-fade-in-delay-5'
+              }`}
             >
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex-1">

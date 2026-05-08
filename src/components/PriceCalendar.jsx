@@ -133,7 +133,7 @@ const PriceCalendar = ({ value, onChange, placeholder = "選擇日期", monthCou
 
       {/* Calendar Dropdown */}
       {isOpen && (
-        <div className={`absolute top-full left-0 mt-2 bg-white rounded-lg shadow-xl p-4 z-50 ${monthCount === 2 ? 'w-full sm:w-[520px]' : monthCount === 3 ? 'w-full sm:w-[780px]' : 'w-full sm:w-[1040px]'}`}>
+        <div className={`absolute top-full left-0 mt-2 bg-white rounded-lg shadow-xl p-4 z-50 ${monthCount === 2 ? 'w-full sm:w-[700px]' : monthCount === 3 ? 'w-full sm:w-[780px]' : 'w-full sm:w-[1040px]'}`}>
           {/* Month Navigation */}
           <div className="flex justify-between items-center mb-4">
             <button onClick={handlePrevMonth} className="p-1 hover:bg-gray-100 rounded transition">
@@ -152,14 +152,6 @@ const PriceCalendar = ({ value, onChange, placeholder = "選擇日期", monthCou
           <div className={`grid gap-4 mb-4 ${monthCount === 2 ? 'grid-cols-2' : monthCount === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
             {Array.from({ length: monthCount }).map((_, idx) => renderCalendar(generateMonth(idx), idx))}
           </div>
-
-          {/* Close Button */}
-          <button
-            onClick={() => setIsOpen(false)}
-            className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
-          >
-            完成
-          </button>
         </div>
       )}
     </div>

@@ -77,7 +77,7 @@ const Home = () => {
       {/* Search Card */}
 
       <div className="max-w-8xl mx-auto px-4 -mt-16 sm:-mt-20 relative z-10 mb-12">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-xl shadow-lg">
           {/* Quick Actions */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 border-b border-gray-200">
             {quickActions.map((action, idx) => (
