@@ -202,7 +202,7 @@ const Home = () => {
                 <label className="block text-xs text-gray-500 mb-1">航程 Trip</label>
                 <div className="relative">
                   <ArrowsRightLeftIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                  <select value={tripType} onChange={e => setTripType(e.target.value)} className="w-full border border-gray-200 rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  <select value={tripType} onChange={e => setTripType(e.target.value)} className="w-full border border-gray-200 rounded-lg py-2.5 pl-9 pr-3 text-base font-bold focus:outline-none focus:ring-2 focus:ring-primary/30">
                     <option value="roundtrip">來回</option>
                     <option value="oneway">單程</option>
                   </select>
@@ -214,7 +214,7 @@ const Home = () => {
                   <label className="block text-xs text-gray-500 mb-1">出發地 From</label>
                   <div className="relative">
                     <MapPinIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <select value={form.from} onChange={e => setForm({...form, from: e.target.value})} className="w-full border border-gray-200 rounded-l-lg rounded-r-none py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                    <select value={form.from} onChange={e => setForm({...form, from: e.target.value})} className="w-full border border-gray-200 rounded-l-lg rounded-r-none py-2.5 pl-9 pr-3 text-base font-bold focus:outline-none focus:ring-2 focus:ring-primary/30">
                       <option value="TPE">台北桃園 TPE</option>
                       <option value="KHH">高雄 KHH</option>
                     </select>
@@ -224,7 +224,7 @@ const Home = () => {
                   <label className="block text-xs text-gray-500 mb-1">目的地 To</label>
                   <div className="relative -ml-px">
                     <PaperAirplaneIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <select value={form.to} onChange={e => setForm({...form, to: e.target.value})} className="w-full border border-gray-200 rounded-l-none rounded-r-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                    <select value={form.to} onChange={e => setForm({...form, to: e.target.value})} className="w-full border border-gray-200 rounded-l-none rounded-r-lg py-2.5 pl-9 pr-3 text-base font-bold focus:outline-none focus:ring-2 focus:ring-primary/30">
                       <option value="NRT">東京成田 NRT</option>
                       <option value="KIX">大阪關西 KIX</option>
                       <option value="ICN">首爾仁川 ICN</option>
@@ -241,7 +241,7 @@ const Home = () => {
                   <label className="block text-xs text-gray-500 mb-1">去程 Depart</label>
                   <div className="relative [&_input]:rounded-l-lg [&_input]:rounded-r-none [&_input]:pl-9">
                     <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <PriceCalendar value={form.depart} onChange={e => setForm({...form, depart: e})} placeholder="選擇出發日期" />
+                    <PriceCalendar value={form.depart} onChange={e => setForm({...form, depart: e})} placeholder="選擇出發日期"/>
                   </div>
                 </div>
                 <div>
@@ -257,13 +257,13 @@ const Home = () => {
                 <label className="block text-xs text-gray-500 mb-1">旅客 Passengers</label>
                 <div className="relative">
                   <UserGroupIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <select value={form.passengers} onChange={e => setForm({...form, passengers: Number(e.target.value)})} className="w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  <select value={form.passengers} onChange={e => setForm({...form, passengers: Number(e.target.value)})} className="w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-base font-bold focus:outline-none focus:ring-2 focus:ring-primary/30">
                     {[1,2,3,4,5,6].map(n => <option key={n} value={n}>{n} 位</option>)}
                   </select>
                 </div>
               </div>
               <div className="flex items-end">
-                <button type="submit" className="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-dark transition flex items-center justify-center gap-2">
+                <button type="submit" className="w-full bg-primary text-white py-2.5 rounded-lg  text-base font-bold hover:bg-primary-dark transition flex items-center justify-center gap-2">
                   <MagnifyingGlassIcon className="h-4 w-4" />
                   搜尋航班
                 </button>

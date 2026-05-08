@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, Search, Users } from 'lucide-react';
+import { Plane } from 'lucide-react';
+import {
+  ArrowsRightLeftIcon,
+  CalendarDaysIcon,
+  MagnifyingGlassIcon,
+  MapPinIcon,
+  PaperAirplaneIcon,
+  UserGroupIcon,
+} from '@heroicons/react/24/solid';
 import ExpandedPriceCalendar from '../components/ExpandedPriceCalendar';
 import PriceCalendar from '../components/PriceCalendar';
 
@@ -61,67 +69,84 @@ const SearchResults = () => {
     <div className="min-h-screen bg-gray-50 py-4">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-4 rounded-xl bg-white p-4 shadow-sm sm:p-6">
-          <form onSubmit={handleSearch} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
+          <form onSubmit={handleSearch} className="grid grid-cols-1 gap-4 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr_0.9fr] lg:items-end">
             <div>
               <label className="mb-1 block text-xs text-gray-500">航程 Trip</label>
-              <select
-                value={tripType}
-                onChange={(event) => setTripType(event.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-              >
-                <option value="roundtrip">來回 Round Trip</option>
-                <option value="oneway">單程 One Way</option>
-              </select>
+              <div className="relative">
+                <ArrowsRightLeftIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <select
+                  value={tripType}
+                  onChange={(event) => setTripType(event.target.value)}
+                  className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-base font-bold focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  <option value="roundtrip">來回</option>
+                  <option value="oneway">單程</option>
+                </select>
+              </div>
             </div>
 
-            <div>
-              <label className="mb-1 block text-xs text-gray-500">出發地 From</label>
-              <select
-                value={form.from}
-                onChange={(event) => setForm({ ...form, from: event.target.value })}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-              >
-                {airports.map((airport) => (
-                  <option key={airport.value} value={airport.value}>{airport.label}</option>
-                ))}
-              </select>
+            <div className="grid grid-cols-2 gap-0">
+              <div>
+                <label className="mb-1 block text-xs text-gray-500">出發地 From</label>
+                <div className="relative">
+                  <MapPinIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <select
+                    value={form.from}
+                    onChange={(event) => setForm({ ...form, from: event.target.value })}
+                    className="w-full rounded-l-lg rounded-r-none border border-gray-200 py-2.5 pl-9 pr-3 text-base font-bold focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  >
+                    {airports.map((airport) => (
+                      <option key={airport.value} value={airport.value}>{airport.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-gray-500">目的地 To</label>
+                <div className="relative -ml-px">
+                  <PaperAirplaneIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <select
+                    value={form.to}
+                    onChange={(event) => setForm({ ...form, to: event.target.value })}
+                    className="w-full rounded-l-none rounded-r-lg border border-gray-200 py-2.5 pl-9 pr-3 text-base font-bold focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  >
+                    {destinations.map((destination) => (
+                      <option key={destination.value} value={destination.value}>{destination.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label className="mb-1 block text-xs text-gray-500">目的地 To</label>
-              <select
-                value={form.to}
-                onChange={(event) => setForm({ ...form, to: event.target.value })}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-              >
-                {destinations.map((destination) => (
-                  <option key={destination.value} value={destination.value}>{destination.label}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs text-gray-500">去程 Depart</label>
-              <PriceCalendar value={form.depart} onChange={handleDepartChange} placeholder="選擇去程日期" />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs text-gray-500">回程 Return</label>
-              <PriceCalendar
-                value={form.returnDate}
-                onChange={(date) => setForm({ ...form, returnDate: date })}
-                placeholder={tripType === 'oneway' ? '單程不需回程' : '選擇回程日期'}
-              />
+            <div className="grid grid-cols-2 gap-0">
+              <div>
+                <label className="mb-1 block text-xs text-gray-500">去程 Depart</label>
+                <div className="relative [&_input]:rounded-l-lg [&_input]:rounded-r-none [&_input]:pl-9 [&_input]:text-base [&_input]:font-bold">
+                  <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <PriceCalendar value={form.depart} onChange={handleDepartChange} placeholder="選擇去程日期" />
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-gray-500">回程 Return</label>
+                <div className="relative -ml-px [&_input]:rounded-l-none [&_input]:rounded-r-lg [&_input]:pl-9 [&_input]:text-base [&_input]:font-bold">
+                  <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <PriceCalendar
+                    value={form.returnDate}
+                    onChange={(date) => setForm({ ...form, returnDate: date })}
+                    placeholder={tripType === 'oneway' ? '單程不需回程' : '選擇回程日期'}
+                  />
+                </div>
+              </div>
             </div>
 
             <div>
               <label className="mb-1 block text-xs text-gray-500">旅客 Passengers</label>
               <div className="relative">
-                <Users className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <UserGroupIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <select
                   value={form.passengers}
                   onChange={(event) => setForm({ ...form, passengers: Number(event.target.value) })}
-                  className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-base font-bold focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   {[1, 2, 3, 4, 5, 6].map((count) => (
                     <option key={count} value={count}>{count} 位</option>
@@ -131,8 +156,8 @@ const SearchResults = () => {
             </div>
 
             <div className="flex items-end">
-              <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 font-medium text-white transition hover:bg-primary-dark">
-                <Search className="h-4 w-4" />
+              <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-base font-bold text-white transition hover:bg-primary-dark">
+                <MagnifyingGlassIcon className="h-4 w-4" />
                 重新搜尋
               </button>
             </div>
