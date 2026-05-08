@@ -121,9 +121,11 @@ const ExpandedPriceCalendar = ({ value, onChange, monthCount = 3 }) => {
                   </span>
                 )}
                 <span className="block text-sm font-bold">{day}</span>
-                <span className={`mt-1 block text-[10px] font-semibold ${isSelected ? 'text-white' : isPast ? 'text-gray-300' : isLowest ? 'text-primary' : 'text-gray-600'}`}>
-                  {price.toLocaleString()}
-                </span>
+                {!isPast && (
+                  <span className={`mt-1 block text-[10px] font-semibold ${isSelected ? 'text-white' : isLowest ? 'text-primary' : 'text-gray-600'}`}>
+                    {price.toLocaleString()}
+                  </span>
+                )}
               </button>
             );
           })}

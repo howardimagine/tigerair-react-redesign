@@ -66,9 +66,9 @@ const SearchResults = () => {
   const filtered = flights.filter((flight) => filter === 'all' || flight.period === filter);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4">
+    <div className="min-h-screen bg-gray-50 py-3">
       <div className="mx-auto max-w-8xl px-4">
-        <div className="mb-4 rounded-xl bg-white p-5 shadow-sm sm:p-6 md:px-8 md:py-5">
+        <div className="mb-4 rounded-xl bg-white p-4 sm:p-6 md:px-8 md:py-5 shadow-lg shadow-gray-300/30">
           <form onSubmit={handleSearch}>
             <div className="grid grid-cols-1 gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr_0.9fr] lg:items-end">
               <div className="relative rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
@@ -166,7 +166,7 @@ const SearchResults = () => {
           </form>
         </div>
 
-        <div className="mb-6 animate-fade-in-delay-2 rounded-xl bg-white px-8 py-3 shadow-sm">
+        <div className="mb-6 animate-fade-in-delay-2 rounded-xl bg-white p-4 sm:p-6 md:px-8 md:py-3 shadow-sm">
           <ExpandedPriceCalendar value={selectedDate} onChange={handleDepartChange} monthCount={3} />
         </div>
 

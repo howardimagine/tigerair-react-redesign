@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MagnifyingGlassIcon,
@@ -15,7 +15,7 @@ import {
   CalendarDaysIcon,
   XMarkIcon,
 } from '@heroicons/react/24/solid';
-import PriceCalendar from '../components/PriceCalendar';
+import DateRangeCalendar from '../components/DateRangeCalendar';
 import { latestNews } from '../data/news';
 
 const heroSlides = [
@@ -71,6 +71,9 @@ const Home = () => {
   const [isPromoOpen, setIsPromoOpen] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromoCode, setAppliedPromoCode] = useState('');
+  const [isPassengerOpen, setIsPassengerOpen] = useState(false);
+  const [passengerCounts, setPassengerCounts] = useState({ adult: 2, child: 0, infant: 0 });
+  const passengerDropdownRef = useRef(null);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -81,6 +84,27 @@ const Home = () => {
     e.preventDefault();
     setAppliedPromoCode(promoCode.trim());
     setIsPromoOpen(false);
+  };
+
+  const handleTripTypeChange = (value) => {
+    setTripType(value);
+    if (value === 'oneway') {
+      setForm((current) => ({ ...current, returnDate: '' }));
+    }
+  };
+
+  const passengerTotal = passengerCounts.adult + passengerCounts.child + passengerCounts.infant;
+  const passengerSummary = `${passengerTotal} 位`;
+
+  const updatePassengerCount = (type, delta) => {
+    setPassengerCounts((current) => {
+      const minValue = type === 'adult' ? 1 : 0;
+      const nextValue = Math.max(minValue, current[type] + delta);
+      const nextCounts = { ...current, [type]: nextValue };
+      const nextTotal = nextCounts.adult + nextCounts.child + nextCounts.infant;
+      setForm((currentForm) => ({ ...currentForm, passengers: nextTotal }));
+      return nextCounts;
+    });
   };
 
   const destinations = [
@@ -137,6 +161,20 @@ const Home = () => {
     }, 5000);
 
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (passengerDropdownRef.current && !passengerDropdownRef.current.contains(event.target)) {
+        setIsPassengerOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   return (
@@ -203,7 +241,7 @@ const Home = () => {
                   <label className="absolute left-9 top-1.5 text-xs text-gray-400">航程</label>
                   <ArrowsRightLeftIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <div className="relative mt-1">
-                    <select value={tripType} onChange={e => setTripType(e.target.value)} className="w-full rounded-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-base font-medium focus:outline-none">
+                    <select value={tripType} onChange={e => handleTripTypeChange(e.target.value)} className="w-full rounded-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-base font-medium focus:outline-none">
                       <option value="roundtrip">來回</option>
                       <option value="oneway">單程</option>
                     </select>
@@ -237,31 +275,56 @@ const Home = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-0">
-                  <div className="relative rounded-l-lg border border-gray-200 bg-white transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
-                    <label className="absolute left-9 top-1.5 z-10 text-xs text-gray-400">去程</label>
-                    <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400 " />
-                    <div className="relative [&_input]:rounded-l-lg [&_input]:rounded-r-none [&_input]:border-0 [&_input]:bg-transparent [&_input]:pb-1.5 [&_input]:pl-9 [&_input]:pt-5 [&_input]:text-base [&_input]:font-medium [&_input]:focus:ring-0">
-                      <PriceCalendar value={form.depart} onChange={e => setForm({...form, depart: e})} placeholder="選擇出發日期"/>
-                    </div>
-                  </div>
-                  <div className="relative -ml-px rounded-r-lg border border-gray-200 bg-white transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
-                    <label className="absolute left-9 top-1.5 z-10 text-xs text-gray-400">回程</label>
-                    <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <div className="relative [&_input]:rounded-l-none [&_input]:rounded-r-lg [&_input]:border-0 [&_input]:bg-transparent [&_input]:pb-1.5 [&_input]:pl-9 [&_input]:pt-5 [&_input]:text-base [&_input]:font-medium [&_input]:focus:ring-0">
-                      <PriceCalendar value={form.returnDate} onChange={e => setForm({...form, returnDate: e})} placeholder="選擇回程日期" />
-                    </div>
-                  </div>
-                </div>
+                <DateRangeCalendar
+                  depart={form.depart}
+                  returnDate={form.returnDate}
+                  onDepartChange={date => setForm({...form, depart: date})}
+                  onReturnChange={date => setForm({...form, returnDate: date})}
+                  tripType={tripType}
+                />
 
-                <div className="relative rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
+                <div ref={passengerDropdownRef} className="relative rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
                   <label className="absolute left-9 top-1.5 text-xs text-gray-400">旅客 Passengers</label>
                   <UserGroupIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <div className="relative mt-1">
-                    <select value={form.passengers} onChange={e => setForm({...form, passengers: Number(e.target.value)})} className="w-full rounded-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-base font-medium focus:outline-none">
-                      {[1,2,3,4,5,6].map(n => <option key={n} value={n}>{n} 位</option>)}
-                    </select>
+                    <button
+                      type="button"
+                      onClick={() => setIsPassengerOpen((current) => !current)}
+                      className="w-full rounded-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none"
+                    >
+                      {passengerSummary}
+                    </button>
                   </div>
+                  {isPassengerOpen && (
+                    <div className="absolute left-0 top-full z-50 mt-2 w-72 rounded-xl border border-gray-100 bg-white p-4 shadow-xl">
+                      {[
+                        { key: 'adult', label: '成人' },
+                        { key: 'child', label: '兒童' },
+                        { key: 'infant', label: '嬰兒' },
+                      ].map((passenger) => (
+                        <div key={passenger.key} className="flex items-center justify-between border-b border-gray-100 py-3 last:border-b-0">
+                          <span className="text-sm font-medium text-gray-800">{passenger.label}</span>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => updatePassengerCount(passenger.key, -1)}
+                              className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-lg font-semibold text-gray-500 transition hover:border-primary hover:text-primary"
+                            >
+                              -
+                            </button>
+                            <span className="w-5 text-center text-sm font-bold text-gray-900">{passengerCounts[passenger.key]}</span>
+                            <button
+                              type="button"
+                              onClick={() => updatePassengerCount(passenger.key, 1)}
+                              className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-lg font-semibold text-gray-500 transition hover:border-primary hover:text-primary"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 

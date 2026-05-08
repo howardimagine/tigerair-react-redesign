@@ -1,12 +1,39 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const PriceCalendar = ({ value, onChange, placeholder = "選擇日期", monthCount = 2 }) => {
+const PriceCalendar = ({ value, onChange, placeholder = "選擇日期", monthCount = 2, disabled = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const calendarRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // 生成示例价格数据（实际项目中应从 API 获取）
+  const isLowestPriceDate = (date) => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const seed = (year + month * 13) % 7;
+    return [3 + seed, 10 + (seed % 5), 18 + (seed % 4), 25 + (seed % 3)].includes(day);
+  };
+
   const getPriceForDate = (date) => {
+    if (isLowestPriceDate(date)) {
+      return 1999 + ((date.getMonth() + date.getDate()) % 4) * 200;
+    }
+
     const day = date.getDate();
     const basePrice = 3999;
     const variation = (day * 123) % 2000; // 伪随机但一致的价格变化
@@ -22,6 +49,7 @@ const PriceCalendar = ({ value, onChange, placeholder = "選擇日期", monthCou
   };
 
   const handleDateClick = (day, month) => {
+    if (disabled) return;
     const selectedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + month, day);
     const formattedDate = selectedDate.toISOString().split('T')[0];
     onChange(formattedDate);
@@ -53,9 +81,6 @@ const PriceCalendar = ({ value, onChange, placeholder = "選擇日期", monthCou
 
     return { month, days };
   };
-
-  const month1 = generateMonth(0);
-  const month2 = generateMonth(1);
 
   const getMonthName = (date) => {
     return date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long' });
@@ -91,6 +116,7 @@ const PriceCalendar = ({ value, onChange, placeholder = "選擇日期", monthCou
             const price = getPriceForDate(date);
             const isToday = new Date().toDateString() === date.toDateString();
             const isPast = date < new Date();
+            const isLowest = isLowestPriceDate(date);
 
             return (
               <button
@@ -104,13 +130,22 @@ const PriceCalendar = ({ value, onChange, placeholder = "選擇日期", monthCou
                     ? 'border-2 border-primary text-primary'
                     : isPast
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : isLowest
+                    ? 'border border-primary/70 bg-orange-50 text-gray-900 ring-1 ring-primary/20 hover:bg-orange-100'
                     : 'bg-gray-50 text-gray-700 hover:bg-orange-100'
                 }`}
               >
+                {isLowest && !isPast && (
+                  <span className={`text-[8px] font-bold leading-none ${isSelected ? 'text-white' : 'text-primary'}`}>
+                    最低價
+                  </span>
+                )}
                 <span className="text-[11px]">{day}</span>
-                <span className={`text-[9px] font-bold ${isSelected ? 'text-white' : 'text-primary'}`}>
-                  NT${Math.floor(price / 1000)}K
-                </span>
+                {!isPast && (
+                  <span className={`text-[9px] font-bold ${isSelected ? 'text-white' : isLowest ? 'text-primary' : 'text-gray-600'}`}>
+                    {Math.floor(price / 1000)}K
+                  </span>
+                )}
               </button>
             );
           })}
@@ -120,19 +155,22 @@ const PriceCalendar = ({ value, onChange, placeholder = "選擇日期", monthCou
   };
 
   return (
-    <div className="relative">
+    <div ref={calendarRef} className="relative">
       {/* Input Field */}
       <input
         type="text"
         readOnly
         value={selectedDate}
-        onClick={() => setIsOpen(!isOpen)}
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled) setIsOpen(!isOpen);
+        }}
         placeholder={placeholder}
-        className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer bg-white text-base font-bold"
+        className={`mt-1 w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white text-base font-bold ${disabled ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer'}`}
       />
 
       {/* Calendar Dropdown */}
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className={`absolute top-full left-0 mt-2 bg-white rounded-lg shadow-xl p-4 z-50 ${monthCount === 2 ? 'w-full sm:w-[700px]' : monthCount === 3 ? 'w-full sm:w-[780px]' : 'w-full sm:w-[1040px]'}`}>
           {/* Month Navigation */}
           <div className="flex justify-between items-center mb-4">
