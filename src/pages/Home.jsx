@@ -10,6 +10,10 @@ import {
   CheckCircleIcon,
   InformationCircleIcon,
   SignalIcon,
+  ArrowsRightLeftIcon,
+  MapPinIcon,
+  CalendarDaysIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/solid';
 import PriceCalendar from '../components/PriceCalendar';
 
@@ -53,7 +57,7 @@ const bannerSlides = [
     title: 'Beach & City Escape',
     subtitle: '曼谷、越南、新加坡，城市和海島一次收藏',
     cta: '開始搜尋',
-    img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=520&fit=crop',
+    img: 'https://strapi-assets.tigerairtw.com/banner_2880x600_e31ff8f824.gif',
   },
 ];
 
@@ -63,10 +67,19 @@ const Home = () => {
   const [form, setForm] = useState({ from: 'TPE', to: 'NRT', depart: '', returnDate: '', passengers: 1 });
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
   const [activeBannerSlide, setActiveBannerSlide] = useState(0);
+  const [isPromoOpen, setIsPromoOpen] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [appliedPromoCode, setAppliedPromoCode] = useState('');
 
   const handleSearch = (e) => {
     e.preventDefault();
     navigate('/search');
+  };
+
+  const handleApplyPromoCode = (e) => {
+    e.preventDefault();
+    setAppliedPromoCode(promoCode.trim());
+    setIsPromoOpen(false);
   };
 
   const destinations = [
@@ -76,6 +89,8 @@ const Home = () => {
     { city: '曼谷 Bangkok', country: 'Thailand', img: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=600&h=400&fit=crop', price: 'NT$ 3,999' },
     { city: '新加坡 Singapore', country: 'Singapore', img: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=600&h=400&fit=crop', price: 'NT$ 4,499' },
     { city: '澳門 Macau', country: 'China', img: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=600&h=400&fit=crop', price: 'NT$ 2,999' },
+    { city: '峴港 Da Nang', country: 'Vietnam', img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&h=400&fit=crop', price: 'NT$ 3,299' },
+    { city: '普吉 Phuket', country: 'Thailand', img: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=600&h=400&fit=crop', price: 'NT$ 4,299' },
   ];
 
   const features = [
@@ -181,40 +196,62 @@ const Home = () => {
 
           {/* Search Form */}
           <div className="p-5 sm:p-6 md:p-8">
-            <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
+            <form onSubmit={handleSearch} className="grid grid-cols-1 gap-4 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr_0.9fr] lg:items-end">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">航程 Trip</label>
-                <select value={tripType} onChange={e => setTripType(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
-                  <option value="roundtrip">來回 Round Trip</option>
-                  <option value="oneway">單程 One Way</option>
-                </select>
+                <div className="relative">
+                  <ArrowsRightLeftIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <select value={tripType} onChange={e => setTripType(e.target.value)} className="w-full border border-gray-200 rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                    <option value="roundtrip">來回</option>
+                    <option value="oneway">單程</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">出發地 From</label>
-                <select value={form.from} onChange={e => setForm({...form, from: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
-                  <option value="TPE">台北桃園 TPE</option>
-                  <option value="KHH">高雄 KHH</option>
-                </select>
+
+              <div className="grid grid-cols-2 gap-0">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">出發地 From</label>
+                  <div className="relative">
+                    <MapPinIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <select value={form.from} onChange={e => setForm({...form, from: e.target.value})} className="w-full border border-gray-200 rounded-l-lg rounded-r-none py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                      <option value="TPE">台北桃園 TPE</option>
+                      <option value="KHH">高雄 KHH</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">目的地 To</label>
+                  <div className="relative -ml-px">
+                    <PaperAirplaneIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <select value={form.to} onChange={e => setForm({...form, to: e.target.value})} className="w-full border border-gray-200 rounded-l-none rounded-r-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                      <option value="NRT">東京成田 NRT</option>
+                      <option value="KIX">大阪關西 KIX</option>
+                      <option value="ICN">首爾仁川 ICN</option>
+                      <option value="BKK">曼谷 BKK</option>
+                      <option value="SIN">新加坡 SIN</option>
+                      <option value="MFM">澳門 MFM</option>
+                    </select>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">目的地 To</label>
-                <select value={form.to} onChange={e => setForm({...form, to: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
-                  <option value="NRT">東京成田 NRT</option>
-                  <option value="KIX">大阪關西 KIX</option>
-                  <option value="ICN">首爾仁川 ICN</option>
-                  <option value="BKK">曼谷 BKK</option>
-                  <option value="SIN">新加坡 SIN</option>
-                  <option value="MFM">澳門 MFM</option>
-                </select>
+
+              <div className="grid grid-cols-2 gap-0">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">去程 Depart</label>
+                  <div className="relative [&_input]:rounded-l-lg [&_input]:rounded-r-none [&_input]:pl-9">
+                    <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <PriceCalendar value={form.depart} onChange={e => setForm({...form, depart: e})} placeholder="選擇出發日期" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">回程 Return</label>
+                  <div className="relative -ml-px [&_input]:rounded-l-none [&_input]:rounded-r-lg [&_input]:pl-9">
+                    <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <PriceCalendar value={form.returnDate} onChange={e => setForm({...form, returnDate: e})} placeholder="選擇回程日期" />
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">去程 Depart</label>
-                <PriceCalendar value={form.depart} onChange={e => setForm({...form, depart: e})} placeholder="選擇出發日期" />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">回程 Return</label>
-                <PriceCalendar value={form.returnDate} onChange={e => setForm({...form, returnDate: e})} placeholder="選擇回程日期" />
-              </div>
+
               <div>
                 <label className="block text-xs text-gray-500 mb-1">旅客 Passengers</label>
                 <div className="relative">
@@ -231,14 +268,83 @@ const Home = () => {
                 </button>
               </div>
             </form>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsPromoOpen(true)}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition hover:text-primary"
+              >
+                <TagIcon className="h-4 w-4" />
+                加入促銷代碼
+              </button>
+              {appliedPromoCode && (
+                <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-primary">
+                  已套用：{appliedPromoCode}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
+      {isPromoOpen && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/45 px-4">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-primary">
+                  <TagIcon className="h-5 w-5" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">輸入促銷代碼</h2>
+                <p className="mt-1 text-sm text-gray-500">套用優惠代碼，搜尋時查看符合條件的票價。</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsPromoOpen(false)}
+                className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                aria-label="關閉促銷代碼視窗"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleApplyPromoCode} className="space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">促銷代碼 Promo Code</label>
+                <input
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                  placeholder="例如 TIGER2026"
+                  className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm uppercase tracking-wide focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  autoFocus
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsPromoOpen(false)}
+                  className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50"
+                >
+                  取消
+                </button>
+                <button
+                  type="submit"
+                  disabled={!promoCode.trim()}
+                  className="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
+                >
+                  套用
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Popular Destinations */}
-      <div className="max-w-7xl mx-auto px-4 mb-16">
+      <div className="max-w-8xl mx-auto px-4 mb-16">
         <h2 className="text-xl sm:text-2xl font-bold mb-6">Popular Destinations 熱門航線</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {destinations.map(d => (
             <div key={d.city} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition cursor-pointer group" onClick={() => navigate('/search')}>
               <div className="overflow-hidden">
@@ -324,22 +430,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Features */}
-      <div className="bg-gray-50 py-12 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold mb-8 text-center">Why Tigerair 為什麼選擇虎航</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            {features.map(f => (
-              <div key={f.title} className="bg-white rounded-xl p-4 sm:p-6 text-center shadow-sm hover:shadow-md transition">
-                <f.icon className="h-8 w-8 sm:h-10 sm:w-10 text-primary mx-auto mb-3" />
-                <h3 className="font-bold text-xs sm:text-sm mb-0.5">{f.title}</h3>
-                <p className="text-[10px] sm:text-xs text-gray-500">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Promo Banner */}
       <div className="max-w-8xl mx-auto px-4 py-12 sm:py-16">
         <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
@@ -384,6 +474,22 @@ const Home = () => {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features */}
+      <div className="bg-gray-50 py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold mb-8 text-center">Why Tigerair 為什麼選擇虎航</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            {features.map(f => (
+              <div key={f.title} className="bg-white rounded-xl p-4 sm:p-6 text-center shadow-sm hover:shadow-md transition">
+                <f.icon className="h-8 w-8 sm:h-10 sm:w-10 text-primary mx-auto mb-3" />
+                <h3 className="font-bold text-xs sm:text-sm mb-0.5">{f.title}</h3>
+                <p className="text-[10px] sm:text-xs text-gray-500">{f.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
