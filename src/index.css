@@ -12,3 +12,46 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-delay-2,
+.animate-fade-in-delay-3,
+.animate-fade-in-delay-4,
+.animate-fade-in-delay-5 {
+  animation: fade-in-up 0.55s ease-out both;
+}
+
+.animate-fade-in-delay-2 {
+  animation-delay: 0.1s;
+}
+
+.animate-fade-in-delay-3 {
+  animation-delay: 0.18s;
+}
+
+.animate-fade-in-delay-4 {
+  animation-delay: 0.26s;
+}
+
+.animate-fade-in-delay-5 {
+  animation-delay: 0.34s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-delay-2,
+  .animate-fade-in-delay-3,
+  .animate-fade-in-delay-4,
+  .animate-fade-in-delay-5 {
+    animation: none;
+  }
+}

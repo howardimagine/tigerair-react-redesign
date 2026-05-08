@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { EnvelopeIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/AuthContext';
+
+const MEMBER_DEMO_URL = 'https://howardimagine.github.io/tigerair-member-demo/';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -9,17 +11,16 @@ const Login = () => {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
-  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!email || !password) { setError('請填寫所有欄位'); return; }
     login(email, password);
-    navigate('/member');
+    window.open(MEMBER_DEMO_URL, '_blank', 'noopener,noreferrer');
   };
 
   return (
-    <div className="min-h-[80vh] bg-gray-50 flex items-center justify-center py-12 px-4">
+    <div className="min-h-[80vh] bg-gray-50 flex items-center justify-center py-12 px-4 animate-fade-in-delay-2">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-xl shadow-sm p-8">
           <h1 className="text-2xl font-bold text-center mb-2">Welcome Back</h1>

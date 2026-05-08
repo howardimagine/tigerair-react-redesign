@@ -19,7 +19,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-[80vh] bg-gray-50 flex items-center justify-center py-12 px-4">
+    <div className="min-h-[80vh] bg-gray-50 flex items-center justify-center py-12 px-4 animate-fade-in-delay-2">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-xl shadow-sm p-8">
           <h1 className="text-2xl font-bold text-center mb-2">Create Account</h1>

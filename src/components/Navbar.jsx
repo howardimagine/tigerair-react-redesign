@@ -26,8 +26,26 @@ const Navbar = () => {
 
   const navLinks = sitemap.navigation;
 
+  const renderMenuItem = (item, className, onClick) => {
+    const itemLink = getItemLink(item);
+
+    if (itemLink === '#') {
+      return (
+        <a href="#" className={className} onClick={onClick}>
+          {item}
+        </a>
+      );
+    }
+
+    return (
+      <Link to={itemLink} className={className} onClick={onClick}>
+        {item}
+      </Link>
+    );
+  };
+
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50">
+    <nav className="bg-white/95 shadow-lg shadow-gray-500/10 sticky top-0 z-50 backdrop-blur">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -36,33 +54,39 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-3">
             {navLinks.map((link, idx) => (
               <div key={idx} className="relative group">
-                <button className="flex items-center gap-1 text-sm text-gray-600 hover:text-primary transition py-2">
+                <button className="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-gray-800 transition hover:bg-orange-50 hover:text-primary">
                   {link.category}
-                  <ChevronDownIcon className="h-4 w-4 group-hover:rotate-180 transition" />
+                  <ChevronDownIcon className="h-4 w-4 transition duration-200 group-hover:rotate-180" />
                 </button>
                 {/* Dropdown Menu */}
-                <div className="hidden group-hover:block absolute left-0 top-full pt-2 bg-white rounded-lg shadow-lg min-w-48 z-50">
-                  {link.subcategories.map((sub, sidx) => (
-                    <div key={sidx}>
-                      <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase border-b">
-                        {sub.name}
-                      </div>
-                      {sub.items.map((item, iidx) => (
-                        getItemLink(item) === '#' ? (
-                          <a key={iidx} href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-primary transition">
-                            {item}
-                          </a>
-                        ) : (
-                          <Link key={iidx} to={getItemLink(item)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-primary transition">
-                            {item}
-                          </Link>
-                        )
+                <div className={`invisible absolute top-full z-50 pt-3 opacity-0 transition duration-200 ease-out group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 ${idx > navLinks.length - 3 ? 'right-0' : 'left-1/2 -translate-x-1/2'}`}>
+                  <div className="relative w-[calc(100vw-2rem)] max-w-[680px] rounded-lg border border-gray-100 bg-white p-3 shadow-xl shadow-gray-900/10 ring-1 ring-black/5">
+                    <div className={`absolute -top-1 h-3 w-3 rotate-45 border-l border-t border-gray-100 bg-white ${idx > navLinks.length - 3 ? 'right-8' : 'left-1/2 -translate-x-1/2'}`} />
+                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                      {link.subcategories.map((sub, sidx) => (
+                        <div key={sidx} className="rounded-md p-3">
+                          <div className="mb-2 flex items-center gap-2 border-b border-gray-200 pb-2">
+                            <div className="text-base font-semibold uppercase tracking-wide text-gray-800">
+                              {sub.name}
+                            </div>
+                          </div>
+                          <div className="">
+                            {sub.items.map((item, iidx) => (
+                              <div key={iidx}>
+                                {renderMenuItem(
+                                  item,
+                                  'block rounded-md py-1 text-sm text-gray-700 transition hover:text-primary'
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
               </div>
             ))}
@@ -83,11 +107,11 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="flex items-center gap-1 text-sm text-gray-600 px-4 py-2 hover:text-primary">
+                <Link to="/login" className="flex items-center gap-1 text-sm text-gray-600 px-2 py-2 hover:text-primary">
                   <ArrowRightOnRectangleIcon className="h-4 w-4" />
                   登入
                 </Link>
-                <Link to="/register" className="flex items-center gap-1 text-sm text-gray-600 py-2 px-4 rounded-lg hover:bg-orange-100 hover:text-primary transition">
+                <Link to="/register" className="flex items-center gap-1 text-sm text-gray-600 py-2 px-2 rounded-lg hover:text-primary">
                   <UserPlusIcon className="h-4 w-4" />
                   註冊
                 </Link>
@@ -96,61 +120,68 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Toggle */}
-          <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-gray-600">
+          <button onClick={() => setIsOpen(!isOpen)} className="md:hidden rounded-lg p-2 text-gray-600 transition hover:bg-orange-50 hover:text-primary">
             {isOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden border-t py-4 space-y-3">
-            {navLinks.map((link, idx) => (
-              <div key={idx}>
-                <button 
-                  onClick={() => setOpenDropdown(openDropdown === idx ? null : idx)}
-                  className="flex items-center justify-between w-full text-gray-600 hover:text-primary py-2 font-medium"
-                >
-                  {link.category}
-                  <ChevronDownIcon className={`h-4 w-4 transition ${openDropdown === idx ? 'rotate-180' : ''}`} />
-                </button>
-                {openDropdown === idx && (
-                  <div className="pl-4 space-y-2">
-                    {link.subcategories.map((sub, sidx) => (
-                      <div key={sidx}>
-                        <div className="text-xs font-semibold text-gray-500 uppercase py-1">{sub.name}</div>
-                        {sub.items.map((item, iidx) => (
-                          getItemLink(item) === '#' ? (
-                            <a key={iidx} href="#" className="block text-sm text-gray-600 hover:text-primary py-1">
-                              {item}
-                            </a>
-                          ) : (
-                            <Link key={iidx} to={getItemLink(item)} onClick={() => setIsOpen(false)} className="block text-sm text-gray-600 hover:text-primary py-1">
-                              {item}
-                            </Link>
-                          )
+          <div className="md:hidden border-t border-gray-100 py-4">
+            <div className="space-y-2">
+              {navLinks.map((link, idx) => (
+                <div key={idx} className="overflow-hidden rounded-lg border border-gray-100 bg-white">
+                  <button
+                    onClick={() => setOpenDropdown(openDropdown === idx ? null : idx)}
+                    className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold transition ${openDropdown === idx ? 'bg-orange-50 text-primary' : 'text-gray-700 hover:bg-gray-50 hover:text-primary'}`}
+                  >
+                    {link.category}
+                    <ChevronDownIcon className={`h-4 w-4 transition duration-200 ${openDropdown === idx ? 'rotate-180' : ''}`} />
+                  </button>
+                  <div className={`grid transition-all duration-200 ease-out ${openDropdown === idx ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                    <div className="overflow-hidden">
+                      <div className="space-y-3 border-t border-gray-100 bg-gray-50/70 px-4 py-3">
+                        {link.subcategories.map((sub, sidx) => (
+                          <div key={sidx}>
+                            <div className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                              {sub.name}
+                            </div>
+                            <div className="space-y-1">
+                              {sub.items.map((item, iidx) => (
+                                <div key={iidx}>
+                                  {renderMenuItem(
+                                    item,
+                                    'block rounded-md px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-primary',
+                                    () => setIsOpen(false)
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                         ))}
                       </div>
-                    ))}
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
-            <div className="border-t pt-3 mt-3">
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 border-t border-gray-100 pt-4">
               {user ? (
                 <>
-                  <Link to="/member" className="block text-gray-600 hover:text-primary py-1" onClick={() => setIsOpen(false)}>
+                  <Link to="/member" className="block rounded-md px-4 py-2 text-sm text-gray-600 transition hover:bg-orange-50 hover:text-primary" onClick={() => setIsOpen(false)}>
                     會員中心
                   </Link>
-                  <button onClick={handleLogout} className="block w-full text-left text-gray-600 hover:text-primary py-1">
+                  <button onClick={handleLogout} className="block w-full rounded-md px-4 py-2 text-left text-sm text-gray-600 transition hover:bg-orange-50 hover:text-primary">
                     登出
                   </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="block text-gray-600 hover:text-primary py-1" onClick={() => setIsOpen(false)}>
+                  <Link to="/login" className="block rounded-md px-4 py-2 text-sm text-gray-600 transition hover:bg-orange-50 hover:text-primary" onClick={() => setIsOpen(false)}>
                     登入
                   </Link>
-                  <Link to="/register" className="block bg-primary text-white text-center px-4 py-2 rounded-lg mt-2" onClick={() => setIsOpen(false)}>
+                  <Link to="/register" className="mt-2 block rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-primary-dark" onClick={() => setIsOpen(false)}>
                     註冊
                   </Link>
                 </>

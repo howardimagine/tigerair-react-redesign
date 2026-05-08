@@ -147,6 +147,23 @@ const SearchResults = () => {
           <ExpandedPriceCalendar value={selectedDate} onChange={handleDepartChange} monthCount={3} />
         </div>
 
+        <div className="mb-4 flex flex-wrap items-center gap-2 animate-fade-in-delay-3">
+          {filters.map((option) => (
+            <button
+              key={option.key}
+              type="button"
+              onClick={() => setFilter(option.key)}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                filter === option.key
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'bg-white text-gray-600 shadow-sm hover:bg-orange-50 hover:text-primary'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+
         <div className="space-y-4">
           {filtered.map((flight, index) => (
             <div

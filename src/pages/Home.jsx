@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MagnifyingGlassIcon,
@@ -13,10 +13,56 @@ import {
 } from '@heroicons/react/24/solid';
 import PriceCalendar from '../components/PriceCalendar';
 
+const heroSlides = [
+  {
+    place: 'Tokyo',
+    img: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1920&h=900&fit=crop',
+  },
+  {
+    place: 'Osaka',
+    img: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?w=1920&h=900&fit=crop',
+  },
+  {
+    place: 'Singapore',
+    img: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1920&h=900&fit=crop',
+  },
+  {
+    place: 'Vietnam',
+    img: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=1920&h=900&fit=crop',
+  },
+  {
+    place: 'Thailand',
+    img: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=1920&h=900&fit=crop',
+  },
+];
+
+const bannerSlides = [
+  {
+    title: 'Fly More, Save More',
+    subtitle: '精選亞洲航線限時優惠，下一趟旅程現在出發',
+    cta: '查看優惠',
+    img: 'https://strapi-assets.tigerairtw.com/HRBN_team_Tiger_2880x600_3758637ac4.jpg',
+  },
+  {
+    title: 'Japan City Break',
+    subtitle: '東京、大阪熱門航點，輕鬆安排週末小旅行',
+    cta: '探索日本',
+    img: 'https://strapi-assets.tigerairtw.com/W26_HERO_Banner_2880_X600_431aaa59d7.jpg',
+  },
+  {
+    title: 'Beach & City Escape',
+    subtitle: '曼谷、越南、新加坡，城市和海島一次收藏',
+    cta: '開始搜尋',
+    img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=520&fit=crop',
+  },
+];
+
 const Home = () => {
   const navigate = useNavigate();
   const [tripType, setTripType] = useState('roundtrip');
   const [form, setForm] = useState({ from: 'TPE', to: 'NRT', depart: '', returnDate: '', passengers: 1 });
+  const [activeHeroSlide, setActiveHeroSlide] = useState(0);
+  const [activeBannerSlide, setActiveBannerSlide] = useState(0);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -61,15 +107,54 @@ const Home = () => {
     { icon: SignalIcon, label: '航班動態', path: '/flight-status' },
   ];
 
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveHeroSlide((current) => (current + 1) % heroSlides.length);
+    }, 4500);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveBannerSlide((current) => (current + 1) % bannerSlides.length);
+    }, 5000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <div>
       {/* Hero */}
-      <div className="relative h-[380px] sm:h-[400px] bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920&h=800&fit=crop)' }}>
-        <div className="absolute inset-0 bg-black/40"></div>
+      <div className="relative h-[380px] overflow-hidden bg-gray-900 sm:h-[600px]">
+        {heroSlides.map((slide, index) => (
+          <img
+            key={slide.place}
+            src={slide.img}
+            alt={`${slide.place} travel scene`}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${
+              activeHeroSlide === index ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/35 to-black/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center">
           <div className="text-white">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3">Explore Asia with Tigerair</h1>
             <p className="text-base sm:text-lg md:text-xl opacity-90">探索亞洲，從這裡開始</p>
+            <div className="mt-5 flex items-center gap-2">
+              {heroSlides.map((slide, index) => (
+                <button
+                  key={slide.place}
+                  type="button"
+                  aria-label={`Show ${slide.place}`}
+                  onClick={() => setActiveHeroSlide(index)}
+                  className={`h-2.5 rounded-full transition-all ${
+                    activeHeroSlide === index ? 'w-8 bg-primary' : 'w-2.5 bg-white/70 hover:bg-white'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -159,16 +244,59 @@ const Home = () => {
               <div className="overflow-hidden">
                 <img src={d.img} alt={d.city} className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
-              <div className="p-4">
+              <div className="px-5 py-5">
                 <h3 className="font-bold text-base sm:text-lg">{d.city}</h3>
                 <p className="text-sm text-gray-500">{d.country}</p>
-                <div className="mt-2 flex justify-between items-center">
-                  <span className="text-primary font-bold">{d.price} 起</span>
+                <div className="mt-2 flex items-end justify-between">
+                  <span className="text-xl font-bold leading-none text-primary sm:text-2xl">{d.price} 起</span>
                   <span className="text-xs text-gray-400">單程 / 含稅</span>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Banner Carousel */}
+      <div className="max-w-7xl mx-auto px-4 mb-8">
+        <div className="relative h-56 overflow-hidden rounded-xl bg-gray-900 shadow-sm sm:h-100">
+          {bannerSlides.map((banner, index) => (
+            <button
+              key={banner.title}
+              type="button"
+              onClick={() => navigate('/search')}
+              className={`absolute inset-0 text-left transition-opacity duration-700 ease-in-out ${
+                activeBannerSlide === index ? 'opacity-100' : 'pointer-events-none opacity-0'
+              }`}
+            >
+              <img src={banner.img} alt={banner.title} className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
+              <div className="absolute inset-0 flex items-center px-6 sm:px-10">
+                <div className="max-w-xl text-white">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary-light">Tigerair Promotion</p>
+                  <h2 className="text-2xl font-bold sm:text-4xl">{banner.title}</h2>
+                  <p className="mt-3 text-sm leading-6 text-white/90 sm:text-base">{banner.subtitle}</p>
+                  <span className="mt-5 inline-flex rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark">
+                    {banner.cta}
+                  </span>
+                </div>
+              </div>
+            </button>
+          ))}
+
+          <div className="absolute bottom-5 left-6 flex items-center gap-2 sm:left-10">
+            {bannerSlides.map((banner, index) => (
+              <button
+                key={banner.title}
+                type="button"
+                aria-label={`Show banner ${index + 1}`}
+                onClick={() => setActiveBannerSlide(index)}
+                className={`h-2.5 rounded-full transition-all ${
+                  activeBannerSlide === index ? 'w-8 bg-primary' : 'w-2.5 bg-white/70 hover:bg-white'
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -213,15 +341,49 @@ const Home = () => {
       </div>
 
       {/* Promo Banner */}
-      <div className="max-w-7xl mx-auto px-4 py-12 sm:py-16">
-        <div className="relative rounded-xl overflow-hidden h-48 sm:h-60" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1200&h=400&fit=crop)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-          <div className="absolute inset-0 bg-primary/80"></div>
-          <div className="relative h-full flex flex-col items-center justify-center text-white text-center px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-2">低價航點地圖</h2>
-            <p className="text-base sm:text-lg mb-4 opacity-90">全航線最低 NT$ 1,999 起</p>
-            <button onClick={() => navigate('/fare-map')} className="bg-white text-primary px-6 py-2.5 rounded-lg font-medium hover:bg-gray-100 transition">
-              立即搶購
-            </button>
+      <div className="max-w-8xl mx-auto px-4 py-12 sm:py-16">
+        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+          <div className="grid gap-0 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="flex flex-col items-start justify-center p-6 sm:p-8 lg:p-10">
+              <h2 className="max-w-2xl text-xl font-bold leading-snug text-gray-900 sm:text-2xl">
+                台灣虎航擁有眾多不同航線，供旅客在各城市中自在飛行。
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-gray-600 sm:text-base">
+                快使用低價航點地圖功能，一覽日、韓、泰、越、澳等各城市的低價機票，實現說走就走的自在旅程。
+              </p>
+              <button
+                onClick={() => navigate('/fare-map')}
+                className="mt-6 inline-flex items-center rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary"
+              >
+                低價航點地圖
+              </button>
+            </div>
+
+            <div className="border-t border-gray-100 bg-gray-50 p-6 sm:p-8 lg:border-l lg:border-t-0">
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { city: 'Tokyo', code: 'NRT', fare: 'NT$ 5,999 起' },
+                  { city: 'Osaka', code: 'KIX', fare: 'NT$ 6,499 起' },
+                  { city: 'Seoul', code: 'ICN', fare: 'NT$ 4,999 起' },
+                  { city: 'Bangkok', code: 'BKK', fare: 'NT$ 3,999 起' },
+                  { city: 'Vietnam', code: 'DAD', fare: 'NT$ 3,299 起' },
+                  { city: 'Macau', code: 'MFM', fare: 'NT$ 2,999 起' },
+                ].map((route) => (
+                  <button
+                    key={route.code}
+                    type="button"
+                    onClick={() => navigate('/fare-map')}
+                    className="rounded-lg border border-gray-200 bg-white p-4 text-left transition hover:border-primary hover:shadow-sm"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-bold text-gray-900">{route.city}</span>
+                      <span className="rounded bg-orange-50 px-2 py-1 text-xs font-semibold text-primary">{route.code}</span>
+                    </div>
+                    <p className="mt-3 text-xs font-medium text-gray-500">{route.fare}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
