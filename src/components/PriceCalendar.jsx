@@ -128,7 +128,7 @@ const PriceCalendar = ({ value, onChange, placeholder = "選擇日期", monthCou
         value={selectedDate}
         onClick={() => setIsOpen(!isOpen)}
         placeholder={placeholder}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer bg-white text-base font-bold"
+        className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer bg-white text-base font-bold"
       />
 
       {/* Calendar Dropdown */}
