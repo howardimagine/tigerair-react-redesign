@@ -18,10 +18,15 @@ const Navbar = () => {
 
   const getItemLink = (item) => {
     const linkMap = {
+      '立即購票': '/search',
       '時刻表': '/schedule',
+      '航點資訊': '/flight-status',
       '低價航點地圖': '/fare-map',
+      '主題旅遊': '/blog/theme-travel',
+      '熱門活動': '/blog/events',
+      '限時促銷': '/blog/promotions',
     };
-    return linkMap[item] || '#';
+    return linkMap[item] || '/articles/article-1';
   };
 
   const navLinks = sitemap.navigation;
@@ -45,7 +50,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white/95 shadow-lg shadow-gray-500/10 sticky top-0 z-50 backdrop-blur">
+    <nav className="bg-white/95 shadow-lg shadow-gray-300/10 sticky top-0 z-50 backdrop-blur">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}

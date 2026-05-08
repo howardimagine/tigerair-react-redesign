@@ -16,6 +16,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/solid';
 import PriceCalendar from '../components/PriceCalendar';
+import { latestNews } from '../data/news';
 
 const heroSlides = [
   {
@@ -474,6 +475,41 @@ const Home = () => {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Latest News */}
+      <div className="max-w-5xl mx-auto px-4 pb-12">
+        <div className="overflow-hidden rounded-xl bg-white">
+          <div className="flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <div>
+              <p className="text-sm font-semibold text-primary">News</p>
+              <h2 className="mt-1 text-xl font-bold text-gray-900 sm:text-2xl">最新消息</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate('/articles')}
+              className="w-fit rounded-lg py-2 text-sm font-semibold text-gray-600 transition hover:text-primary"
+            >
+              查看全部
+            </button>
+          </div>
+          <div>
+            {latestNews.map((news) => (
+              <button
+                key={news.title}
+                type="button"
+                onClick={() => navigate(`/articles/${news.id}`)}
+                className="flex w-full flex-col gap-2 border-b border-gray-100 px-5 py-4 text-left hover:text-primary transition last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+              >
+                <span className="text-sm font-semibold text-gray-900 sm:text-base hover:text-primary">{news.title}</span>
+                <span className="flex items-center gap-1.5 text-xs font-medium text-gray-500 sm:text-sm">
+                  <CalendarDaysIcon className="h-4 w-4" />
+                  {news.date}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
       </div>

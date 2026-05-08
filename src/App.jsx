@@ -17,6 +17,9 @@ import Support from './pages/Support';
 import LowFareMap from './pages/LowFareMap';
 import Schedule from './pages/Schedule';
 import FlightStatus from './pages/FlightStatus';
+import Blog from './pages/Blog';
+import ArticleList from './pages/ArticleList';
+import ArticleDetail from './pages/ArticleDetail';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -50,6 +53,9 @@ function App() {
             <Route path="/fare-map" element={<LowFareMap />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/flight-status" element={<FlightStatus />} />
+            <Route path="/blog/:category" element={<Blog />} />
+            <Route path="/articles" element={<ArticleList />} />
+            <Route path="/articles/:id" element={<ArticleDetail />} />
           </Routes>
         </Layout>
       </BrowserRouter>
