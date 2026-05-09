@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { CalendarDaysIcon } from '@heroicons/react/24/solid';
+import { CalendarDaysIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
@@ -123,6 +123,14 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
     setIsOpen(true);
   };
 
+  const clearDates = (event) => {
+    event.stopPropagation();
+    onDepartChange('');
+    onReturnChange('');
+    setIsOpen(false);
+    setActiveField('depart');
+  };
+
   const renderMonth = (monthData, monthOffset) => {
     const { month, days } = monthData;
     const today = new Date();
@@ -192,7 +200,7 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
         <button
           type="button"
           onClick={() => openCalendar('depart')}
-          className="w-full rounded-l-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none"
+          className="mt-1 w-full rounded-l-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none"
         >
           {formatDisplayDate(depart, '選擇出發日期')}
         </button>
@@ -205,10 +213,20 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
           type="button"
           onClick={() => openCalendar('return')}
           disabled={isOneWay}
-          className="w-full rounded-r-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none disabled:cursor-not-allowed"
+          className="mt-1 w-full rounded-r-lg border-0 bg-transparent pb-1.5 pl-9 pr-9 pt-5 text-left text-base font-medium focus:outline-none disabled:cursor-not-allowed"
         >
           {isOneWay ? '單程不需回程' : formatDisplayDate(returnDate, '選擇回程日期')}
         </button>
+        {(depart || returnDate) && (
+          <button
+            type="button"
+            onClick={clearDates}
+            className="absolute right-2 top-1/2 z-20 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+            aria-label="清空去程與回程"
+          >
+            <XMarkIcon className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {isOpen && (

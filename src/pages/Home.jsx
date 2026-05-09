@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MagnifyingGlassIcon,
@@ -14,6 +14,8 @@ import {
   MapPinIcon,
   CalendarDaysIcon,
   XMarkIcon,
+  ChevronDownIcon,
+  ArrowRightIcon,
 } from '@heroicons/react/24/solid';
 import DateRangeCalendar from '../components/DateRangeCalendar';
 import { latestNews } from '../data/news';
@@ -21,22 +23,32 @@ import { latestNews } from '../data/news';
 const heroSlides = [
   {
     place: 'Tokyo',
+    city: '東京 Tokyo',
+    fare: 'NT$ 5,999 起',
     img: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1920&h=900&fit=crop',
   },
   {
     place: 'Osaka',
+    city: '大阪 Osaka',
+    fare: 'NT$ 6,499 起',
     img: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?w=1920&h=900&fit=crop',
   },
   {
     place: 'Singapore',
+    city: '新加坡 Singapore',
+    fare: 'NT$ 4,499 起',
     img: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1920&h=900&fit=crop',
   },
   {
     place: 'Vietnam',
+    city: '越南 Da Nang',
+    fare: 'NT$ 3,299 起',
     img: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=1920&h=900&fit=crop',
   },
   {
     place: 'Thailand',
+    city: '泰國 Bangkok',
+    fare: 'NT$ 3,999 起',
     img: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=1920&h=900&fit=crop',
   },
 ];
@@ -62,6 +74,116 @@ const bannerSlides = [
   },
 ];
 
+const destinationAirportGroups = [
+  {
+    country: '台灣',
+    airports: [
+      { value: 'TPE', label: '台北桃園 TPE' },
+      { value: 'KHH', label: '高雄 KHH' },
+      { value: 'RMQ', label: '台中 RMQ' },
+      { value: 'TSA', label: '台北松山 TSA' },
+    ],
+  },
+  {
+    country: '日本',
+    airports: [
+      { value: 'NRT', label: '東京成田 NRT' },
+      { value: 'KIX', label: '大阪關西 KIX' },
+      { value: 'OKA', label: '沖繩那霸 OKA' },
+      { value: 'FUK', label: '福岡 FUK' },
+    ],
+  },
+  {
+    country: '南韓',
+    airports: [
+      { value: 'ICN', label: '首爾仁川 ICN' },
+      { value: 'PUS', label: '釜山 PUS' },
+      { value: 'CJU', label: '濟州 CJU' },
+      { value: 'TAE', label: '大邱 TAE' },
+    ],
+  },
+  {
+    country: '泰國',
+    airports: [
+      { value: 'BKK', label: '曼谷 BKK' },
+      { value: 'DMK', label: '曼谷廊曼 DMK' },
+      { value: 'HKT', label: '普吉 HKT' },
+      { value: 'CNX', label: '清邁 CNX' },
+    ],
+  },
+  {
+    country: '越南',
+    airports: [
+      { value: 'DAD', label: '峴港 DAD' },
+      { value: 'SGN', label: '胡志明 SGN' },
+      { value: 'HAN', label: '河內 HAN' },
+      { value: 'CXR', label: '芽莊 CXR' },
+    ],
+  },
+];
+
+const AirportDropdown = ({ value, onChange, label, groups, Icon, roundedClass = 'rounded-lg' }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const selectedAirport = groups.flatMap((group) => group.airports).find((airport) => airport.value === value);
+  const buttonRoundedClass = roundedClass.replace('-ml-px', '').trim();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div ref={dropdownRef} className={`relative border border-gray-200 bg-white transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${roundedClass}`}>
+      <label className="absolute left-9 top-1.5 text-xs text-gray-400">{label}</label>
+      <Icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+      <button
+        type="button"
+        onClick={() => setIsOpen((current) => !current)}
+        className={`mt-1 flex w-full items-center justify-between gap-2 border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none ${buttonRoundedClass}`}
+      >
+        <span className="truncate">{selectedAirport?.label || '請選擇'}</span>
+        <ChevronDownIcon className={`h-4 w-4 shrink-0 text-gray-400 transition ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute left-0 top-full z-50 mt-2 max-h-96 w-80 overflow-y-auto rounded-xl border border-gray-100 bg-white p-3 shadow-xl">
+          {groups.map((group) => (
+            <div key={group.country} className="mb-3 last:mb-0">
+              <div className="mb-1 rounded bg-gray-50 px-3 py-2 text-xs font-bold text-gray-500">{group.country}</div>
+              <div className="space-y-1">
+                {group.airports.map((airport) => (
+                  <button
+                    key={airport.value}
+                    type="button"
+                    onClick={() => {
+                      onChange(airport.value);
+                      setIsOpen(false);
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition hover:bg-orange-50 hover:text-primary ${value === airport.value ? 'bg-orange-50 text-primary' : 'text-gray-700'}`}
+                  >
+                    <span>{airport.label}</span>
+                    <span className="text-xs font-semibold text-gray-400">{airport.value}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Home = () => {
   const navigate = useNavigate();
   const [tripType, setTripType] = useState('roundtrip');
@@ -74,6 +196,8 @@ const Home = () => {
   const [isPassengerOpen, setIsPassengerOpen] = useState(false);
   const [passengerCounts, setPassengerCounts] = useState({ adult: 2, child: 0, infant: 0 });
   const passengerDropdownRef = useRef(null);
+  const heroFareMeasureRef = useRef(null);
+  const [heroFareButtonWidth, setHeroFareButtonWidth] = useState(0);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -177,6 +301,14 @@ const Home = () => {
     };
   }, []);
 
+  const activeHeroRoute = heroSlides[activeHeroSlide];
+
+  useLayoutEffect(() => {
+    if (heroFareMeasureRef.current) {
+      setHeroFareButtonWidth(heroFareMeasureRef.current.offsetWidth);
+    }
+  }, [activeHeroRoute]);
+
   return (
     <div>
       {/* Hero */}
@@ -192,10 +324,39 @@ const Home = () => {
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/35 to-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center">
+        <div className="relative mx-auto flex h-full max-w-7xl items-center px-4 pb-16 sm:pb-20">
           <div className="text-white">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3">Explore Asia with Tigerair</h1>
             <p className="text-base sm:text-lg md:text-xl opacity-90">探索亞洲，從這裡開始</p>
+            <div className="relative mt-6 inline-block">
+              <button
+                type="button"
+                onClick={() => navigate('/fare-map')}
+                style={heroFareButtonWidth ? { width: `${heroFareButtonWidth}px` } : undefined}
+                className="group inline-flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-full bg-white px-5 py-3 text-left text-sm font-bold text-gray-900 shadow-lg shadow-black/20 transition-[width,transform,box-shadow,background-color,color] duration-300 ease-out hover:bg-primary hover:text-white hover:shadow-xl sm:pr-3"
+              >
+                <span className="flex flex-col whitespace-nowrap leading-tight sm:flex-row sm:items-center sm:gap-2">
+                  <span>{activeHeroRoute.city}</span>
+                  <span className="text-base font-black text-primary transition-colors duration-300 group-hover:text-white sm:text-lg">{activeHeroRoute.fare}</span>
+                </span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white transition-colors duration-300 group-hover:bg-white group-hover:text-primary">
+                  <ArrowRightIcon className="h-4 w-4" />
+                </span>
+              </button>
+              <span
+                ref={heroFareMeasureRef}
+                aria-hidden="true"
+                className="pointer-events-none invisible absolute left-0 top-0 inline-flex items-center gap-4 rounded-full px-5 py-3 text-left text-sm font-bold sm:pr-3"
+              >
+                <span className="flex flex-col whitespace-nowrap leading-tight sm:flex-row sm:items-center sm:gap-2">
+                  <span>{activeHeroRoute.city}</span>
+                  <span className="text-base font-black sm:text-lg">{activeHeroRoute.fare}</span>
+                </span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+                  <ArrowRightIcon className="h-4 w-4" />
+                </span>
+              </span>
+            </div>
             <div className="mt-5 flex items-center gap-2">
               {heroSlides.map((slide, index) => (
                 <button
@@ -249,37 +410,29 @@ const Home = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-0">
-                  <div className="relative rounded-l-lg border border-gray-200 bg-white transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
-                    <label className="absolute left-9 top-1.5 text-xs text-gray-400">出發地 From</label>
-                    <MapPinIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <div className="relative mt-1">
-                      <select value={form.from} onChange={e => setForm({...form, from: e.target.value})} className="w-full rounded-l-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-base font-medium focus:outline-none">
-                        <option value="TPE">台北桃園 TPE</option>
-                        <option value="KHH">高雄 KHH</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="relative -ml-px rounded-r-lg border border-gray-200 bg-white transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
-                    <label className="absolute left-9 top-1.5 text-xs text-gray-400">目的地 To</label>
-                    <PaperAirplaneIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <div className="relative mt-1">
-                      <select value={form.to} onChange={e => setForm({...form, to: e.target.value})} className="w-full rounded-r-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-base font-medium focus:outline-none">
-                        <option value="NRT">東京成田 NRT</option>
-                        <option value="KIX">大阪關西 KIX</option>
-                        <option value="ICN">首爾仁川 ICN</option>
-                        <option value="BKK">曼谷 BKK</option>
-                        <option value="SIN">新加坡 SIN</option>
-                        <option value="MFM">澳門 MFM</option>
-                      </select>
-                    </div>
-                  </div>
+                  <AirportDropdown
+                    value={form.from}
+                    onChange={value => setForm({...form, from: value})}
+                    label="出發地 From"
+                    groups={destinationAirportGroups}
+                    Icon={MapPinIcon}
+                    roundedClass="rounded-l-lg"
+                  />
+                  <AirportDropdown
+                    value={form.to}
+                    onChange={value => setForm({...form, to: value})}
+                    label="目的地 To"
+                    groups={destinationAirportGroups}
+                    Icon={PaperAirplaneIcon}
+                    roundedClass="-ml-px rounded-r-lg"
+                  />
                 </div>
 
                 <DateRangeCalendar
                   depart={form.depart}
                   returnDate={form.returnDate}
-                  onDepartChange={date => setForm({...form, depart: date})}
-                  onReturnChange={date => setForm({...form, returnDate: date})}
+                  onDepartChange={date => setForm((current) => ({ ...current, depart: date }))}
+                  onReturnChange={date => setForm((current) => ({ ...current, returnDate: date }))}
                   tripType={tripType}
                 />
 
