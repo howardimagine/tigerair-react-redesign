@@ -3,9 +3,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
 
-const ExpandedPriceCalendar = ({ value, onChange, monthCount = 3 }) => {
+const ExpandedPriceCalendar = ({ value, returnValue = '', tripType = 'oneway', onChange, monthCount = 3, readOnly = false }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const scrollRef = useRef(null);
+  const departDate = value ? new Date(value) : null;
+  const returnDate = returnValue ? new Date(returnValue) : null;
+  departDate?.setHours(0, 0, 0, 0);
+  returnDate?.setHours(0, 0, 0, 0);
 
   const isLowestPriceDate = (date) => {
     const day = date.getDate();
@@ -38,6 +42,8 @@ const ExpandedPriceCalendar = ({ value, onChange, monthCount = 3 }) => {
   };
 
   const handleDateClick = (day, monthOffset) => {
+    if (readOnly) return;
+
     const selectedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthOffset, day);
     onChange(formatDate(selectedDate));
   };
@@ -83,7 +89,7 @@ const ExpandedPriceCalendar = ({ value, onChange, monthCount = 3 }) => {
           ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-1.5">
+        <div className="grid grid-cols-7 gap-0">
           {days.map((day, index) => {
             if (day === null) {
               return <div key={`empty-${index}`} className="min-h-[72px]" />;
@@ -91,38 +97,60 @@ const ExpandedPriceCalendar = ({ value, onChange, monthCount = 3 }) => {
 
             const date = new Date(month.getFullYear(), month.getMonth(), day);
             const formattedDate = formatDate(date);
-            const isSelected = formattedDate === value;
+            const isDepartSelected = formattedDate === value;
+            const isReturnSelected = tripType === 'roundtrip' && formattedDate === returnValue;
+            const isSelected = isDepartSelected || isReturnSelected;
+            const isInSelectedRange = tripType === 'roundtrip' && departDate && returnDate && date > departDate && date < returnDate;
+            const isHighlighted = isSelected || isInSelectedRange;
+            const isPendingRoundtripDepart = tripType === 'roundtrip' && isDepartSelected && !returnValue;
             const isToday = today.toDateString() === date.toDateString();
             const isPast = date < today;
             const isLowest = isLowestPriceDate(date);
             const price = getPriceForDate(date);
+            const selectedRadiusClass = !isHighlighted
+              ? 'rounded-lg'
+              : isPendingRoundtripDepart
+              ? 'rounded-2xl'
+              : tripType === 'oneway'
+              ? 'rounded-2xl'
+              : isDepartSelected
+              ? 'rounded-l-2xl'
+              : isReturnSelected
+              ? 'rounded-r-2xl'
+              : 'rounded-none';
 
             return (
               <button
                 key={formattedDate}
                 type="button"
                 onClick={() => handleDateClick(day, monthOffset)}
-                disabled={isPast}
-                className={`relative min-h-[72px] rounded-lg border p-1.5 text-center transition ${
-                  isSelected
-                    ? 'border-primary bg-primary text-white shadow-md'
+                disabled={isPast || readOnly}
+                className={`relative flex min-h-[72px] flex-col items-center justify-center border px-1.5 pb-0.5 pt-3.5 text-center transition ${selectedRadiusClass} ${
+                  isPendingRoundtripDepart
+                    ? 'border-transparent bg-primary text-white'
+                    : isInSelectedRange
+                    ? 'border-transparent bg-primary text-white'
+                    : isHighlighted
+                    ? 'border-transparent bg-primary text-white'
+                    : readOnly
+                    ? 'border-transparent bg-white text-gray-700'
                     : isPast
-                    ? 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
+                    ? 'border-transparent bg-gray-50 text-gray-300 cursor-not-allowed'
                     : isLowest
-                    ? 'border-primary/70 bg-orange-50 text-gray-900 shadow-sm ring-1 ring-primary/20 hover:bg-orange-100'
+                    ? 'border-transparent bg-white text-gray-900 hover:bg-orange-50'
                     : isToday
-                    ? 'border-primary bg-white text-gray-900'
-                    : 'border-gray-100 bg-gray-50 text-gray-700 hover:border-primary/40 hover:bg-orange-50'
+                    ? 'border-transparent bg-white text-gray-900'
+                    : 'border-transparent bg-white text-gray-700 hover:bg-orange-50'
                 }`}
               >
                 {isLowest && !isPast && (
-                  <span className={`mb-0.5 block text-[9px] font-bold ${isSelected ? 'text-white' : 'text-primary'}`}>
+                  <span className={`absolute top-2 inline-block rounded-full px-1.5 py-0.5 text-[9px] font-bold leading-none ${isHighlighted ? 'bg-white text-primary' : 'bg-primary text-white'}`}>
                     最低價
                   </span>
                 )}
                 <span className="block text-sm font-bold">{day}</span>
                 {!isPast && (
-                  <span className={`mt-1 block text-[10px] font-semibold ${isSelected ? 'text-white' : isLowest ? 'text-primary' : 'text-gray-600'}`}>
+                  <span className={`block text-xs font-semibold ${isHighlighted ? 'text-white' : isLowest ? 'text-primary' : 'text-gray-600'}`}>
                     {price.toLocaleString()}
                   </span>
                 )}

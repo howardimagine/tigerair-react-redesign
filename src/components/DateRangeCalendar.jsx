@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { CalendarDaysIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+const weekdays = ['\u65e5', '\u4e00', '\u4e8c', '\u4e09', '\u56db', '\u4e94', '\u516d'];
 
-const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange, tripType }) => {
+const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange, tripType, readOnly = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeField, setActiveField] = useState('depart');
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -118,6 +118,7 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
   };
 
   const openCalendar = (field) => {
+    if (readOnly) return;
     if (field === 'return' && isOneWay) return;
     setActiveField(field);
     setIsOpen(true);
@@ -125,6 +126,7 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
 
   const clearDates = (event) => {
     event.stopPropagation();
+    if (readOnly) return;
     onDepartChange('');
     onReturnChange('');
     setIsOpen(false);
@@ -175,7 +177,7 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
               >
                 {isLowest && !isLocked && (
                   <span className={`text-[8px] font-bold leading-none ${isSelected ? 'text-white' : 'text-primary'}`}>
-                    最低價
+                    {'\u6700\u4f4e\u50f9'}
                   </span>
                 )}
                 <span className="text-[11px]">{day}</span>
@@ -194,35 +196,36 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
 
   return (
     <div ref={calendarRef} className="relative grid grid-cols-2 gap-0">
-      <div className="relative rounded-l-lg border border-gray-200 bg-white transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30">
-        <label className="absolute left-9 top-1.5 z-10 text-xs text-gray-400">去程</label>
+      <div className={`relative rounded-l-lg border border-gray-200 bg-white transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${readOnly ? 'cursor-not-allowed bg-gray-50 opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm'}`}>
+        <label className="absolute left-9 top-1.5 z-10 text-xs text-gray-400">{'\u53bb\u7a0b'}</label>
         <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
         <button
           type="button"
           onClick={() => openCalendar('depart')}
-          className="mt-1 w-full rounded-l-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none"
+          disabled={readOnly}
+          className="mt-1 w-full rounded-l-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none disabled:cursor-not-allowed"
         >
-          {formatDisplayDate(depart, '選擇出發日期')}
+          {formatDisplayDate(depart, '\u9078\u64c7\u51fa\u767c\u65e5')}
         </button>
       </div>
 
-      <div className={`relative -ml-px rounded-r-lg border border-gray-200 bg-white transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${isOneWay ? 'opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm'}`}>
-        <label className="absolute left-9 top-1.5 z-10 text-xs text-gray-400">回程</label>
+      <div className={`relative -ml-px rounded-r-lg border border-gray-200 bg-white transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${isOneWay || readOnly ? 'opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm'}`}>
+        <label className="absolute left-9 top-1.5 z-10 text-xs text-gray-400">{'\u56de\u7a0b'}</label>
         <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
         <button
           type="button"
           onClick={() => openCalendar('return')}
-          disabled={isOneWay}
+          disabled={isOneWay || readOnly}
           className="mt-1 w-full rounded-r-lg border-0 bg-transparent pb-1.5 pl-9 pr-9 pt-5 text-left text-base font-medium focus:outline-none disabled:cursor-not-allowed"
         >
-          {isOneWay ? '單程不需回程' : formatDisplayDate(returnDate, '選擇回程日期')}
+          {isOneWay ? '\u55ae\u7a0b\u4e0d\u9700\u56de\u7a0b' : formatDisplayDate(returnDate, '\u9078\u64c7\u56de\u7a0b\u65e5')}
         </button>
-        {(depart || returnDate) && (
+        {!readOnly && (depart || returnDate) && (
           <button
             type="button"
             onClick={clearDates}
             className="absolute right-2 top-1/2 z-20 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-            aria-label="清空去程與回程"
+            aria-label="Clear dates"
           >
             <XMarkIcon className="h-4 w-4" />
           </button>
@@ -241,7 +244,7 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
                 onClick={() => setActiveField('depart')}
                 className={`rounded-full px-3 py-1 ${activeField === 'depart' ? 'bg-white text-primary shadow-sm' : 'text-gray-500'}`}
               >
-                去程
+                {'\u53bb\u7a0b'}
               </button>
               {!isOneWay && (
                 <button
@@ -249,7 +252,7 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
                   onClick={() => setActiveField('return')}
                   className={`rounded-full px-3 py-1 ${activeField === 'return' ? 'bg-white text-primary shadow-sm' : 'text-gray-500'}`}
                 >
-                  回程
+                  {'\u56de\u7a0b'}
                 </button>
               )}
             </div>
