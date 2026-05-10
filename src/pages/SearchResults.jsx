@@ -481,7 +481,7 @@ const SearchResults = () => {
         </div>
 
         {filtered.length > 0 && (
-          <div className={`grid gap-8 ${tripType === 'roundtrip' ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
+          <div className={`grid p-1 gap-8 ${tripType === 'roundtrip' ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
             <section>
               {renderDirectionHeading('outbound')}
               <div className="space-y-4">
@@ -501,8 +501,8 @@ const SearchResults = () => {
         )}
 
         {filtered.length > 0 && (
-          <div className="sticky bottom-0 z-30 mt-6 border-t border-gray-200 bg-gray-50/95 py-4 backdrop-blur">
-            <div className="flex flex-col gap-3 rounded-xl bg-white p-4 shadow-lg shadow-gray-300/30 sm:flex-row sm:items-center sm:justify-between">
+          <div className="sticky bottom-0 z-30 mt-6 border-t border-gray-200 bg-gray-50/95 py-5 backdrop-blur">
+            <div className="flex gap-3 flex-row items-center justify-between">
               <div>
                 <p className="text-sm font-bold text-gray-900">
                   {isFlightSelectionComplete ? '\u5df2\u9078\u64c7\u822a\u73ed' : '\u8acb\u5148\u9078\u64c7\u822a\u73ed\u8207\u65b9\u6848'}
