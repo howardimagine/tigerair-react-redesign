@@ -28,7 +28,7 @@ const getItemLink = (item) => {
 };
 
 const Footer = () => (
-  <footer className="border-t border-gray-100 bg-white text-gray-700">
+  <footer className="border-t border-gray-200 bg-gray-50 text-gray-700">
     <div className="mx-auto max-w-8xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
       <div className="grid gap-10 lg:grid-cols-[0.85fr_2fr]">
         <div>
@@ -92,7 +92,7 @@ const Footer = () => (
         </div>
       </div>
 
-      <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-gray-100 pt-6 text-sm text-gray-500">
+      <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-gray-200 pt-6 text-sm text-gray-500">
         <span>© 2026 {sitemap.site_name}. 台灣虎航股份有限公司</span>
         <Link to="/articles/article-1" className="transition hover:text-primary">隱私權政策</Link>
         <Link to="/articles/article-1" className="transition hover:text-primary">使用條款</Link>

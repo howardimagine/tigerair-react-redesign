@@ -315,7 +315,7 @@ const SearchResults = () => {
         }}
         className={`relative cursor-pointer overflow-hidden rounded-xl bg-white shadow-sm ring-1 transition hover:shadow-md ${
           isSelected ? 'ring-2 ring-primary' : 'ring-gray-100'
-        } ${isDimmed ? 'grayscale opacity-80 hover:grayscale-0 hover:opacity-100' : ''} ${animationClass}`}
+        } ${isDimmed ? 'grayscale opacity-50' : ''} ${animationClass}`}
       >
         <div className="absolute bottom-0 right-32 top-0 hidden border-l border-dashed border-gray-200 md:block" />
         <div className="absolute right-32 top-0 hidden h-5 w-5 -translate-y-1/2 translate-x-1/2 rounded-full bg-gray-50 md:block" />
