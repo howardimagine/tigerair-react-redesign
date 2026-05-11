@@ -144,13 +144,13 @@ const ExpandedPriceCalendar = ({ value, returnValue = '', tripType = 'oneway', o
                 }`}
               >
                 {isLowest && !isPast && (
-                  <span className={`absolute top-2 inline-block rounded-full px-1.5 py-0.5 text-[9px] font-bold leading-none ${isHighlighted ? 'bg-white text-primary' : 'bg-primary text-white'}`}>
+                  <span className={`absolute top-2 inline-block rounded-full px-1.5 py-0.5 text-[8px] font-bold leading-none sm:text-[9px] ${isHighlighted ? 'bg-white text-primary' : 'bg-primary text-white'}`}>
                     最低價
                   </span>
                 )}
                 <span className="block text-sm font-bold">{day}</span>
                 {!isPast && (
-                  <span className={`block text-xs font-semibold ${isHighlighted ? 'text-white' : isLowest ? 'text-primary' : 'text-gray-600'}`}>
+                  <span className={`block text-[10px] font-semibold sm:text-xs ${isHighlighted ? 'text-white' : isLowest ? 'text-primary' : 'text-gray-600'}`}>
                     {price.toLocaleString()}
                   </span>
                 )}

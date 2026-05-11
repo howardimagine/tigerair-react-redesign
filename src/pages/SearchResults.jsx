@@ -299,6 +299,11 @@ const SearchResults = () => {
     const selectedFlight = selectedFlights[direction];
     const isSelected = selectedFlight?.flight.id === flight.id;
     const isDimmed = Boolean(selectedFlight) && !isSelected;
+    const mainTextClass = isDimmed ? 'text-gray-500/80' : 'text-gray-900';
+    const mutedTextClass = isDimmed ? 'text-gray-500/80' : 'text-gray-400';
+    const accentTextClass = isDimmed ? 'text-gray-500/80' : 'text-primary';
+    const accentBgClass = isDimmed ? 'bg-gray-400/80' : 'bg-primary';
+    const pathLineClass = isDimmed ? 'bg-gray-300' : 'bg-gray-200';
     const animationClass =
       index === 0 ? 'animate-fade-in-delay-3' :
       index === 1 ? 'animate-fade-in-delay-4' :
@@ -315,51 +320,56 @@ const SearchResults = () => {
         }}
         className={`relative cursor-pointer overflow-hidden rounded-xl bg-white shadow-sm ring-1 transition hover:shadow-md ${
           isSelected ? 'ring-2 ring-primary' : 'ring-gray-100'
-        } ${isDimmed ? 'grayscale opacity-50' : ''} ${animationClass}`}
+        } ${animationClass}`}
       >
+        {isSelected && (
+          <div className="absolute right-0 top-0 z-10 rounded-bl-lg bg-primary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+            {selectedFlight.bundle.name}
+          </div>
+        )}
         <div className="absolute bottom-0 right-32 top-0 hidden border-l border-dashed border-gray-200 md:block" />
         <div className="absolute right-32 top-0 hidden h-5 w-5 -translate-y-1/2 translate-x-1/2 rounded-full bg-gray-50 md:block" />
         <div className="absolute bottom-0 right-32 hidden h-5 w-5 translate-x-1/2 translate-y-1/2 rounded-full bg-gray-50 md:block" />
 
-        <div className="grid md:grid-cols-[1fr_8rem]">
-          <div className="p-4 sm:p-5">
-            <div className="flex items-end gap-3">
+        <div className="grid grid-cols-[1fr_5rem] md:grid-cols-[1fr_8rem]">
+          <div className="p-3 sm:p-5">
+            <div className="flex items-end gap-2 sm:gap-3">
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-gray-900">{getAirportDisplayName(origin)}</p>
+                <p className={`truncate text-xs font-semibold sm:text-sm ${mainTextClass}`}>{getAirportDisplayName(origin)}</p>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-sm font-bold text-gray-900">{origin}</span>
-                  <span className="text-2xl font-bold text-gray-900">{flight.depart}</span>
+                  <span className={`text-xs font-bold sm:text-sm ${mainTextClass}`}>{origin}</span>
+                  <span className={`text-lg font-bold sm:text-2xl ${mainTextClass}`}>{flight.depart}</span>
                 </div>
               </div>
 
               <div className="flex flex-1 flex-col items-center pb-1">
-                <span className="mb-1 text-xs font-semibold text-gray-900">{flight.id}</span>
-                <span className="mb-1 text-xs font-medium text-gray-400">{flight.duration}</span>
-                <div className="flex w-full items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                  <span className="h-px flex-1 bg-gray-200" />
-                  <Plane className="h-4 w-4 text-primary" />
-                  <span className="h-px flex-1 bg-gray-200" />
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                <span className={`mb-0.5 text-[10px] font-semibold sm:mb-1 sm:text-xs ${mainTextClass}`}>{flight.id}</span>
+                <span className={`mb-0.5 text-[10px] font-medium sm:mb-1 sm:text-xs ${mutedTextClass}`}>{flight.duration}</span>
+                <div className="flex w-full items-center gap-1 sm:gap-2">
+                  <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${accentBgClass}`} />
+                  <span className={`h-px flex-1 ${pathLineClass}`} />
+                  <Plane className={`h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4 ${accentTextClass}`} />
+                  <span className={`h-px flex-1 ${pathLineClass}`} />
+                  <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${accentBgClass}`} />
                 </div>
               </div>
 
               <div className="min-w-0 text-right">
-                <p className="truncate text-sm font-semibold text-gray-900">{getAirportDisplayName(destination)}</p>
+                <p className={`truncate text-xs font-semibold sm:text-sm ${mainTextClass}`}>{getAirportDisplayName(destination)}</p>
                 <div className="mt-1 flex items-baseline justify-end gap-2">
-                  <span className="text-sm font-bold text-gray-900">{destination}</span>
-                  <span className="text-2xl font-bold text-gray-900">{flight.arrive}</span>
+                  <span className={`text-xs font-bold sm:text-sm ${mainTextClass}`}>{destination}</span>
+                  <span className={`text-lg font-bold sm:text-2xl ${mainTextClass}`}>{flight.arrive}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between border-t border-dashed border-gray-200 p-4 md:flex-col md:items-start md:justify-center md:border-l md:border-t-0">
-            <div>
-              <div className="mt-1 whitespace-nowrap text-xl font-bold text-primary">NT$ {flight.price.toLocaleString()}</div>
-              {isSelected && (
-                <div className="mt-1 text-xs font-semibold text-gray-900">{selectedFlight.bundle.name}</div>
-              )}
+          <div className="flex items-center justify-center border-l border-dashed border-gray-200 p-2 md:flex-col md:items-start md:justify-center md:p-4">
+            <div className="text-center md:text-left">
+              <div className={`mt-1 flex flex-col leading-tight text-base font-bold sm:text-xl ${accentTextClass}`}>
+                <span>NT$</span>
+                <span>{flight.price.toLocaleString()}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -370,7 +380,7 @@ const SearchResults = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-3">
       <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-4 rounded-xl bg-white p-4 sm:p-6 md:px-8 md:py-5 shadow-lg shadow-gray-300/30">
+        <div className="mb-4 rounded-xl bg-white p-2 sm:p-6 md:px-8 md:py-5 shadow-lg shadow-gray-300/30">
           <form onSubmit={handleSearch}>
             <div className="grid grid-cols-1 gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr_0.9fr] lg:items-end">
               <div className="relative rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
@@ -463,14 +473,14 @@ const SearchResults = () => {
               <div className="flex items-stretch">
                 <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-4 text-base font-bold text-white transition hover:bg-primary-dark">
                   <MagnifyingGlassIcon className="h-4 w-4" />
-                  {'\u641c\u5c0b\u822a\u73ed'}
+                  {'重新搜尋'}
                 </button>
               </div>
             </div>
           </form>
         </div>
 
-        <div className="mb-6 animate-fade-in-delay-2 rounded-xl bg-white p-4 sm:p-6 md:px-8 md:py-3 shadow-sm">
+        <div className="mb-6 animate-fade-in-delay-2 rounded-xl bg-white p-2 sm:p-6 md:px-8 md:py-3 shadow-sm">
           <ExpandedPriceCalendar
             value={form.depart}
             returnValue={form.returnDate}

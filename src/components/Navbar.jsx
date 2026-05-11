@@ -155,7 +155,7 @@ const Navbar = () => {
             <img
               src="https://www.tigerairtw.com/assets/zh-TW.8eb62b76.svg"
               alt="Tiger Air Taiwan"
-              className="h-9"
+              className="h-7 sm:h-9"
             />
           </Link>
 
