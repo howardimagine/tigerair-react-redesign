@@ -317,7 +317,7 @@ const SearchResults = () => {
           if (event.key === 'Enter') openBundleModal(flight, direction);
         }}
         className={`relative cursor-pointer overflow-hidden rounded-xl bg-white shadow-sm ring-1 transition hover:shadow-md ${
-          isSelected ? 'ring-2 ring-primary' : 'ring-gray-100'
+          isSelected ? 'ring-2  ring-primary' : 'ring-gray-100'
         } ${animationClass}`}
       >
         {isSelected && (
@@ -376,11 +376,11 @@ const SearchResults = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-3">
+    <div className="min-h-screen bg-gray-50 pt-3 pb-10">
       <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-4 rounded-xl bg-white p-2 sm:p-6 md:px-8 md:py-5 shadow-lg shadow-gray-300/30">
+        <div className="m-1 mb-2 rounded-xl bg-white p-2 sm:p-6 md:px-8 md:py-5 shadow-lg shadow-gray-300/30">
           <form onSubmit={handleSearch}>
-            <div className="grid grid-cols-2 gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr_0.6fr] lg:items-end">
+            <div className="grid grid-cols-[2fr_3fr] gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr_0.6fr] lg:items-end">
               <div className="relative order-1 col-span-1 rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30 lg:order-1 lg:col-span-1">
                 <label className="absolute left-9 top-1.5 text-xs text-gray-400">{'\u65c5\u7a0b'}</label>
                 <ArrowsRightLeftIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -480,7 +480,7 @@ const SearchResults = () => {
           </form>
         </div>
 
-        <div className="mb-6 animate-fade-in-delay-2 rounded-xl bg-white p-2 sm:p-6 md:px-8 md:py-3 shadow-sm">
+        <div className="m-1 mb-6 animate-fade-in-delay-2 rounded-xl bg-white p-2 sm:p-6 md:px-8 md:py-3 shadow-sm">
           <ExpandedPriceCalendar
             value={form.depart}
             returnValue={form.returnDate}
@@ -511,14 +511,14 @@ const SearchResults = () => {
         )}
 
         {filtered.length > 0 && (
-          <div className="sticky bottom-0 z-30 mt-6 border-t border-gray-200 bg-gray-50/95 pt-2 pb-5 backdrop-blur">
+          <div className="sticky bottom-0 z-30 mt-6 border-t border-gray-200 bg-gray-50/95 pt-3 pb-4 backdrop-blur">
             <div className="flex gap-3 flex-row items-center justify-between">
               <div>
                 <p className="text-xl font-black text-gray-900">
                   <span className="mr-1 text-xs font-bold">TWD</span>
                   {selectedTotalPrice.toLocaleString()}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">欲參考機隊資料請按此</p>
+                <p className="text-xs text-gray-400">欲參考機隊資料請按此</p>
               </div>
               <button
                 type="button"
