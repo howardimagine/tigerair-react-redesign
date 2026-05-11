@@ -1,12 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, PlaneTakeoff } from 'lucide-react';
+import { Plane, PlaneLanding, PlaneTakeoff, RefreshCw } from 'lucide-react';
 import {
   ArrowsRightLeftIcon,
   ChevronDownIcon,
-  MagnifyingGlassIcon,
-  MapPinIcon,
-  PaperAirplaneIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/solid';
 import ExpandedPriceCalendar from '../components/ExpandedPriceCalendar';
@@ -251,6 +248,7 @@ const SearchResults = () => {
 
   const filtered = flights;
   const isFlightSelectionComplete = Boolean(selectedFlights.outbound) && (tripType === 'oneway' || Boolean(selectedFlights.return));
+  const selectedTotalPrice = (selectedFlights.outbound?.totalPrice || 0) + (selectedFlights.return?.totalPrice || 0);
 
   const openBundleModal = (flight, direction) => {
     setBundleModal({ flight, direction });
@@ -364,10 +362,10 @@ const SearchResults = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-center border-l border-dashed border-gray-200 p-2 md:flex-col md:items-start md:justify-center md:p-4">
-            <div className="text-center md:text-left">
-              <div className={`mt-1 flex flex-col leading-tight text-base font-bold sm:text-xl ${accentTextClass}`}>
-                <span>NT$</span>
+          <div className="flex items-center justify-center border-l border-dashed border-gray-200 p-2 md:flex-col md:items-center md:justify-center md:p-4">
+            <div className="text-center">
+              <div className={`mt-1 flex flex-col items-center leading-tight text-base font-bold sm:text-xl ${accentTextClass}`}>
+                <span className="text-[10px] font-bold sm:text-xs">TWD</span>
                 <span>{flight.price.toLocaleString()}</span>
               </div>
             </div>
@@ -382,8 +380,8 @@ const SearchResults = () => {
       <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
         <div className="mb-4 rounded-xl bg-white p-2 sm:p-6 md:px-8 md:py-5 shadow-lg shadow-gray-300/30">
           <form onSubmit={handleSearch}>
-            <div className="grid grid-cols-1 gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr_0.9fr] lg:items-end">
-              <div className="relative rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
+            <div className="grid grid-cols-2 gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr_0.6fr] lg:items-end">
+              <div className="relative order-1 col-span-1 rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30 lg:order-1 lg:col-span-1">
                 <label className="absolute left-9 top-1.5 text-xs text-gray-400">{'\u65c5\u7a0b'}</label>
                 <ArrowsRightLeftIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <div className="relative mt-1">
@@ -398,13 +396,13 @@ const SearchResults = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-0">
+              <div className="order-3 col-span-2 grid grid-cols-2 gap-0 lg:order-2 lg:col-span-1">
                 <AirportDropdown
                   value={form.from}
                   onChange={value => setForm({...form, from: value})}
                   label={'\u51fa\u767c\u5730 From'}
                   groups={airportGroups}
-                  Icon={MapPinIcon}
+                  Icon={PlaneTakeoff}
                   roundedClass="rounded-l-lg"
                 />
                 <AirportDropdown
@@ -412,21 +410,23 @@ const SearchResults = () => {
                   onChange={value => setForm({...form, to: value})}
                   label={'\u76ee\u7684\u5730 To'}
                   groups={airportGroups}
-                  Icon={PaperAirplaneIcon}
+                  Icon={PlaneLanding}
                   roundedClass="-ml-px rounded-r-lg"
                 />
               </div>
 
-              <DateRangeCalendar
-                depart={form.depart}
-                returnDate={form.returnDate}
-                onDepartChange={date => setForm((current) => ({ ...current, depart: date }))}
-                onReturnChange={date => setForm((current) => ({ ...current, returnDate: date }))}
-                tripType={tripType}
-                readOnly
-              />
+              <div className="order-4 col-span-2 lg:order-3 lg:col-span-1">
+                <DateRangeCalendar
+                  depart={form.depart}
+                  returnDate={form.returnDate}
+                  onDepartChange={date => setForm((current) => ({ ...current, depart: date }))}
+                  onReturnChange={date => setForm((current) => ({ ...current, returnDate: date }))}
+                  tripType={tripType}
+                  readOnly
+                />
+              </div>
 
-              <div ref={passengerDropdownRef} className="relative rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
+              <div ref={passengerDropdownRef} className="relative order-2 col-span-1 rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30 lg:order-4">
                 <label className="absolute left-9 top-1.5 text-xs text-gray-400">{'\u65c5\u5ba2 Passengers'}</label>
                 <UserGroupIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <div className="relative mt-1">
@@ -470,9 +470,9 @@ const SearchResults = () => {
                 )}
               </div>
 
-              <div className="flex items-stretch">
-                <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-4 text-base font-bold text-white transition hover:bg-primary-dark">
-                  <MagnifyingGlassIcon className="h-4 w-4" />
+              <div className="order-5 col-span-2 flex items-stretch lg:order-5 lg:col-span-1">
+                <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-lg border border-primary/20 bg-orange-50 px-4 py-4 text-sm font-bold text-primary transition hover:border-primary hover:bg-primary hover:text-white">
+                  <RefreshCw className="h-4 w-4" />
                   {'重新搜尋'}
                 </button>
               </div>
@@ -511,15 +511,14 @@ const SearchResults = () => {
         )}
 
         {filtered.length > 0 && (
-          <div className="sticky bottom-0 z-30 mt-6 border-t border-gray-200 bg-gray-50/95 py-5 backdrop-blur">
+          <div className="sticky bottom-0 z-30 mt-6 border-t border-gray-200 bg-gray-50/95 pt-2 pb-5 backdrop-blur">
             <div className="flex gap-3 flex-row items-center justify-between">
               <div>
-                <p className="text-sm font-bold text-gray-900">
-                  {isFlightSelectionComplete ? '\u5df2\u9078\u64c7\u822a\u73ed' : '\u8acb\u5148\u9078\u64c7\u822a\u73ed\u8207\u65b9\u6848'}
+                <p className="text-xl font-black text-gray-900">
+                  <span className="mr-1 text-xs font-bold">TWD</span>
+                  {selectedTotalPrice.toLocaleString()}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">
-                  {tripType === 'roundtrip' ? '\u9700\u8981\u5b8c\u6210\u53bb\u7a0b\u8207\u56de\u7a0b\u9078\u64c7' : '\u9700\u8981\u5b8c\u6210\u53bb\u7a0b\u9078\u64c7'}
-                </p>
+                <p className="mt-1 text-xs text-gray-500">欲參考機隊資料請按此</p>
               </div>
               <button
                 type="button"
@@ -527,7 +526,7 @@ const SearchResults = () => {
                 disabled={!isFlightSelectionComplete}
                 className="rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
               >
-                {'\u78ba\u5b9a\u822a\u73ed\u4e0b\u4e00\u6b65'}
+                {'下一步'}
               </button>
             </div>
           </div>
@@ -571,7 +570,7 @@ const SearchResults = () => {
                   <p className="text-xs font-bold uppercase tracking-wide text-primary">{bundle.name}</p>
                   <h3 className="mt-1 text-lg font-bold text-gray-900">{bundle.title}</h3>
                   <p className="mt-3 text-xl font-bold text-gray-900">
-                    NT$ {(bundleModal.flight.price + bundle.priceOffset).toLocaleString()}
+                    TWD {(bundleModal.flight.price + bundle.priceOffset).toLocaleString()}
                   </p>
                   <ul className="mt-4 space-y-2 text-xs font-medium text-gray-600">
                     {bundle.features.map((feature) => (

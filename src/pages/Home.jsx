@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PlaneLanding, PlaneTakeoff } from 'lucide-react';
 import {
   MagnifyingGlassIcon,
   PaperAirplaneIcon,
@@ -11,7 +12,6 @@ import {
   InformationCircleIcon,
   SignalIcon,
   ArrowsRightLeftIcon,
-  MapPinIcon,
   CalendarDaysIcon,
   XMarkIcon,
   ChevronDownIcon,
@@ -415,7 +415,7 @@ const Home = () => {
                     onChange={value => setForm({...form, from: value})}
                     label="出發地 From"
                     groups={destinationAirportGroups}
-                    Icon={MapPinIcon}
+                    Icon={PlaneTakeoff}
                     roundedClass="rounded-l-lg"
                   />
                   <AirportDropdown
@@ -423,7 +423,7 @@ const Home = () => {
                     onChange={value => setForm({...form, to: value})}
                     label="目的地 To"
                     groups={destinationAirportGroups}
-                    Icon={PaperAirplaneIcon}
+                    Icon={PlaneLanding}
                     roundedClass="-ml-px rounded-r-lg"
                   />
                 </div>

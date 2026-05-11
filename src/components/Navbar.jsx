@@ -150,7 +150,7 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 bg-white/95 shadow-lg shadow-gray-300/10 backdrop-blur">
       <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-14 items-center justify-between md:h-16">
           <Link to="/" className="flex items-center">
             <img
               src="https://www.tigerairtw.com/assets/zh-TW.8eb62b76.svg"
