@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const weekdays = ['\u65e5', '\u4e00', '\u4e8c', '\u4e09', '\u56db', '\u4e94', '\u516d'];
 
-const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange, tripType, readOnly = false }) => {
+const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange, tripType, readOnly = false, openTrigger = 0 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeField, setActiveField] = useState('depart');
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -24,6 +24,52 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (openTrigger > 0 && !readOnly) {
+      setIsOpen(true);
+      setActiveField('depart');
+    }
+  }, [openTrigger, readOnly]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    let lockTimer = null;
+    let raf1 = null;
+    let raf2 = null;
+    const previousOverflow = document.body.style.overflow;
+
+    const centerDropdown = () => {
+      if (cancelled) return;
+      const node = dropdownRef.current;
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      const dropdownCenter = rect.top + rect.height / 2;
+      const viewportCenter = window.innerHeight / 2;
+      const delta = dropdownCenter - viewportCenter;
+      if (Math.abs(delta) > 4) {
+        window.scrollBy({ top: delta, behavior: 'smooth' });
+      }
+      lockTimer = window.setTimeout(() => {
+        if (!cancelled) document.body.style.overflow = 'hidden';
+      }, 500);
+    };
+
+    raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(centerDropdown);
+    });
+
+    return () => {
+      cancelled = true;
+      if (raf1) window.cancelAnimationFrame(raf1);
+      if (raf2) window.cancelAnimationFrame(raf2);
+      if (lockTimer) window.clearTimeout(lockTimer);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
 
   const formatDate = (date) => {
     const year = date.getFullYear();
@@ -197,11 +243,11 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
   return (
     <div ref={calendarRef} className="relative grid grid-cols-2 gap-0">
       <div
-        className={`group relative rounded-l-lg border border-gray-200 bg-white transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${readOnly ? 'cursor-not-allowed bg-gray-50 opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm'}`}
+        className={`group relative rounded-l-lg border border-gray-200 bg-white/70 backdrop-blur-sm transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${readOnly ? 'cursor-not-allowed bg-gray-50 opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm'}`}
         title={readOnly ? '請使用下方月曆選擇日期' : undefined}
       >
-        <label className="absolute left-9 top-1.5 z-10 text-xs text-gray-400">{'\u53bb\u7a0b'}</label>
-        <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <label className="absolute left-9 top-1.5 z-10 text-xs font-semibold text-gray-600">{'\u53bb\u7a0b'}</label>
+        <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-primary" />
         <button
           type="button"
           onClick={() => openCalendar('depart')}
@@ -218,11 +264,11 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
       </div>
 
       <div
-        className={`group relative -ml-px rounded-r-lg border border-gray-200 bg-white transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${isOneWay || readOnly ? 'opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm'}`}
+        className={`group relative -ml-px rounded-r-lg border border-gray-200 bg-white/70 backdrop-blur-sm transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${isOneWay || readOnly ? 'opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm'}`}
         title={readOnly ? '請使用下方月曆選擇日期' : undefined}
       >
-        <label className="absolute left-9 top-1.5 z-10 text-xs text-gray-400">{'\u56de\u7a0b'}</label>
-        <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <label className="absolute left-9 top-1.5 z-10 text-xs font-semibold text-gray-600">{'\u56de\u7a0b'}</label>
+        <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-primary" />
         <button
           type="button"
           onClick={() => openCalendar('return')}
@@ -249,7 +295,13 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-full rounded-lg bg-white p-4 shadow-xl sm:w-[700px]">
+        <>
+          <div
+            className="fixed inset-0 z-[60] bg-black/55 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+        <div ref={dropdownRef} className="absolute left-0 top-full z-[70] mt-2 w-full rounded-2xl bg-white p-5 shadow-2xl lg:left-[calc(-100%-0.5rem)] lg:w-[calc(200%+0.5rem)]">
           <div className="mb-4 flex items-center justify-between">
             <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="rounded p-1 transition hover:bg-gray-100">
               <ChevronLeft className="h-5 w-5 text-gray-600" />
@@ -280,6 +332,7 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
             {[0, 1].map((index) => renderMonth(generateMonth(index), index))}
           </div>
         </div>
+        </>
       )}
     </div>
   );

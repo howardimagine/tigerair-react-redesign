@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlaneLanding, PlaneTakeoff } from 'lucide-react';
 import {
@@ -15,62 +15,58 @@ import {
   CalendarDaysIcon,
   XMarkIcon,
   ChevronDownIcon,
-  ArrowRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  MapPinIcon,
+  PlusIcon,
+  ClipboardDocumentListIcon,
+  EnvelopeIcon,
+  QuestionMarkCircleIcon,
 } from '@heroicons/react/24/solid';
 import DateRangeCalendar from '../components/DateRangeCalendar';
+import FlipBoard from '../components/FlipBoard';
 import { latestNews } from '../data/news';
 
 const heroSlides = [
   {
     place: 'Tokyo',
-    city: '東京 Tokyo',
-    fare: 'NT$ 5,999 起',
-    img: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1920&h=900&fit=crop',
+    name: '東京',
+    code: 'NRT',
+    fare: '4,999',
+    subtitle: '現在就預訂春季賞櫻機票',
+    img: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1920&h=900&fit=crop',
   },
   {
     place: 'Osaka',
-    city: '大阪 Osaka',
-    fare: 'NT$ 6,499 起',
-    img: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?w=1920&h=900&fit=crop',
+    name: '大阪',
+    code: 'KIX',
+    fare: '5,499',
+    subtitle: '搶先卡位秋季賞楓秘境，感受滿山紅葉的浪漫',
+    img: 'https://images.unsplash.com/photo-1604834733992-8453fdf4ba68?w=1920&h=900&fit=crop',
   },
   {
-    place: 'Singapore',
-    city: '新加坡 Singapore',
-    fare: 'NT$ 4,499 起',
-    img: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1920&h=900&fit=crop',
+    place: 'Okinawa',
+    name: '沖繩',
+    code: 'OKA',
+    fare: '3,999',
+    subtitle: '擁抱盛夏湛藍海島，立馬預訂你的陽光沙灘假期',
+    img: 'https://images.unsplash.com/photo-1610971250019-f677bc1300be?w=1920&h=900&fit=crop',
   },
   {
-    place: 'Vietnam',
-    city: '越南 Da Nang',
-    fare: 'NT$ 3,299 起',
-    img: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=1920&h=900&fit=crop',
+    place: 'Seoul',
+    name: '首爾',
+    code: 'ICN',
+    fare: '4,499',
+    subtitle: '預約冬季浪漫初雪，享受道地美食與滑雪樂趣',
+    img: 'https://images.unsplash.com/photo-1637073758540-f2aaec39e9c3?w=1920&h=900&fit=crop',
   },
   {
-    place: 'Thailand',
-    city: '泰國 Bangkok',
-    fare: 'NT$ 3,999 起',
-    img: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=1920&h=900&fit=crop',
-  },
-];
-
-const bannerSlides = [
-  {
-    title: 'Fly More, Save More',
-    subtitle: '精選亞洲航線限時優惠，下一趟旅程現在出發',
-    cta: '查看優惠',
-    img: 'https://strapi-assets.tigerairtw.com/HRBN_team_Tiger_2880x600_3758637ac4.jpg',
-  },
-  {
-    title: 'Japan City Break',
-    subtitle: '東京、大阪熱門航點，輕鬆安排週末小旅行',
-    cta: '探索日本',
-    img: 'https://strapi-assets.tigerairtw.com/W26_HERO_Banner_2880_X600_431aaa59d7.jpg',
-  },
-  {
-    title: 'Beach & City Escape',
-    subtitle: '曼谷、越南、新加坡，城市和海島一次收藏',
-    cta: '開始搜尋',
-    img: 'https://strapi-assets.tigerairtw.com/banner_2880x600_e31ff8f824.gif',
+    place: 'Bangkok',
+    name: '曼谷',
+    code: 'BKK',
+    fare: '3,999',
+    subtitle: '逃離寒冬擁抱暖陽，立刻出發享受熱帶放鬆之旅',
+    img: 'https://images.unsplash.com/photo-1562602833-0f4ab2fc46e3?w=1920&h=900&fit=crop',
   },
 ];
 
@@ -143,16 +139,16 @@ const AirportDropdown = ({ value, onChange, label, groups, Icon, roundedClass = 
   }, []);
 
   return (
-    <div ref={dropdownRef} className={`relative border border-gray-200 bg-white transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${roundedClass}`}>
-      <label className="absolute left-9 top-1.5 text-xs text-gray-400">{label}</label>
-      <Icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+    <div ref={dropdownRef} className={`relative border border-gray-200 bg-white/70 backdrop-blur-sm transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${roundedClass}`}>
+      <label className="absolute left-9 top-1.5 text-xs font-semibold text-gray-600">{label}</label>
+      <Icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
         className={`mt-1 flex w-full items-center justify-between gap-2 border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none ${buttonRoundedClass}`}
       >
         <span className="truncate">{selectedAirport?.label || '請選擇'}</span>
-        <ChevronDownIcon className={`h-4 w-4 shrink-0 text-gray-400 transition ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDownIcon className={`h-4 w-4 shrink-0 text-gray-600 transition ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
@@ -189,15 +185,41 @@ const Home = () => {
   const [tripType, setTripType] = useState('roundtrip');
   const [form, setForm] = useState({ from: 'TPE', to: 'NRT', depart: '', returnDate: '', passengers: 1 });
   const [activeHeroSlide, setActiveHeroSlide] = useState(0);
-  const [activeBannerSlide, setActiveBannerSlide] = useState(0);
   const [isPromoOpen, setIsPromoOpen] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromoCode, setAppliedPromoCode] = useState('');
   const [isPassengerOpen, setIsPassengerOpen] = useState(false);
   const [passengerCounts, setPassengerCounts] = useState({ adult: 2, child: 0, infant: 0 });
   const passengerDropdownRef = useRef(null);
-  const heroFareMeasureRef = useRef(null);
-  const [heroFareButtonWidth, setHeroFareButtonWidth] = useState(0);
+  const [calendarOpenTrigger, setCalendarOpenTrigger] = useState(0);
+  const [isOpeningMap, setIsOpeningMap] = useState(false);
+  const searchFormRef = useRef(null);
+  const parallaxRef = useRef(null);
+
+  const handleOpenMap = () => {
+    if (isOpeningMap) return;
+    setIsOpeningMap(true);
+    window.setTimeout(() => navigate('/fare-map'), 500);
+  };
+
+  useEffect(() => {
+    let frameId = null;
+    const onScroll = () => {
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(() => {
+        if (parallaxRef.current) {
+          const offset = Math.min(window.scrollY, 600) * 0.35;
+          parallaxRef.current.style.transform = `translate3d(0, ${offset}px, 0)`;
+        }
+        frameId = null;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (frameId) window.cancelAnimationFrame(frameId);
+    };
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -231,17 +253,6 @@ const Home = () => {
     });
   };
 
-  const destinations = [
-    { city: '東京 Tokyo', country: 'Japan', img: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&h=400&fit=crop', price: 'NT$ 5,999' },
-    { city: '首爾 Seoul', country: 'Korea', img: 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=600&h=400&fit=crop', price: 'NT$ 4,999' },
-    { city: '大阪 Osaka', country: 'Japan', img: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?w=600&h=400&fit=crop', price: 'NT$ 6,499' },
-    { city: '曼谷 Bangkok', country: 'Thailand', img: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=600&h=400&fit=crop', price: 'NT$ 3,999' },
-    { city: '新加坡 Singapore', country: 'Singapore', img: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=600&h=400&fit=crop', price: 'NT$ 4,499' },
-    { city: '澳門 Macau', country: 'China', img: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=600&h=400&fit=crop', price: 'NT$ 2,999' },
-    { city: '峴港 Da Nang', country: 'Vietnam', img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&h=400&fit=crop', price: 'NT$ 3,299' },
-    { city: '普吉 Phuket', country: 'Thailand', img: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=600&h=400&fit=crop', price: 'NT$ 4,299' },
-  ];
-
   const features = [
     { icon: TagIcon, title: '超值票價', sub: 'Low Fares', desc: '最優惠的機票價格' },
     { icon: GlobeAltIcon, title: '多元航線', sub: 'Routes', desc: '飛往亞洲各大城市' },
@@ -249,40 +260,61 @@ const Home = () => {
     { icon: PaperAirplaneIcon, title: '準點起飛', sub: 'On-time', desc: '高準點率保證' },
   ];
 
-  const bannerAds = [
+  const promoSquares = [
     {
-      title: 'Early Bird Sale 早鳥優惠',
-      subtitle: '日本、韓國熱門航線限時開搶',
-      cta: '立即訂票',
+      tag: 'SALE',
+      tagClass: 'bg-red-500',
+      title: 'Fly More, Save More',
+      subtitle: '精選亞洲航線限時優惠，下一趟旅程現在出發',
       img: 'https://strapi-assets.tigerairtw.com/HRBN_team_Tiger_2880x600_3758637ac4.jpg',
+      path: '/search',
     },
     {
-      title: 'Weekend Getaway 週末輕旅行',
-      subtitle: '亞洲城市短航線，說走就走',
-      cta: '探索航線',
+      tag: 'JAPAN',
+      tagClass: 'bg-pink-500',
+      title: 'Japan City Break',
+      subtitle: '東京、大阪熱門航點，輕鬆安排週末小旅行',
       img: 'https://strapi-assets.tigerairtw.com/W26_HERO_Banner_2880_X600_431aaa59d7.jpg',
+      path: '/search',
+    },
+    {
+      tag: 'BEACH',
+      tagClass: 'bg-sky-500',
+      title: 'Beach & City Escape',
+      subtitle: '曼谷、越南、新加坡，城市和海島一次收藏',
+      img: 'https://strapi-assets.tigerairtw.com/banner_2880x600_e31ff8f824.gif',
+      path: '/search',
+    },
+    {
+      tag: 'EARLY',
+      tagClass: 'bg-primary',
+      title: 'Early Bird 早鳥優惠',
+      subtitle: '日本、韓國熱門航線限時開搶',
+      img: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=900&h=900&fit=crop',
+      path: '/search',
+    },
+    {
+      tag: 'WEEKEND',
+      tagClass: 'bg-emerald-500',
+      title: 'Weekend Getaway',
+      subtitle: '亞洲城市短航線，說走就走',
+      img: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=900&h=900&fit=crop',
+      path: '/search',
     },
   ];
 
   const quickActions = [
-    { icon: PaperAirplaneIcon, label: '訂位購票', path: '/search' },
-    { icon: CheckCircleIcon, label: '確認定位', path: '/orders' },
-    { icon: InformationCircleIcon, label: '自助報到', path: '/checkin' },
-    { icon: SignalIcon, label: '航班動態', path: '/flight-status' },
+    { icon: ClipboardDocumentListIcon, label: '管理訂單', path: '/orders' },
+    { icon: PaperAirplaneIcon, label: '自助報到', path: '/checkin' },
+    { icon: CalendarDaysIcon, label: '航班動態', path: '/flight-status' },
+    { icon: EnvelopeIcon, label: '免稅品購買', path: '/articles' },
+    { icon: QuestionMarkCircleIcon, label: '常見問題', path: '/support' },
   ];
 
   useEffect(() => {
     const timer = window.setInterval(() => {
       setActiveHeroSlide((current) => (current + 1) % heroSlides.length);
     }, 4500);
-
-    return () => window.clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setActiveBannerSlide((current) => (current + 1) % bannerSlides.length);
-    }, 5000);
 
     return () => window.clearInterval(timer);
   }, []);
@@ -303,61 +335,84 @@ const Home = () => {
 
   const activeHeroRoute = heroSlides[activeHeroSlide];
 
-  useLayoutEffect(() => {
-    if (heroFareMeasureRef.current) {
-      setHeroFareButtonWidth(heroFareMeasureRef.current.offsetWidth);
-    }
-  }, [activeHeroRoute]);
+  const handleHeroNav = (direction) => {
+    setActiveHeroSlide((current) => (current + direction + heroSlides.length) % heroSlides.length);
+  };
+
+  const handleHeroBook = () => {
+    setForm((current) => ({ ...current, from: 'TPE', to: activeHeroRoute.code }));
+    setTripType('roundtrip');
+    setCalendarOpenTrigger((current) => current + 1);
+  };
 
   return (
     <div>
       {/* Hero */}
-      <div className="relative h-[380px] overflow-hidden bg-gray-900 sm:h-[600px]">
-        {heroSlides.map((slide, index) => (
-          <img
-            key={slide.place}
-            src={slide.img}
-            alt={`${slide.place} travel scene`}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${
-              activeHeroSlide === index ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
-        ))}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/35 to-black/20"></div>
-        <div className="relative mx-auto flex h-full max-w-7xl items-center px-4 pb-16 sm:pb-20">
-          <div className="text-white">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3">Explore Asia with Tigerair</h1>
-            <p className="text-base sm:text-lg md:text-xl opacity-90">探索亞洲，從這裡開始</p>
-            <div className="relative mt-6 inline-block">
+      <div className="relative -mt-14 bg-gray-900 pb-10 pt-14 sm:pb-16 md:-mt-16 md:pt-16">
+        <div className="absolute inset-0 overflow-hidden">
+          <div ref={parallaxRef} className="absolute inset-x-0 -top-12 bottom-0 will-change-transform">
+            {heroSlides.map((slide, index) => (
+              <img
+                key={slide.place}
+                src={slide.img}
+                alt={`${slide.place} travel scene`}
+                className={`absolute inset-0 h-full w-full scale-110 object-cover transition-opacity duration-1000 ease-in-out ${
+                  activeHeroSlide === index ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            ))}
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/65"></div>
+        </div>
+
+        {/* Side arrows */}
+        <button
+          type="button"
+          onClick={() => handleHeroNav(-1)}
+          aria-label="上一個航點"
+          className="absolute left-2 top-[160px] z-20 flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition hover:bg-white/30 sm:left-6 sm:top-[220px] sm:h-14 sm:w-14"
+        >
+          <ChevronLeftIcon className="h-6 w-6" />
+        </button>
+        <button
+          type="button"
+          onClick={() => handleHeroNav(1)}
+          aria-label="下一個航點"
+          className="absolute right-2 top-[160px] z-20 flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition hover:bg-white/30 sm:right-6 sm:top-[220px] sm:h-14 sm:w-14"
+        >
+          <ChevronRightIcon className="h-6 w-6" />
+        </button>
+
+        <div className={`relative mx-auto max-w-7xl px-12 pt-16 transition-all duration-500 sm:px-20 sm:pt-20 ${isOpeningMap ? 'pointer-events-none -translate-y-4 opacity-0' : ''}`}>
+          <div key={activeHeroSlide} className="hero-slide-enter text-white">
+            <h1 className="flex flex-wrap items-center gap-x-3 gap-y-2 text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
+              <span>跟虎航一起探索</span>
+              <MapPinIcon className="h-7 w-7 text-primary sm:h-10 sm:w-10" />
+              <span className="text-primary">
+                <FlipBoard text={activeHeroRoute.name} />
+              </span>
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-white/90 sm:text-lg md:text-xl">
+              {activeHeroRoute.subtitle}
+            </p>
+
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-gray-900 shadow-lg shadow-black/20 sm:text-base">
+                <span className="text-gray-500">來回</span>
+                <span className="text-lg font-black text-primary sm:text-xl">NT$ {activeHeroRoute.fare}</span>
+                <span className="text-gray-500">起</span>
+              </div>
               <button
                 type="button"
-                onClick={() => navigate('/fare-map')}
-                style={heroFareButtonWidth ? { width: `${heroFareButtonWidth}px` } : undefined}
-                className="group inline-flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-full bg-white px-5 py-3 text-left text-sm font-bold text-gray-900 shadow-lg shadow-black/20 transition-[width,transform,box-shadow,background-color,color] duration-300 ease-out hover:bg-primary hover:text-white hover:shadow-xl sm:pr-3"
+                onClick={handleHeroBook}
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/40 transition hover:bg-primary-dark sm:text-base"
               >
-                <span className="flex flex-col whitespace-nowrap leading-tight sm:flex-row sm:items-center sm:gap-2">
-                  <span>{activeHeroRoute.city}</span>
-                  <span className="text-base font-black text-primary transition-colors duration-300 group-hover:text-white sm:text-lg">{activeHeroRoute.fare}</span>
-                </span>
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white transition-colors duration-300 group-hover:bg-white group-hover:text-primary">
-                  <ArrowRightIcon className="h-4 w-4" />
-                </span>
+                <PlusIcon className="h-4 w-4" />
+                現在搶票
               </button>
-              <span
-                ref={heroFareMeasureRef}
-                aria-hidden="true"
-                className="pointer-events-none invisible absolute left-0 top-0 inline-flex items-center gap-4 rounded-full px-5 py-3 text-left text-sm font-bold sm:pr-3"
-              >
-                <span className="flex flex-col whitespace-nowrap leading-tight sm:flex-row sm:items-center sm:gap-2">
-                  <span>{activeHeroRoute.city}</span>
-                  <span className="text-base font-black sm:text-lg">{activeHeroRoute.fare}</span>
-                </span>
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
-                  <ArrowRightIcon className="h-4 w-4" />
-                </span>
-              </span>
             </div>
-            <div className="mt-5 flex items-center gap-2">
+
+            <div className="mt-7 flex items-center gap-2">
               {heroSlides.map((slide, index) => (
                 <button
                   key={slide.place}
@@ -372,35 +427,15 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Search Card */}
-
-      <div className="max-w-8xl mx-auto px-4 -mt-16 sm:-mt-20 relative z-10 mb-12">
-        <div className="bg-white rounded-xl shadow-lg shadow-gray-300/30">
-          {/* Quick Actions */}
-          <div className="grid grid-cols-4 gap-0 border-b border-gray-200">
-            {quickActions.map((action, idx) => (
-              <button
-                key={idx}
-                onClick={() => navigate(action.path)}
-                className="relative overflow-hidden border-r border-gray-200 px-2 py-3 transition last:border-r-0 sm:px-4 sm:py-4 group"
-              >
-                <div className="flex flex-col items-center justify-center gap-1.5 text-center sm:flex-row sm:gap-2 sm:text-left">
-                  <action.icon className="h-5 w-5 text-primary flex-shrink-0 group-hover:scale-110 transition-transform" />
-                  <p className="text-xs font-medium leading-tight text-gray-900 sm:text-sm">{action.label}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {/* Search Form */}
-          <div className="p-5 sm:p-6 md:px-8 py-5">
+        {/* Search Card — merged into Hero, glass */}
+        <div ref={searchFormRef} className={`relative z-10 mx-auto max-w-7xl pl-12 pr-16 pt-10 transition-all duration-500 sm:pl-20 sm:pr-24 sm:pt-14 ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
+          <div className="rounded-2xl border border-white/25 bg-white/15 p-5 shadow-2xl shadow-black/30 backdrop-blur-2xl sm:p-6 md:px-8 md:py-6">
             <form onSubmit={handleSearch}>
               <div className="grid grid-cols-1 gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr] lg:items-end">
-                <div className="relative rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
-                  <label className="absolute left-9 top-1.5 text-xs text-gray-400">航程</label>
-                  <ArrowsRightLeftIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <div className="relative rounded-lg border border-gray-200 bg-white/70 backdrop-blur-sm transition hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
+                  <label className="absolute left-9 top-1.5 text-xs font-semibold text-gray-600">航程</label>
+                  <ArrowsRightLeftIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
                   <div className="relative mt-1">
                     <select value={tripType} onChange={e => handleTripTypeChange(e.target.value)} className="w-full rounded-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-base font-medium focus:outline-none">
                       <option value="roundtrip">來回</option>
@@ -434,11 +469,12 @@ const Home = () => {
                   onDepartChange={date => setForm((current) => ({ ...current, depart: date }))}
                   onReturnChange={date => setForm((current) => ({ ...current, returnDate: date }))}
                   tripType={tripType}
+                  openTrigger={calendarOpenTrigger}
                 />
 
-                <div ref={passengerDropdownRef} className="relative rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
-                  <label className="absolute left-9 top-1.5 text-xs text-gray-400">旅客 Passengers</label>
-                  <UserGroupIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <div ref={passengerDropdownRef} className="relative rounded-lg border border-gray-200 bg-white/70 backdrop-blur-sm transition hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
+                  <label className="absolute left-9 top-1.5 text-xs font-semibold text-gray-600">旅客 Passengers</label>
+                  <UserGroupIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
                   <div className="relative mt-1">
                     <button
                       type="button"
@@ -486,9 +522,9 @@ const Home = () => {
                   <button
                     type="button"
                     onClick={() => setIsPromoOpen(true)}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition hover:text-primary"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm backdrop-blur transition hover:bg-white hover:text-primary"
                   >
-                    <TagIcon className="h-4 w-4" />
+                    <TagIcon className="h-4 w-4 text-primary" />
                     加入促銷代碼
                   </button>
                   {appliedPromoCode && (
@@ -504,6 +540,19 @@ const Home = () => {
               </div>
             </form>
           </div>
+        </div>
+
+        {/* Map search entrance */}
+        <div className={`relative mt-6 flex justify-center transition-all duration-500 ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
+          <button
+            type="button"
+            onClick={handleOpenMap}
+            className="group inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-5 py-2.5 text-sm font-semibold text-white shadow-lg backdrop-blur transition hover:bg-white/25"
+          >
+            <MapPinIcon className="h-4 w-4 text-primary" />
+            地圖搜尋
+            <ChevronDownIcon className="h-4 w-4 transition group-hover:translate-y-1" />
+          </button>
         </div>
       </div>
 
@@ -561,140 +610,62 @@ const Home = () => {
         </div>
       )}
 
-      {/* Popular Destinations */}
+      {/* Quick Actions */}
+      <div className="mx-auto mb-12 mt-12 max-w-7xl px-4 sm:mt-16">
+        <div className="grid grid-cols-5 divide-x divide-gray-200 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+          {quickActions.map((action) => (
+            <button
+              key={action.label}
+              onClick={() => navigate(action.path)}
+              className="group flex flex-col items-center justify-center gap-1.5 py-3 transition hover:bg-orange-50/60 sm:py-4"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary text-primary transition group-hover:bg-primary group-hover:text-white sm:h-10 sm:w-10">
+                <action.icon className="h-4 w-4 sm:h-5 sm:w-5" />
+              </span>
+              <span className="text-xs font-semibold text-gray-800 sm:text-sm">{action.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Promo Squares */}
       <div className="max-w-8xl mx-auto px-4 mb-16">
-        <h2 className="text-xl sm:text-2xl font-bold mb-6">Popular Destinations 熱門航線</h2>
-        <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
-          {destinations.map(d => (
-            <div key={d.city} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition cursor-pointer group" onClick={() => navigate('/search')}>
-              <div className="overflow-hidden">
-                <img src={d.img} alt={d.city} className="h-28 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-48" />
-              </div>
-              <div className="px-3 py-3 sm:px-5 sm:py-5">
-                <h3 className="text-sm font-bold leading-tight sm:text-lg">{d.city}</h3>
-                <p className="mt-0.5 text-xs text-gray-500 sm:text-sm">{d.country}</p>
-                <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-                  <span className="text-base font-bold leading-none text-primary sm:text-xl">{d.price} 起</span>
-                  <span className="text-[10px] text-gray-400 sm:text-xs">單程 / 含稅</span>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="mb-5 flex items-end justify-between">
+          <div>
+            <p className="text-sm font-semibold text-primary">Promotions</p>
+            <h2 className="mt-1 text-xl font-bold text-gray-900 sm:text-2xl">焦點優惠</h2>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/articles')}
+            className="text-sm font-semibold text-gray-600 transition hover:text-primary"
+          >
+            查看全部
+          </button>
         </div>
-      </div>
-
-      {/* Banner Carousel */}
-      <div className="max-w-7xl mx-auto px-4 mb-8">
-        <div className="relative h-56 overflow-hidden rounded-xl bg-gray-900 shadow-sm sm:h-100">
-          {bannerSlides.map((banner, index) => (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
+          {promoSquares.map((promo) => (
             <button
-              key={banner.title}
+              key={promo.title}
               type="button"
-              onClick={() => navigate('/search')}
-              className={`absolute inset-0 text-left transition-opacity duration-700 ease-in-out ${
-                activeBannerSlide === index ? 'opacity-100' : 'pointer-events-none opacity-0'
-              }`}
+              onClick={() => navigate(promo.path || '/search')}
+              className="group relative aspect-square overflow-hidden rounded-xl text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
             >
-              <img src={banner.img} alt={banner.title} className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
-              <div className="absolute inset-0 flex items-center px-6 sm:px-10">
-                <div className="max-w-xl text-white">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary-light">Tigerair Promotion</p>
-                  <h2 className="text-2xl font-bold sm:text-4xl">{banner.title}</h2>
-                  <p className="mt-3 text-sm leading-6 text-white/90 sm:text-base">{banner.subtitle}</p>
-                  <span className="mt-5 inline-flex rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark">
-                    {banner.cta}
-                  </span>
-                </div>
-              </div>
-            </button>
-          ))}
-
-          <div className="absolute bottom-5 left-6 flex items-center gap-2 sm:left-10">
-            {bannerSlides.map((banner, index) => (
-              <button
-                key={banner.title}
-                type="button"
-                aria-label={`Show banner ${index + 1}`}
-                onClick={() => setActiveBannerSlide(index)}
-                className={`h-2.5 rounded-full transition-all ${
-                  activeBannerSlide === index ? 'w-8 bg-primary' : 'w-2.5 bg-white/70 hover:bg-white'
-                }`}
+              <img
+                src={promo.img}
+                alt={promo.title}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Banner Ads */}
-      <div className="max-w-7xl mx-auto px-4 mb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          {bannerAds.map((banner) => (
-            <button
-              key={banner.title}
-              type="button"
-              onClick={() => navigate('/search')}
-              className="relative h-48 sm:h-56 overflow-hidden rounded-xl text-left shadow-sm transition hover:shadow-md group"
-            >
-              <img src={banner.img} alt={banner.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-black/45" />
-              <div className="relative z-10 flex h-full flex-col justify-end p-5 sm:p-6 text-white">
-                <h2 className="text-2xl sm:text-3xl font-bold mb-2">{banner.title}</h2>
-                <p className="text-sm sm:text-base opacity-90 mb-4">{banner.subtitle}</p>
-                <span className="inline-flex w-fit items-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold transition group-hover:bg-primary-dark">
-                  {banner.cta}
-                </span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
+              <span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white ${promo.tagClass}`}>
+                {promo.tag}
+              </span>
+              <div className="absolute inset-x-0 bottom-0 p-3 text-white sm:p-4">
+                <h3 className="text-sm font-bold leading-tight sm:text-base">{promo.title}</h3>
+                <p className="mt-1 text-xs leading-snug text-white/85 line-clamp-2">{promo.subtitle}</p>
               </div>
             </button>
           ))}
-        </div>
-      </div>
-
-      {/* Promo Banner */}
-      <div className="max-w-8xl mx-auto px-4 py-12 sm:py-16">
-        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-          <div className="grid gap-0 lg:grid-cols-[1.2fr_0.8fr]">
-            <div className="flex flex-col items-start justify-center p-6 sm:p-8 lg:p-10">
-              <h2 className="max-w-2xl text-xl font-bold leading-snug text-gray-900 sm:text-2xl">
-                台灣虎航擁有眾多不同航線，供旅客在各城市中自在飛行。
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-gray-600 sm:text-base">
-                快使用低價航點地圖功能，一覽日、韓、泰、越、澳等各城市的低價機票，實現說走就走的自在旅程。
-              </p>
-              <button
-                onClick={() => navigate('/fare-map')}
-                className="mt-6 inline-flex items-center rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary"
-              >
-                低價航點地圖
-              </button>
-            </div>
-
-            <div className="border-t border-gray-100 bg-gray-50 p-6 sm:p-8 lg:border-l lg:border-t-0">
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { city: 'Tokyo', code: 'NRT', fare: 'NT$ 5,999 起' },
-                  { city: 'Osaka', code: 'KIX', fare: 'NT$ 6,499 起' },
-                  { city: 'Seoul', code: 'ICN', fare: 'NT$ 4,999 起' },
-                  { city: 'Bangkok', code: 'BKK', fare: 'NT$ 3,999 起' },
-                  { city: 'Vietnam', code: 'DAD', fare: 'NT$ 3,299 起' },
-                  { city: 'Macau', code: 'MFM', fare: 'NT$ 2,999 起' },
-                ].map((route) => (
-                  <button
-                    key={route.code}
-                    type="button"
-                    onClick={() => navigate('/fare-map')}
-                    className="rounded-lg border border-gray-200 bg-white p-4 text-left transition hover:border-primary hover:shadow-sm"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-bold text-gray-900">{route.city}</span>
-                      <span className="rounded bg-orange-50 px-2 py-1 text-xs font-semibold text-primary">{route.code}</span>
-                    </div>
-                    <p className="mt-3 text-xs font-medium text-gray-500">{route.fare}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 

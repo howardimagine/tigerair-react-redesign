@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, PlaneLanding, PlaneTakeoff, RefreshCw } from 'lucide-react';
+import { Plane, PlaneLanding, PlaneTakeoff, RefreshCw, Briefcase, UtensilsCrossed, Armchair, ShieldCheck, RefreshCcw, Check, X, Plus } from 'lucide-react';
 import {
   ArrowsRightLeftIcon,
   ChevronDownIcon,
   UserGroupIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/solid';
 import ExpandedPriceCalendar from '../components/ExpandedPriceCalendar';
 import DateRangeCalendar from '../components/DateRangeCalendar';
@@ -22,23 +23,60 @@ const fareBundles = [
     key: 'tigerlight',
     name: 'tigerlight',
     title: '\u8f15\u88dd\u51fa\u767c',
+    tagline: '\u8f15\u4fbf\u8d77\u98db\uff0c\u6309\u9700\u52a0\u503c',
     priceOffset: 0,
-    features: ['\u624b\u63d0\u884c\u674e', '\u5ea7\u4f4d\u52a0\u8cfc', '\u6258\u904b\u884c\u674e\u52a0\u8cfc'],
+    accent: 'border-gray-300',
+    items: {
+      carryOn: { included: true, label: '\u624b\u63d0\u884c\u674e 10kg' },
+      checkedBag: { included: false, label: '\u8a17\u904b\u884c\u674e (\u52a0\u8cfc)' },
+      seat: { included: false, label: '\u5ea7\u4f4d (\u96a8\u6a5f\u6307\u5b9a)' },
+      meal: { included: false, label: '\u6a5f\u4e0a\u9910\u98df (\u52a0\u8cfc)' },
+      change: { included: false, label: '\u4e00\u6b21\u514d\u8cbb\u8b8a\u66f4' },
+      priority: { included: false, label: '\u512a\u5148\u767b\u6a5f' },
+    },
   },
   {
     key: 'tigersmart',
     name: 'tigersmart',
     title: '\u8070\u660e\u9996\u9078',
+    tagline: '\u71b1\u8ce3\u65b9\u6848\uff0c\u884c\u674e+\u5ea7\u4f4d\u5168\u5305',
     priceOffset: 900,
-    features: ['\u624b\u63d0\u884c\u674e', '20kg \u6258\u904b\u884c\u674e', '\u864e\u539d\u908a\u5ea7\u4f4d'],
+    accent: 'border-primary ring-2 ring-primary/30',
+    recommended: true,
+    items: {
+      carryOn: { included: true, label: '\u624b\u63d0\u884c\u674e 10kg' },
+      checkedBag: { included: true, label: '\u8a17\u904b\u884c\u674e 20kg' },
+      seat: { included: true, label: '\u864e\u5ec4\u908a\u5ea7\u4f4d' },
+      meal: { included: false, label: '\u6a5f\u4e0a\u9910\u98df (\u52a0\u8cfc)' },
+      change: { included: false, label: '\u4e00\u6b21\u514d\u8cbb\u8b8a\u66f4' },
+      priority: { included: false, label: '\u512a\u5148\u767b\u6a5f' },
+    },
   },
   {
     key: 'tigerpro',
     name: 'tigerpro',
     title: '\u5f48\u6027\u5b8c\u6574',
+    tagline: '\u884c\u674e\u3001\u9910\u98df\u3001\u8b8a\u66f4\u4e00\u6b21\u5230\u4f4d',
     priceOffset: 1800,
-    features: ['\u624b\u63d0\u884c\u674e', '20kg \u6258\u904b\u884c\u674e', '\u9910\u9ede', '\u514d\u8cbb\u8b8a\u66f4\u4e00\u6b21'],
+    accent: 'border-amber-400',
+    items: {
+      carryOn: { included: true, label: '\u624b\u63d0\u884c\u674e 10kg' },
+      checkedBag: { included: true, label: '\u8a17\u904b\u884c\u674e 25kg' },
+      seat: { included: true, label: '\u524d\u6392\u512a\u9078\u5ea7\u4f4d' },
+      meal: { included: true, label: '\u6a5f\u4e0a\u71b1\u9910' },
+      change: { included: true, label: '\u4e00\u6b21\u514d\u8cbb\u8b8a\u66f4' },
+      priority: { included: true, label: '\u512a\u5148\u767b\u6a5f' },
+    },
   },
+];
+
+const bundleFeatureRows = [
+  { key: 'carryOn', label: '\u624b\u63d0\u884c\u674e', Icon: Briefcase },
+  { key: 'checkedBag', label: '\u8a17\u904b\u884c\u674e', Icon: Briefcase },
+  { key: 'seat', label: '\u6307\u5b9a\u5ea7\u4f4d', Icon: Armchair },
+  { key: 'meal', label: '\u6a5f\u4e0a\u9910\u98df', Icon: UtensilsCrossed },
+  { key: 'change', label: '\u514d\u8cbb\u8b8a\u66f4', Icon: RefreshCcw },
+  { key: 'priority', label: '\u512a\u5148\u767b\u6a5f', Icon: ShieldCheck },
 ];
 
 
@@ -189,8 +227,19 @@ const SearchResults = () => {
   });
   const [isPassengerOpen, setIsPassengerOpen] = useState(false);
   const [passengerCounts, setPassengerCounts] = useState({ adult: 2, child: 0, infant: 0 });
-  const [selectedFlights, setSelectedFlights] = useState({ outbound: null, return: null });
+  const defaultBundle = fareBundles.find((b) => b.recommended) || fareBundles[1] || fareBundles[0];
+  const buildDefaultSelection = (flight) => ({
+    flight,
+    bundle: defaultBundle,
+    totalPrice: flight.price + defaultBundle.priceOffset,
+  });
+
+  const [selectedFlights, setSelectedFlights] = useState(() => ({
+    outbound: buildDefaultSelection(flights[0]),
+    return: buildDefaultSelection(flights[3] || flights[0]),
+  }));
   const [bundleModal, setBundleModal] = useState(null);
+  const [step, setStep] = useState('outbound');
   const passengerDropdownRef = useRef(null);
 
   const handleSearch = (event) => {
@@ -248,9 +297,21 @@ const SearchResults = () => {
 
   const filtered = flights;
   const isFlightSelectionComplete = Boolean(selectedFlights.outbound) && (tripType === 'oneway' || Boolean(selectedFlights.return));
-  const selectedTotalPrice = (selectedFlights.outbound?.totalPrice || 0) + (selectedFlights.return?.totalPrice || 0);
+  const selectedTotalPrice = (selectedFlights.outbound?.totalPrice || 0) + ((tripType === 'oneway' ? 0 : selectedFlights.return?.totalPrice) || 0);
 
-  const openBundleModal = (flight, direction) => {
+  const selectFlight = (flight, direction) => {
+    setSelectedFlights((current) => {
+      const existing = current[direction];
+      const bundle = existing?.bundle || defaultBundle;
+      return {
+        ...current,
+        [direction]: { flight, bundle, totalPrice: flight.price + bundle.priceOffset },
+      };
+    });
+  };
+
+  const openBundleModal = (flight, direction, event) => {
+    if (event) event.stopPropagation();
     setBundleModal({ flight, direction });
   };
 
@@ -268,8 +329,20 @@ const SearchResults = () => {
   };
 
   const handleNextStep = () => {
+    if (step === 'outbound' && tripType !== 'oneway') {
+      setStep('return');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     if (!isFlightSelectionComplete) return;
-    navigate(`/flight/${selectedFlights.outbound.flight.id}`);
+    navigate('/booking');
+  };
+
+  const handlePrevStep = () => {
+    if (step === 'return') {
+      setStep('outbound');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const getAirportDisplayName = (code) => airportDisplayNames[code] || code;
@@ -312,16 +385,17 @@ const SearchResults = () => {
         key={`${direction}-${flight.id}`}
         role="button"
         tabIndex={0}
-        onClick={() => openBundleModal(flight, direction)}
+        onClick={() => selectFlight(flight, direction)}
         onKeyDown={(event) => {
-          if (event.key === 'Enter') openBundleModal(flight, direction);
+          if (event.key === 'Enter') selectFlight(flight, direction);
         }}
         className={`relative cursor-pointer overflow-hidden rounded-xl bg-white shadow-sm ring-1 transition hover:shadow-md ${
-          isSelected ? 'ring-2  ring-primary' : 'ring-gray-100'
+          isSelected ? 'ring-2 ring-primary' : 'ring-gray-100 hover:ring-gray-200'
         } ${animationClass}`}
       >
         {isSelected && (
-          <div className="absolute right-0 top-0 z-10 rounded-bl-lg bg-primary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+          <div className="absolute right-0 top-0 z-10 flex items-center gap-1.5 rounded-bl-lg bg-primary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+            <Check className="h-3 w-3" />
             {selectedFlight.bundle.name}
           </div>
         )}
@@ -362,22 +436,65 @@ const SearchResults = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-center border-l border-dashed border-gray-200 p-2 md:flex-col md:items-center md:justify-center md:p-4">
-            <div className="text-center">
-              <div className={`mt-1 flex flex-col items-center leading-tight text-base font-bold sm:text-xl ${accentTextClass}`}>
-                <span className="text-[10px] font-bold sm:text-xs">TWD</span>
-                <span>{flight.price.toLocaleString()}</span>
-              </div>
+          <div className="flex flex-col items-center justify-center gap-2 border-l border-dashed border-gray-200 p-2 md:p-3">
+            <div className={`flex flex-col items-center leading-tight text-base font-bold sm:text-xl ${accentTextClass}`}>
+              <span className="text-[10px] font-bold sm:text-xs">TWD</span>
+              <span>{((isSelected ? selectedFlight.totalPrice : flight.price + defaultBundle.priceOffset)).toLocaleString()}</span>
+              <span className="text-[10px] font-medium text-gray-400">起</span>
             </div>
+            <button
+              type="button"
+              onClick={(event) => openBundleModal(flight, direction, event)}
+              className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-orange-50 px-2.5 py-1 text-[11px] font-bold text-primary transition hover:bg-primary hover:text-white"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              方案
+            </button>
           </div>
         </div>
       </div>
     );
   };
 
+  const fromName = getAirportDisplayName(form.from);
+  const toName = getAirportDisplayName(form.to);
+  const stepLabels = tripType === 'oneway'
+    ? [{ key: 'outbound', label: '航班' }, { key: 'passengers', label: '旅客資料' }, { key: 'addons', label: '加購' }]
+    : [{ key: 'outbound', label: '去程' }, { key: 'return', label: '回程' }, { key: 'passengers', label: '旅客資料' }, { key: 'addons', label: '加購' }];
+  const currentStepIndex = stepLabels.findIndex((s) => s.key === step);
+
   return (
-    <div className="min-h-screen bg-gray-50 pt-3 pb-10">
-      <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 pb-24">
+      {/* Dark hero-style header */}
+      <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(250,168,54,0.18),transparent_55%)]" />
+        <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-white">
+            <span className="text-sm font-semibold text-primary">Step {currentStepIndex + 1} / {stepLabels.length}</span>
+            <h1 className="text-2xl font-bold sm:text-3xl">
+              {step === 'return' ? `${toName} → ${fromName}` : `${fromName} → ${toName}`}
+            </h1>
+            <span className="text-sm text-white/70">
+              {step === 'return' ? '選擇回程航班' : step === 'outbound' ? '選擇去程航班' : ''}
+            </span>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {stepLabels.map((s, idx) => (
+              <div key={s.key} className="flex items-center gap-2">
+                <span className={`flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-xs font-bold transition ${
+                  idx < currentStepIndex ? 'bg-primary text-white'
+                  : idx === currentStepIndex ? 'bg-white text-gray-900'
+                  : 'bg-white/15 text-white/70'
+                }`}>{idx < currentStepIndex ? <Check className="h-3.5 w-3.5" /> : idx + 1}</span>
+                <span className={`text-xs font-semibold sm:text-sm ${idx === currentStepIndex ? 'text-white' : 'text-white/60'}`}>{s.label}</span>
+                {idx < stepLabels.length - 1 && <span className="mx-1 h-px w-6 bg-white/20 sm:w-10" />}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
         <div className="m-1 mb-2 rounded-xl bg-white p-2 sm:p-6 md:px-8 md:py-5 shadow-lg shadow-gray-300/30">
           <form onSubmit={handleSearch}>
             <div className="grid grid-cols-[2fr_3fr] gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr_0.6fr] lg:items-end">
@@ -486,48 +603,52 @@ const SearchResults = () => {
             returnValue={form.returnDate}
             tripType={tripType}
             onChange={handleCalendarDateChange}
-            monthCount={3}
+            monthCount={2}
           />
         </div>
 
         {filtered.length > 0 && (
-          <div className={`grid p-1 gap-8 ${tripType === 'roundtrip' ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
+          <div className="p-1">
             <section>
-              {renderDirectionHeading('outbound')}
+              {renderDirectionHeading(step === 'return' ? 'return' : 'outbound')}
               <div className="space-y-4">
-                {filtered.slice(0, 3).map((flight, index) => renderFlightCard(flight, index, 'outbound'))}
+                {filtered.map((flight, index) => renderFlightCard(flight, index, step === 'return' ? 'return' : 'outbound'))}
               </div>
             </section>
-
-            {tripType === 'roundtrip' && (
-              <section>
-                {renderDirectionHeading('return')}
-                <div className="space-y-4">
-                  {filtered.slice(0, 2).map((flight, index) => renderFlightCard(flight, index, 'return'))}
-                </div>
-              </section>
-            )}
           </div>
         )}
 
         {filtered.length > 0 && (
-          <div className="sticky bottom-0 z-30 mt-6 border-t border-gray-200 bg-gray-50/95 pt-3 pb-4 backdrop-blur">
-            <div className="flex gap-3 flex-row items-center justify-between">
+          <div className="sticky bottom-0 z-30 mt-6 border-t border-gray-200 bg-white/95 pt-3 pb-4 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.15)] backdrop-blur">
+            <div className="flex flex-row items-center justify-between gap-3">
               <div>
+                <p className="text-xs font-semibold text-gray-500">
+                  {step === 'return' ? '回程' : '去程'} · {(step === 'return' ? selectedFlights.return?.bundle?.title : selectedFlights.outbound?.bundle?.title) || ''}
+                </p>
                 <p className="text-xl font-black text-gray-900">
                   <span className="mr-1 text-xs font-bold">TWD</span>
                   {selectedTotalPrice.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-400">欲參考機隊資料請按此</p>
               </div>
-              <button
-                type="button"
-                onClick={handleNextStep}
-                disabled={!isFlightSelectionComplete}
-                className="rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
-              >
-                {'下一步'}
-              </button>
+              <div className="flex items-center gap-2">
+                {step === 'return' && (
+                  <button
+                    type="button"
+                    onClick={handlePrevStep}
+                    className="rounded-lg border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-primary hover:text-primary"
+                  >
+                    上一步
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleNextStep}
+                  disabled={!isFlightSelectionComplete}
+                  className="rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
+                >
+                  {step === 'outbound' && tripType !== 'oneway' ? '下一步：選回程' : '下一步：填旅客資料'}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -542,43 +663,82 @@ const SearchResults = () => {
       </div>
 
       {bundleModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 p-4">
-          <div className="w-full max-w-3xl rounded-2xl bg-white p-5 shadow-2xl">
-            <div className="mb-5 flex items-start justify-between gap-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4">
+          <div className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mb-6 flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-primary">{bundleModal.direction === 'return' ? '\u56de\u7a0b' : '\u53bb\u7a0b'} {bundleModal.flight.id}</p>
-                <h2 className="mt-1 text-xl font-bold text-gray-900">{'\u9078\u64c7\u7968\u50f9\u65b9\u6848'}</h2>
+                <p className="text-sm font-semibold text-primary">
+                  {bundleModal.direction === 'return' ? '\u56de\u7a0b' : '\u53bb\u7a0b'} \u00b7 \u822a\u73ed {bundleModal.flight.id} \u00b7 {bundleModal.flight.depart} \u2192 {bundleModal.flight.arrive}
+                </p>
+                <h2 className="mt-1 text-2xl font-bold text-gray-900">{'\u9078\u64c7\u7968\u50f9\u65b9\u6848'}</h2>
+                <p className="mt-1 text-sm text-gray-500">{'\u6311\u4e00\u500b\u6700\u9069\u5408\u4f60\u65c5\u7a0b\u7684\u7968\u50f9\u7d44\u5408 \u2014 \u884c\u674e\u3001\u5ea7\u4f4d\u3001\u9910\u98df\u3001\u5f48\u6027\u4e00\u6b21\u770b\u6e05\u695a'}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setBundleModal(null)}
-                className="rounded-full px-3 py-1 text-xl leading-none text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                className="rounded-full p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
                 aria-label="Close fare bundle modal"
               >
-                x
+                <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="grid gap-3 md:grid-cols-3">
-              {fareBundles.map((bundle) => (
-                <button
-                  key={bundle.key}
-                  type="button"
-                  onClick={() => handleBundleSelect(bundle)}
-                  className="rounded-xl border border-gray-200 p-4 text-left transition hover:border-primary hover:bg-orange-50/40"
-                >
-                  <p className="text-xs font-bold uppercase tracking-wide text-primary">{bundle.name}</p>
-                  <h3 className="mt-1 text-lg font-bold text-gray-900">{bundle.title}</h3>
-                  <p className="mt-3 text-xl font-bold text-gray-900">
-                    TWD {(bundleModal.flight.price + bundle.priceOffset).toLocaleString()}
-                  </p>
-                  <ul className="mt-4 space-y-2 text-xs font-medium text-gray-600">
-                    {bundle.features.map((feature) => (
-                      <li key={feature}>- {feature}</li>
-                    ))}
-                  </ul>
-                </button>
-              ))}
+            <div className="grid gap-4 md:grid-cols-3">
+              {fareBundles.map((bundle) => {
+                const totalPrice = bundleModal.flight.price + bundle.priceOffset;
+                return (
+                  <div
+                    key={bundle.key}
+                    className={`relative flex flex-col rounded-2xl border-2 bg-white p-5 transition ${bundle.accent} hover:shadow-xl`}
+                  >
+                    {bundle.recommended && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow">
+                        {'\u2605 \u71b1\u8ce3\u63a8\u85a6'}
+                      </span>
+                    )}
+                    <p className="text-xs font-bold uppercase tracking-wide text-primary">{bundle.name}</p>
+                    <h3 className="mt-1 text-xl font-bold text-gray-900">{bundle.title}</h3>
+                    <p className="mt-1 text-xs text-gray-500">{bundle.tagline}</p>
+                    <div className="mt-4 flex items-baseline gap-1">
+                      <span className="text-xs font-bold text-gray-500">TWD</span>
+                      <span className="text-3xl font-black text-gray-900">{totalPrice.toLocaleString()}</span>
+                    </div>
+                    {bundle.priceOffset > 0 && (
+                      <p className="text-xs font-semibold text-primary">{'+ NT$ '}{bundle.priceOffset.toLocaleString()}{' \u52a0\u503c'}</p>
+                    )}
+
+                    <ul className="mt-5 space-y-2.5 border-t border-gray-100 pt-4 text-sm">
+                      {bundleFeatureRows.map(({ key, label, Icon }) => {
+                        const item = bundle.items[key];
+                        const included = item?.included;
+                        return (
+                          <li key={key} className={`flex items-start gap-2.5 ${included ? 'text-gray-800' : 'text-gray-400'}`}>
+                            <span className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full ${included ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
+                              {included ? <Check className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
+                            </span>
+                            <span className="flex items-center gap-1.5 text-xs font-medium">
+                              <Icon className="h-3.5 w-3.5 opacity-70" />
+                              {item?.label || label}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+
+                    <button
+                      type="button"
+                      onClick={() => handleBundleSelect(bundle)}
+                      className={`mt-5 w-full rounded-lg px-4 py-2.5 text-sm font-bold transition ${
+                        bundle.recommended
+                          ? 'bg-primary text-white hover:bg-primary-dark'
+                          : 'border border-gray-200 bg-white text-gray-800 hover:border-primary hover:text-primary'
+                      }`}
+                    >
+                      {'\u9078\u64c7 '}{bundle.title}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
