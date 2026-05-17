@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plane, Briefcase, Armchair, UtensilsCrossed, RefreshCcw, ShieldCheck, Check, Edit3, User, Users } from 'lucide-react';
+import { Plane, Briefcase, Armchair, UtensilsCrossed, RefreshCcw, ShieldCheck, Check, Edit3, User, Users, AlertCircle, Sparkles } from 'lucide-react';
 import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../context/AuthContext';
 import { useSavedTravelers } from '../context/SavedTravelersContext';
@@ -322,6 +322,9 @@ const PassengerInfo = () => {
   const [autoFillEnabled, setAutoFillEnabled] = useState(true);
   const [showQuickLogin, setShowQuickLogin] = useState(false);
   const [quickLoginForm, setQuickLoginForm] = useState({ email: '', password: '' });
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [submitAttempt, setSubmitAttempt] = useState(0);
+  const [demoFilled, setDemoFilled] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && autoFillEnabled && user) {
@@ -359,7 +362,71 @@ const PassengerInfo = () => {
     setShowQuickLogin(false);
   };
 
+  const demoPassengers = [
+    {
+      type: 'adult', nickname: '',
+      lastNameEn: 'CHEN', firstNameEn: 'MING-WEI',
+      lastNameZh: '陳', firstNameZh: '明偉',
+      gender: 'male', birthDate: '1990-03-15',
+      nationality: 'TW', passportNumber: 'A1234567', passportExpiry: '2032-06-10',
+    },
+    {
+      type: 'adult', nickname: '',
+      lastNameEn: 'LEE', firstNameEn: 'MEI-LING',
+      lastNameZh: '李', firstNameZh: '美玲',
+      gender: 'female', birthDate: '1992-08-22',
+      nationality: 'TW', passportNumber: 'B7891234', passportExpiry: '2031-04-18',
+    },
+    {
+      type: 'child', nickname: '',
+      lastNameEn: 'CHEN', firstNameEn: 'YU-AN',
+      lastNameZh: '陳', firstNameZh: '宇安',
+      gender: 'male', birthDate: '2018-11-30',
+      nationality: 'TW', passportNumber: 'C4567890', passportExpiry: '2030-07-25',
+    },
+  ];
+
+  const validatePassengers = () => {
+    const errs = [];
+    passengers.forEach((p, i) => {
+      if (!p.lastNameEn.trim()) errs.push(`旅客 ${i + 1}：英文姓必填`);
+      if (!p.firstNameEn.trim()) errs.push(`旅客 ${i + 1}：英文名必填`);
+      if (!p.birthDate) errs.push(`旅客 ${i + 1}：出生日期必填`);
+      if (!p.passportNumber.trim()) errs.push(`旅客 ${i + 1}：護照號碼必填`);
+      if (!p.passportExpiry) errs.push(`旅客 ${i + 1}：護照效期必填`);
+    });
+    if (!contact.email.trim()) errs.push('聯絡 email 必填');
+    if (!contact.phone.trim()) errs.push('手機號碼必填');
+    return errs;
+  };
+
+  const fillDemoData = () => {
+    setPassengers((current) =>
+      current.map((p, idx) => {
+        const demo = demoPassengers[idx % demoPassengers.length];
+        const matchedType = demoPassengers.find((d) => d.type === p.type) || demo;
+        return { ...p, ...matchedType, type: p.type, nickname: p.nickname };
+      }),
+    );
+    setContact({ email: 'demo@tigerair.com', phone: '+886 912 345 678' });
+    setDemoFilled(true);
+    setValidationErrors([]);
+  };
+
   const handleNext = () => {
+    const errs = validatePassengers();
+    if (errs.length > 0) {
+      if (submitAttempt >= 1) {
+        // Demo helper: auto-fill on 2nd attempt
+        fillDemoData();
+        setSubmitAttempt(0);
+        return;
+      }
+      setValidationErrors(errs);
+      setSubmitAttempt((c) => c + 1);
+      window.scrollTo({ top: 200, behavior: 'smooth' });
+      return;
+    }
     navigate('/add-ons', {
       state: {
         selectedFlights,
@@ -488,6 +555,33 @@ const PassengerInfo = () => {
               </form>
             )}
           </div>
+
+          {validationErrors.length > 0 && (
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-rose-600" />
+                <div className="flex-1 text-sm">
+                  <p className="font-bold text-rose-700">尚有 {validationErrors.length} 項資料未填寫</p>
+                  <ul className="mt-1 list-disc space-y-0.5 pl-5 text-rose-700/80">
+                    {validationErrors.slice(0, 4).map((err) => (
+                      <li key={err}>{err}</li>
+                    ))}
+                    {validationErrors.length > 4 && <li>… 還有 {validationErrors.length - 4} 項</li>}
+                  </ul>
+                  <p className="mt-2 text-xs text-rose-600/80">再點一次「下一步」會自動帶入 demo 資料</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {demoFilled && (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-emerald-600" />
+                <p className="text-sm font-semibold text-emerald-800">已自動帶入 demo 旅客資料，請點擊「下一步」繼續</p>
+              </div>
+            </div>
+          )}
 
           {/* Passenger forms */}
           {passengers.map((p, i) => (

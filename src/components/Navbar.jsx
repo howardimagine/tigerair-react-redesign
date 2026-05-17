@@ -210,6 +210,7 @@ const Navbar = () => {
                       <Link to="/member" className="block px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">會員中心</Link>
                       <Link to="/member/travelers" className="block px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">常用旅客</Link>
                       <Link to="/orders" className="block px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">我的訂單</Link>
+                      <Link to="/boarding-passes" className="block px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">我的登機證</Link>
                       <div className="my-1 border-t border-gray-100" />
                       <button onClick={handleLogout} className="block w-full px-4 py-2.5 text-left text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">
                         登出
