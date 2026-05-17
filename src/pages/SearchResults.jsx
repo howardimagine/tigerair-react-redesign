@@ -328,13 +328,8 @@ const SearchResults = () => {
   };
 
   const handleNextStep = () => {
-    if (step === 'outbound' && tripType !== 'oneway') {
-      setStep('return');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
     if (!isFlightSelectionComplete) return;
-    navigate('/passengers', {
+    navigate('/seat', {
       state: {
         selectedFlights,
         tripType,
@@ -342,13 +337,6 @@ const SearchResults = () => {
         form,
       },
     });
-  };
-
-  const handlePrevStep = () => {
-    if (step === 'return') {
-      setStep('outbound');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
   };
 
   const getAirportDisplayName = (code) => airportDisplayNames[code] || code;
@@ -464,153 +452,96 @@ const SearchResults = () => {
 
   const fromName = getAirportDisplayName(form.from);
   const toName = getAirportDisplayName(form.to);
-  const stepLabels = tripType === 'oneway'
-    ? [{ key: 'outbound', label: '航班' }, { key: 'passengers', label: '旅客資料' }, { key: 'addons', label: '加購' }]
-    : [{ key: 'outbound', label: '去程' }, { key: 'return', label: '回程' }, { key: 'passengers', label: '旅客資料' }, { key: 'addons', label: '加購' }];
-  const currentStepIndex = stepLabels.findIndex((s) => s.key === step);
+  const stepLabels = [
+    { key: 'flights', label: '機票' },
+    { key: 'seat', label: '座位' },
+    { key: 'passengers', label: '旅客資料' },
+    { key: 'addons', label: '加購' },
+  ];
+  const currentStepIndex = 0;
+  const tripLabel = tripType === 'oneway' ? '單程' : '來回';
+  const dateLabel = (() => {
+    if (!form.depart) return '尚未選日期';
+    if (tripType === 'oneway') return form.depart;
+    return `${form.depart}  →  ${form.returnDate || '--'}`;
+  })();
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Dark hero-style header */}
+    <div className="min-h-screen bg-gray-50 pb-28">
+      {/* Dark compact header */}
       <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(250,168,54,0.18),transparent_55%)]" />
-        <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
+        <div className="relative mx-auto max-w-7xl px-4 pb-5 pt-5 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-white">
-            <span className="text-sm font-semibold text-primary">Step {currentStepIndex + 1} / {stepLabels.length}</span>
-            <h1 className="text-2xl font-bold sm:text-3xl">
-              {step === 'return' ? `${toName} → ${fromName}` : `${fromName} → ${toName}`}
-            </h1>
-            <span className="text-sm text-white/70">
-              {step === 'return' ? '選擇回程航班' : step === 'outbound' ? '選擇去程航班' : ''}
-            </span>
+            <span className="text-sm font-semibold text-primary">{'Step 1 / 4'}</span>
+            <h1 className="text-xl font-bold sm:text-2xl">{fromName} → {toName}</h1>
+            <span className="text-sm text-white/70">{tripType === 'oneway' ? '選擇航班' : '選擇去程與回程航班'}</span>
           </div>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             {stepLabels.map((s, idx) => (
               <div key={s.key} className="flex items-center gap-2">
-                <span className={`flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-xs font-bold transition ${
-                  idx < currentStepIndex ? 'bg-primary text-white'
-                  : idx === currentStepIndex ? 'bg-white text-gray-900'
-                  : 'bg-white/15 text-white/70'
-                }`}>{idx < currentStepIndex ? <Check className="h-3.5 w-3.5" /> : idx + 1}</span>
-                <span className={`text-xs font-semibold sm:text-sm ${idx === currentStepIndex ? 'text-white' : 'text-white/60'}`}>{s.label}</span>
-                {idx < stepLabels.length - 1 && <span className="mx-1 h-px w-6 bg-white/20 sm:w-10" />}
+                <span className={`flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-[11px] font-bold transition ${
+                  idx === currentStepIndex ? 'bg-white text-gray-900' : 'bg-white/15 text-white/70'
+                }`}>{idx + 1}</span>
+                <span className={`text-[11px] font-semibold sm:text-xs ${idx === currentStepIndex ? 'text-white' : 'text-white/60'}`}>{s.label}</span>
+                {idx < stepLabels.length - 1 && <span className="mx-0.5 h-px w-5 bg-white/20 sm:w-8" />}
               </div>
             ))}
           </div>
         </div>
       </div>
 
+      {/* Compact locked summary bar */}
       <div className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-        <div className="m-1 mb-2 rounded-xl bg-white p-2 sm:p-6 md:px-8 md:py-5 shadow-lg shadow-gray-300/30">
-          <form onSubmit={handleSearch}>
-            <div className="grid grid-cols-[2fr_3fr] gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr_0.6fr] lg:items-end">
-              <div className="relative order-1 col-span-1 rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30 lg:order-1 lg:col-span-1">
-                <label className="absolute left-9 top-1.5 text-xs text-gray-400">{'\u65c5\u7a0b'}</label>
-                <ArrowsRightLeftIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <div className="relative mt-1">
-                  <select
-                    value={tripType}
-                    onChange={(event) => handleTripTypeChange(event.target.value)}
-                    className="w-full rounded-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-base font-medium focus:outline-none"
-                  >
-                    <option value="roundtrip">{'\u4f86\u56de'}</option>
-                    <option value="oneway">{'\u55ae\u7a0b'}</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="order-3 col-span-2 grid grid-cols-2 gap-0 lg:order-2 lg:col-span-1">
-                <AirportDropdown
-                  value={form.from}
-                  onChange={value => setForm({...form, from: value})}
-                  label={'\u51fa\u767c\u5730 From'}
-                  groups={airportGroups}
-                  Icon={PlaneTakeoff}
-                  roundedClass="rounded-l-lg"
-                />
-                <AirportDropdown
-                  value={form.to}
-                  onChange={value => setForm({...form, to: value})}
-                  label={'\u76ee\u7684\u5730 To'}
-                  groups={airportGroups}
-                  Icon={PlaneLanding}
-                  roundedClass="-ml-px rounded-r-lg"
-                />
-              </div>
-
-              <div className="order-4 col-span-2 lg:order-3 lg:col-span-1">
-                <DateRangeCalendar
-                  depart={form.depart}
-                  returnDate={form.returnDate}
-                  onDepartChange={date => setForm((current) => ({ ...current, depart: date }))}
-                  onReturnChange={date => setForm((current) => ({ ...current, returnDate: date }))}
-                  tripType={tripType}
-                  readOnly
-                />
-              </div>
-
-              <div ref={passengerDropdownRef} className="relative order-2 col-span-1 rounded-lg border border-gray-200 bg-white transition hover:border-primary/60 hover:bg-orange-50/30 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30 lg:order-4">
-                <label className="absolute left-9 top-1.5 text-xs text-gray-400">{'\u65c5\u5ba2 Passengers'}</label>
-                <UserGroupIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <div className="relative mt-1">
-                  <button
-                    type="button"
-                    onClick={() => setIsPassengerOpen((current) => !current)}
-                    className="w-full rounded-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none"
-                  >
-                    {passengerSummary}
-                  </button>
-                </div>
-                {isPassengerOpen && (
-                  <div className="absolute left-0 top-full z-50 mt-2 w-72 rounded-xl border border-gray-100 bg-white p-4 shadow-xl">
-                    {[
-                      { key: 'adult', label: '\u6210\u4eba' },
-                      { key: 'child', label: '\u5152\u7ae5' },
-                      { key: 'infant', label: '\u5b30\u5152' },
-                    ].map((passenger) => (
-                      <div key={passenger.key} className="flex items-center justify-between border-b border-gray-100 py-3 last:border-b-0">
-                        <span className="text-sm font-medium text-gray-800">{passenger.label}</span>
-                        <div className="flex items-center gap-3">
-                          <button
-                            type="button"
-                            onClick={() => updatePassengerCount(passenger.key, -1)}
-                            className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-lg font-semibold text-gray-500 transition hover:border-primary hover:text-primary"
-                          >
-                            -
-                          </button>
-                          <span className="w-5 text-center text-sm font-bold text-gray-900">{passengerCounts[passenger.key]}</span>
-                          <button
-                            type="button"
-                            onClick={() => updatePassengerCount(passenger.key, 1)}
-                            className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-lg font-semibold text-gray-500 transition hover:border-primary hover:text-primary"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="order-5 col-span-2 flex items-stretch lg:order-5 lg:col-span-1">
-                <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-lg border border-primary/20 bg-orange-50 px-4 py-4 text-sm font-bold text-primary transition hover:border-primary hover:bg-primary hover:text-white">
-                  <RefreshCw className="h-4 w-4" />
-                  {'重新搜尋'}
-                </button>
-              </div>
-            </div>
-          </form>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm sm:px-5">
+          <div className="flex items-center gap-1.5">
+            <ArrowsRightLeftIcon className="h-4 w-4 text-primary" />
+            <span className="text-xs font-bold text-gray-900">{tripLabel}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <PlaneTakeoff className="h-4 w-4 text-primary" />
+            <span className="text-xs font-semibold text-gray-700">{fromName} <span className="text-gray-400">({form.from})</span></span>
+            <span className="text-gray-300">→</span>
+            <PlaneLanding className="h-4 w-4 text-primary" />
+            <span className="text-xs font-semibold text-gray-700">{toName} <span className="text-gray-400">({form.to})</span></span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">{'日期'}</span>
+            <span className="text-xs font-semibold text-gray-700">{dateLabel}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <UserGroupIcon className="h-4 w-4 text-primary" />
+            <span className="text-xs font-semibold text-gray-700">{passengerSummary}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="ml-auto inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[11px] font-bold text-gray-700 transition hover:border-primary hover:text-primary"
+          >
+            <RefreshCw className="h-3.5 w-3.5" /> {'重新搜尋'}
+          </button>
         </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Legacy form removed \u2014 using compact summary bar above */}
 
         {filtered.length > 0 && (
-          <div className="p-1">
+          <div className={`mt-4 grid gap-4 ${tripType === 'roundtrip' ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
             <section>
-              {renderDirectionHeading(step === 'return' ? 'return' : 'outbound')}
-              <div className="space-y-4">
-                {filtered.map((flight, index) => renderFlightCard(flight, index, step === 'return' ? 'return' : 'outbound'))}
+              {renderDirectionHeading('outbound')}
+              <div className="space-y-3">
+                {filtered.map((flight, index) => renderFlightCard(flight, index, 'outbound'))}
               </div>
             </section>
+            {tripType === 'roundtrip' && (
+              <section>
+                {renderDirectionHeading('return')}
+                <div className="space-y-3">
+                  {filtered.map((flight, index) => renderFlightCard(flight, index, 'return'))}
+                </div>
+              </section>
+            )}
           </div>
         )}
 
@@ -619,32 +550,22 @@ const SearchResults = () => {
             <div className="flex flex-row items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold text-gray-500">
-                  {step === 'return' ? '回程' : '去程'} · {(step === 'return' ? selectedFlights.return?.bundle?.title : selectedFlights.outbound?.bundle?.title) || ''}
+                  {selectedFlights.outbound?.bundle?.title}
+                  {tripType !== 'oneway' && selectedFlights.return?.bundle?.title && ` · ${selectedFlights.return.bundle.title}`}
                 </p>
                 <p className="text-xl font-black text-gray-900">
                   <span className="mr-1 text-xs font-bold">TWD</span>
                   {selectedTotalPrice.toLocaleString()}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                {step === 'return' && (
-                  <button
-                    type="button"
-                    onClick={handlePrevStep}
-                    className="rounded-lg border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-primary hover:text-primary"
-                  >
-                    上一步
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={handleNextStep}
-                  disabled={!isFlightSelectionComplete}
-                  className="rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
-                >
-                  {step === 'outbound' && tripType !== 'oneway' ? '下一步：選回程' : '下一步：填旅客資料'}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleNextStep}
+                disabled={!isFlightSelectionComplete}
+                className="rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
+              >
+                {'下一步：選擇座位'}
+              </button>
             </div>
           </div>
         )}

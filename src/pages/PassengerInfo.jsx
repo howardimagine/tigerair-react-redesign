@@ -475,8 +475,8 @@ const PassengerInfo = () => {
           <p className="text-sm font-semibold text-primary">Step 3 / 4</p>
           <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">填寫旅客資料</h1>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 去程</span>
-            {tripType !== 'oneway' && <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 回程</span>}
+            <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 機票</span>
+            <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 座位</span>
             <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-gray-900">3 旅客資料</span>
             <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-bold text-white/70">4 加購</span>
           </div>

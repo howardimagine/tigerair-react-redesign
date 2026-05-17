@@ -11,6 +11,7 @@ import SearchResults from './pages/SearchResults';
 import FlightDetail from './pages/FlightDetail';
 import Booking from './pages/Booking';
 import PassengerInfo from './pages/PassengerInfo';
+import SeatSelection from './pages/SeatSelection';
 import AddOns from './pages/AddOns';
 import SavedTravelers from './pages/SavedTravelers';
 import BoardingPasses from './pages/BoardingPasses';
@@ -51,6 +52,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/search" element={<SearchResults />} />
               <Route path="/flight/:id" element={<FlightDetail />} />
+              <Route path="/seat" element={<SeatSelection />} />
               <Route path="/passengers" element={<PassengerInfo />} />
               <Route path="/add-ons" element={<AddOns />} />
               <Route path="/booking" element={<Booking />} />

@@ -281,9 +281,10 @@ const AddOns = () => {
         <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
           <p className="text-sm font-semibold text-primary">Step 4 / 4</p>
           <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">加購行李與餐食</h1>
-          <p className="mt-2 text-sm text-white/70">指定座位包含在票價方案內 — 行李託運與機上餐食可在這裡額外加購</p>
+          <p className="mt-2 text-sm text-white/70">座位已於上一步選擇 — 行李託運與機上餐食可在這裡額外加購</p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 機票</span>
+            <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 座位</span>
             <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 旅客資料</span>
             <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-gray-900">4 加購</span>
           </div>
@@ -371,24 +372,35 @@ const AddOns = () => {
             </div>
           </section>
 
-          {/* Seat reminder */}
-          <section className="rounded-2xl border border-blue-100 bg-blue-50/60 p-5 sm:p-6">
-            <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-blue-500 text-white">
-                <Sparkles className="h-5 w-5" />
-              </span>
-              <div>
-                <h2 className="text-base font-bold text-gray-900">座位指定</h2>
-                <p className="mt-1 text-sm text-gray-600">座位選擇是票價方案的一部分。你目前選擇的方案：
-                  <span className="font-bold text-primary">{selectedFlights.outbound.bundle.title}</span>
-                  {tripType !== 'oneway' && selectedFlights.return && (
-                    <>（回程 <span className="font-bold text-primary">{selectedFlights.return.bundle.title}</span>）</>
-                  )}
-                  。如需重新選擇方案，請回到航班選擇頁面。
-                </p>
+          {/* Seat already selected reminder */}
+          {incoming.seats && (
+            <section className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5 sm:p-6">
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white">
+                  <Sparkles className="h-5 w-5" />
+                </span>
+                <div className="flex-1">
+                  <h2 className="text-base font-bold text-gray-900">座位已選擇</h2>
+                  <p className="mt-1 text-sm text-gray-600">
+                    去程 {(incoming.seats.outbound || []).filter(Boolean).join(' / ')}
+                    {tripType !== 'oneway' && (
+                      <>　·　回程 {(incoming.seats.return || []).filter(Boolean).join(' / ')}</>
+                    )}
+                    {incoming.seatSurchargeTotal > 0 && (
+                      <>（額外座位費 NT$ {incoming.seatSurchargeTotal.toLocaleString()}）</>
+                    )}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate('/seat', { state: incoming })}
+                  className="rounded-full border border-emerald-300 bg-white px-3 py-1.5 text-xs font-bold text-emerald-700 hover:bg-emerald-100"
+                >
+                  重新選座位
+                </button>
               </div>
-            </div>
-          </section>
+            </section>
+          )}
         </div>
 
         {/* Sidebar */}
