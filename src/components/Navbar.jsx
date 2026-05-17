@@ -199,14 +199,24 @@ const Navbar = () => {
           <div className="hidden items-center gap-2 md:flex">
             {user ? (
               <>
-                <Link to="/member" className="flex items-center gap-1 text-sm text-gray-600 hover:text-primary">
-                  <UserIcon className="h-4 w-4" />
-                  {user.name}
-                </Link>
-                <button onClick={handleLogout} className="flex items-center gap-1 text-sm text-gray-600 hover:text-primary">
-                  <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                  登出
-                </button>
+                <div className="group relative">
+                  <button className="flex items-center gap-1 rounded-full px-3 py-2 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">
+                    <UserIcon className="h-4 w-4" />
+                    {user.name}
+                    <ChevronDownIcon className="h-3.5 w-3.5 transition group-hover:rotate-180" />
+                  </button>
+                  <div className="invisible absolute right-0 top-full z-50 pt-2 opacity-0 transition duration-200 group-hover:visible group-hover:opacity-100">
+                    <div className="w-56 overflow-hidden rounded-lg border border-gray-100 bg-white py-1 shadow-xl shadow-gray-900/10 ring-1 ring-black/5">
+                      <Link to="/member" className="block px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">會員中心</Link>
+                      <Link to="/member/travelers" className="block px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">常用旅客</Link>
+                      <Link to="/orders" className="block px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">我的訂單</Link>
+                      <div className="my-1 border-t border-gray-100" />
+                      <button onClick={handleLogout} className="block w-full px-4 py-2.5 text-left text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">
+                        登出
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </>
             ) : (
               <>

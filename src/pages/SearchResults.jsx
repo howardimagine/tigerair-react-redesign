@@ -7,7 +7,6 @@ import {
   UserGroupIcon,
   XMarkIcon,
 } from '@heroicons/react/24/solid';
-import ExpandedPriceCalendar from '../components/ExpandedPriceCalendar';
 import DateRangeCalendar from '../components/DateRangeCalendar';
 
 const flights = [
@@ -335,7 +334,14 @@ const SearchResults = () => {
       return;
     }
     if (!isFlightSelectionComplete) return;
-    navigate('/booking');
+    navigate('/passengers', {
+      state: {
+        selectedFlights,
+        tripType,
+        passengerCounts,
+        form,
+      },
+    });
   };
 
   const handlePrevStep = () => {
@@ -595,16 +601,6 @@ const SearchResults = () => {
               </div>
             </div>
           </form>
-        </div>
-
-        <div className="m-1 mb-6 animate-fade-in-delay-2 rounded-xl bg-white p-2 sm:p-6 md:px-8 md:py-3 shadow-sm">
-          <ExpandedPriceCalendar
-            value={form.depart}
-            returnValue={form.returnDate}
-            tripType={tripType}
-            onChange={handleCalendarDateChange}
-            monthCount={2}
-          />
         </div>
 
         {filtered.length > 0 && (
