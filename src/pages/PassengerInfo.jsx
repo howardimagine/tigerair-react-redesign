@@ -401,13 +401,17 @@ const PassengerInfo = () => {
   };
 
   const fillDemoData = () => {
-    setPassengers((current) =>
-      current.map((p, idx) => {
-        const demo = demoPassengers[idx % demoPassengers.length];
-        const matchedType = demoPassengers.find((d) => d.type === p.type) || demo;
-        return { ...p, ...matchedType, type: p.type, nickname: p.nickname };
-      }),
-    );
+    setPassengers((current) => {
+      // Build per-type counters so each passenger of the same type gets a unique demo identity
+      const typeCounters = { adult: 0, child: 0, infant: 0 };
+      return current.map((p) => {
+        const sameType = demoPassengers.filter((d) => d.type === p.type);
+        const pool = sameType.length > 0 ? sameType : demoPassengers;
+        const demo = pool[typeCounters[p.type] % pool.length];
+        typeCounters[p.type] += 1;
+        return { ...p, ...demo, type: p.type, nickname: p.nickname };
+      });
+    });
     setContact({ email: 'demo@tigerair.com', phone: '+886 912 345 678' });
     setDemoFilled(true);
     setValidationErrors([]);

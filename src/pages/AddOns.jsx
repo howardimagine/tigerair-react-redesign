@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plane, Briefcase, UtensilsCrossed, Check, Edit3, Plus, Minus, Sparkles } from 'lucide-react';
+import { Plane, Briefcase, UtensilsCrossed, Check, Edit3, Sparkles, User } from 'lucide-react';
 
 const baggageOptions = [
   {
@@ -127,15 +127,15 @@ const BaggageCard = ({ option, value, onChange, label }) => {
   );
 };
 
-const MealCard = ({ option, count, onChange }) => {
-  const selected = count > 0;
-  const dec = () => onChange(Math.max(0, count - 1));
-  const inc = () => onChange(count + 1);
+const MealCard = ({ option, selected, onSelect }) => {
   const noImage = !option.img;
-
   return (
-    <div className={`flex overflow-hidden rounded-2xl border-2 bg-white transition ${selected ? 'border-primary shadow-lg' : 'border-gray-200'}`}>
-      <div className={`relative w-32 flex-shrink-0 ${noImage ? 'bg-gray-100' : ''}`}>
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`flex overflow-hidden rounded-2xl border-2 bg-white text-left transition ${selected ? 'border-primary shadow-lg' : 'border-gray-200 hover:border-primary/50'}`}
+    >
+      <div className={`relative w-28 flex-shrink-0 ${noImage ? 'bg-gray-100' : ''}`}>
         {noImage ? (
           <div className="flex h-full items-center justify-center">
             <UtensilsCrossed className="h-10 w-10 text-gray-300" />
@@ -143,7 +143,7 @@ const MealCard = ({ option, count, onChange }) => {
         ) : (
           <img src={option.img} alt={option.title} className="h-full w-full object-cover" />
         )}
-        {selected && !noImage && (
+        {selected && (
           <span className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white shadow">
             <Check className="h-3.5 w-3.5" />
           </span>
@@ -152,7 +152,7 @@ const MealCard = ({ option, count, onChange }) => {
       <div className="flex flex-1 flex-col p-3">
         <div className="flex items-start justify-between gap-2">
           <h4 className="text-sm font-bold text-gray-900">{option.title}</h4>
-          <span className="text-sm font-black text-primary whitespace-nowrap">
+          <span className="whitespace-nowrap text-sm font-black text-primary">
             {option.price === 0 ? '免費' : `+ NT$ ${option.price}`}
           </span>
         </div>
@@ -164,40 +164,8 @@ const MealCard = ({ option, count, onChange }) => {
             ))}
           </div>
         )}
-        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-          {option.key === 'none' ? (
-            <button
-              type="button"
-              onClick={() => onChange(0)}
-              className={`w-full rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
-                count === 0 ? 'border-primary bg-primary text-white' : 'border-gray-200 text-gray-700 hover:border-primary'
-              }`}
-            >
-              {count === 0 ? '已選擇' : '選此項'}
-            </button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={dec}
-                disabled={count === 0}
-                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <Minus className="h-3.5 w-3.5" />
-              </button>
-              <span className="w-6 text-center text-sm font-bold text-gray-900">{count}</span>
-              <button
-                type="button"
-                onClick={inc}
-                className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white transition hover:bg-primary-dark"
-              >
-                <Plus className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          )}
-        </div>
       </div>
-    </div>
+    </button>
   );
 };
 
@@ -236,7 +204,10 @@ const AddOns = () => {
   const [baggagePerPassenger, setBaggagePerPassenger] = useState(
     Array.from({ length: passengerCount }, () => 'none'),
   );
-  const [mealCounts, setMealCounts] = useState({});
+  const [mealPerPassenger, setMealPerPassenger] = useState(
+    Array.from({ length: passengerCount }, () => 'none'),
+  );
+  const [activePassenger, setActivePassenger] = useState(0);
 
   const baggageTotal = useMemo(
     () => baggagePerPassenger.reduce((sum, key) => {
@@ -247,11 +218,11 @@ const AddOns = () => {
   );
 
   const mealTotal = useMemo(
-    () => Object.entries(mealCounts).reduce((sum, [key, count]) => {
+    () => mealPerPassenger.reduce((sum, key) => {
       const opt = mealOptions.find((o) => o.key === key);
-      return sum + (opt?.price || 0) * count;
+      return sum + (opt?.price || 0);
     }, 0),
-    [mealCounts],
+    [mealPerPassenger],
   );
 
   const flightsTotal = (selectedFlights?.outbound?.totalPrice || 0) + (tripType === 'oneway' ? 0 : selectedFlights?.return?.totalPrice || 0);
@@ -261,15 +232,25 @@ const AddOns = () => {
     setBaggagePerPassenger((current) => current.map((v, idx) => (idx === i ? key : v)));
   };
 
-  const updateMeal = (key, count) => {
-    setMealCounts((current) => ({ ...current, [key]: count }));
+  const updateMeal = (i, key) => {
+    setMealPerPassenger((current) => current.map((v, idx) => (idx === i ? key : v)));
   };
+
+  const passengerName = (i) => {
+    const p = passengers[i];
+    if (p && (p.firstNameEn || p.lastNameEn)) return `${p.lastNameEn || ''} ${p.firstNameEn || ''}`.trim();
+    return `旅客 ${i + 1}`;
+  };
+
+  const passengerHasSelection = (i) =>
+    (baggagePerPassenger[i] && baggagePerPassenger[i] !== 'none') ||
+    (mealPerPassenger[i] && mealPerPassenger[i] !== 'none');
 
   const handleNext = () => {
     navigate('/confirmation', {
       state: {
         ...incoming,
-        addOns: { baggagePerPassenger, mealCounts, baggageTotal, mealTotal, grandTotal },
+        addOns: { baggagePerPassenger, mealPerPassenger, baggageTotal, mealTotal, grandTotal },
       },
     });
   };
@@ -292,7 +273,6 @@ const AddOns = () => {
   }
 
   const route = { from: form.from, to: form.to };
-  const mealEntries = Object.entries(mealCounts).filter(([, c]) => c > 0);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-32">
@@ -312,43 +292,71 @@ const AddOns = () => {
 
       <div className="mx-auto mt-6 grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-8">
         <div className="space-y-6">
-          {/* Baggage */}
+          {/* Passenger tabs */}
+          <section className="rounded-2xl border border-gray-100 bg-white p-2 shadow-sm sm:p-3">
+            <div className="flex flex-wrap gap-2">
+              {Array.from({ length: passengerCount }).map((_, i) => {
+                const isActive = i === activePassenger;
+                const hasSel = passengerHasSelection(i);
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setActivePassenger(i)}
+                    className={`group flex flex-1 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition sm:flex-none sm:min-w-44 ${
+                      isActive
+                        ? 'bg-primary text-white shadow-md'
+                        : 'bg-gray-50 text-gray-700 hover:bg-orange-50'
+                    }`}
+                  >
+                    <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
+                      isActive ? 'bg-white text-primary' : 'bg-white text-gray-600 ring-1 ring-gray-200'
+                    }`}>
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 truncate text-xs font-bold sm:text-sm">{passengerName(i)}</span>
+                    {hasSel && (
+                      <Check className={`h-3.5 w-3.5 ${isActive ? 'text-white' : 'text-emerald-500'}`} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-2 px-2 text-[11px] text-gray-500">為每位旅客個別選擇行李與餐食，切換上方分頁進行設定。</p>
+          </section>
+
+          {/* Baggage (active passenger only) */}
           <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
             <div className="mb-4 flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-primary">
                 <Briefcase className="h-5 w-5" />
               </span>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">託運行李</h2>
-                <p className="text-xs text-gray-500">為每位旅客選擇行李額度，價格依重量計算</p>
+                <h2 className="text-lg font-bold text-gray-900">託運行李 — {passengerName(activePassenger)}</h2>
+                <p className="text-xs text-gray-500">為這位旅客選擇行李額度，價格依重量計算</p>
               </div>
             </div>
-
-            {Array.from({ length: passengerCount }).map((_, i) => {
-              const p = passengers[i];
-              const name = p && (p.firstNameEn || p.lastNameEn) ? `${p.lastNameEn} ${p.firstNameEn}`.trim() : `旅客 ${i + 1}`;
-              return (
-                <div key={i} className="mb-5 last:mb-0">
-                  <p className="mb-2 text-sm font-bold text-gray-700">{name}</p>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    {baggageOptions.map((opt) => (
-                      <BaggageCard key={opt.key} option={opt} value={baggagePerPassenger[i]} onChange={(k) => updateBaggage(i, k)} />
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {baggageOptions.map((opt) => (
+                <BaggageCard
+                  key={opt.key}
+                  option={opt}
+                  value={baggagePerPassenger[activePassenger]}
+                  onChange={(k) => updateBaggage(activePassenger, k)}
+                />
+              ))}
+            </div>
           </section>
 
-          {/* Meals */}
+          {/* Meals (active passenger only) */}
           <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
             <div className="mb-4 flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-primary">
                 <UtensilsCrossed className="h-5 w-5" />
               </span>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">機上餐食</h2>
-                <p className="text-xs text-gray-500">預選熱騰騰的機上餐點，免費送上座位</p>
+                <h2 className="text-lg font-bold text-gray-900">機上餐食 — {passengerName(activePassenger)}</h2>
+                <p className="text-xs text-gray-500">為這位旅客挑一份熱騰騰的機上餐點</p>
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -356,14 +364,8 @@ const AddOns = () => {
                 <MealCard
                   key={opt.key}
                   option={opt}
-                  count={opt.key === 'none' ? (mealEntries.length === 0 ? 1 : 0) : (mealCounts[opt.key] || 0)}
-                  onChange={(c) => {
-                    if (opt.key === 'none') {
-                      setMealCounts({});
-                    } else {
-                      updateMeal(opt.key, c);
-                    }
-                  }}
+                  selected={mealPerPassenger[activePassenger] === opt.key}
+                  onSelect={() => updateMeal(activePassenger, opt.key)}
                 />
               ))}
             </div>
