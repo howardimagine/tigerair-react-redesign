@@ -329,7 +329,7 @@ const SearchResults = () => {
 
   const handleNextStep = () => {
     if (!isFlightSelectionComplete) return;
-    navigate('/seat', {
+    navigate('/passengers', {
       state: {
         selectedFlights,
         tripType,
@@ -564,7 +564,7 @@ const SearchResults = () => {
                 disabled={!isFlightSelectionComplete}
                 className="rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
               >
-                {'下一步：選擇座位'}
+                {'下一步：填旅客資料'}
               </button>
             </div>
           </div>

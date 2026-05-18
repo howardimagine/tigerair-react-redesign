@@ -256,7 +256,7 @@ const AddOns = () => {
   };
 
   const handleBack = () => {
-    navigate('/passengers', { state: incoming });
+    navigate('/seat', { state: incoming });
   };
 
   if (!selectedFlights?.outbound) {
@@ -284,8 +284,8 @@ const AddOns = () => {
           <p className="mt-2 text-sm text-white/70">座位已於上一步選擇 — 行李託運與機上餐食可在這裡額外加購</p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 機票</span>
-            <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 座位</span>
             <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 旅客資料</span>
+            <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 座位</span>
             <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-gray-900">4 加購</span>
           </div>
         </div>

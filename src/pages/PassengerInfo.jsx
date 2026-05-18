@@ -431,7 +431,7 @@ const PassengerInfo = () => {
       window.scrollTo({ top: 200, behavior: 'smooth' });
       return;
     }
-    navigate('/add-ons', {
+    navigate('/seat', {
       state: {
         selectedFlights,
         tripType,
@@ -472,12 +472,12 @@ const PassengerInfo = () => {
       <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(250,168,54,0.16),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold text-primary">Step 3 / 4</p>
+          <p className="text-sm font-semibold text-primary">Step 2 / 4</p>
           <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">填寫旅客資料</h1>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 機票</span>
-            <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 座位</span>
-            <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-gray-900">3 旅客資料</span>
+            <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-gray-900">2 旅客資料</span>
+            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-bold text-white/70">3 座位</span>
             <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-bold text-white/70">4 加購</span>
           </div>
         </div>
@@ -639,7 +639,7 @@ const PassengerInfo = () => {
               上一步
             </button>
             <button type="button" onClick={handleNext} className="rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-dark">
-              下一步：加購
+              下一步：選擇座位
             </button>
           </div>
         </div>
