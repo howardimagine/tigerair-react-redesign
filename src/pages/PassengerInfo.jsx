@@ -378,11 +378,11 @@ const PassengerInfo = () => {
       nationality: 'TW', passportNumber: 'B7891234', passportExpiry: '2031-04-18',
     },
     {
-      type: 'child', nickname: '',
+      type: 'infant', nickname: '',
       lastNameEn: 'CHEN', firstNameEn: 'YU-AN',
       lastNameZh: '陳', firstNameZh: '宇安',
-      gender: 'male', birthDate: '2018-11-30',
-      nationality: 'TW', passportNumber: 'C4567890', passportExpiry: '2030-07-25',
+      gender: 'male', birthDate: '2024-09-12',
+      nationality: 'TW', passportNumber: 'D2334455', passportExpiry: '2029-09-12',
     },
   ];
 

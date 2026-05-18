@@ -211,6 +211,10 @@ const Navbar = () => {
                       <Link to="/member/travelers" className="block px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">常用旅客</Link>
                       <Link to="/orders" className="block px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">我的訂單</Link>
                       <Link to="/boarding-passes" className="block px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">我的登機證</Link>
+                      <Link to="/my-trips" className="flex items-center gap-1.5 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">
+                        我的行程
+                        <span className="rounded-full bg-gradient-to-r from-primary to-violet-600 px-1.5 py-0.5 text-[9px] font-bold text-white">AI</span>
+                      </Link>
                       <div className="my-1 border-t border-gray-100" />
                       <button onClick={handleLogout} className="block w-full px-4 py-2.5 text-left text-sm text-gray-700 transition hover:bg-orange-50 hover:text-primary">
                         登出

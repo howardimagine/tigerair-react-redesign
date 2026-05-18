@@ -1,10 +1,13 @@
 import { User, Award, CreditCard, LogOut, Plane, Target, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import CreditCardManager from '../components/CreditCardManager';
+import { useCreditCards } from '../context/CreditCardsContext';
 
 const Member = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { cards } = useCreditCards();
 
   if (!user) {
     return (
@@ -66,10 +69,13 @@ const Member = () => {
               </div>
               <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 sm:p-6 text-white">
                 <CreditCard className="mb-2" size={24} />
-                <div className="text-2xl sm:text-3xl font-bold mb-1">3</div>
-                <div className="text-blue-100 text-sm">優惠券 Vouchers</div>
+                <div className="text-2xl sm:text-3xl font-bold mb-1">{cards.length}</div>
+                <div className="text-blue-100 text-sm">綁定信用卡 Cards</div>
               </div>
             </div>
+
+            {/* Credit Card Management */}
+            <CreditCardManager />
 
             {/* Recent Activity */}
             <div className="bg-white rounded-xl shadow-sm p-6">

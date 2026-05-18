@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Plane, Wallet, Download, WifiOff, Apple, Smartphone, Trash2,
   Cloud, CloudRain, Sun, Shield, BedDouble, Umbrella, MapPin, Wind, Droplets, ChevronDown,
+  Train, Car, Wifi, Sparkles, Coins,
 } from 'lucide-react';
 import { useBoardingPasses } from '../context/BoardingPassesContext';
 
@@ -491,7 +492,8 @@ const hotelData = {
   ],
 };
 
-const TravelTips = ({ pass }) => {
+// eslint-disable-next-line no-unused-vars
+const TravelTipsLegacy = ({ pass }) => {
   const [open, setOpen] = useState(false);
   const fallback = {
     name: pass.flight.to, tempHi: 24, tempLo: 18, condition: 'sunny', humidity: 60, wind: 10,
@@ -657,6 +659,289 @@ const TravelTips = ({ pass }) => {
   );
 };
 
+const TipsHeader = ({ pass, passCount, onAddCheckIn, onOpenAi }) => {
+  const [open, setOpen] = useState(false);
+  const fallback = {
+    name: pass?.flight.to || '—', tempHi: 24, tempLo: 18, condition: 'sunny', humidity: 60, wind: 10,
+    hint: '一切看起來都不錯，準備出發吧！',
+    photo: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&h=900&fit=crop',
+    forecast: [
+      { day: '今', icon: 'sunny', hi: 24, lo: 18 },
+      { day: '明', icon: 'cloudy', hi: 23, lo: 17 },
+      { day: '三', icon: 'sunny', hi: 25, lo: 19 },
+      { day: '四', icon: 'rain', hi: 22, lo: 17 },
+    ],
+  };
+  const weather = pass ? (destinationData[pass.flight.to] || fallback) : fallback;
+  const hotels = pass ? (hotelData[pass.flight.to] || []) : [];
+  const WeatherIcon = conditionIcon(weather.condition);
+  // Higher-res destination photo for header background
+  const headerPhoto = weather.photo.replace(/w=\d+&h=\d+/, 'w=1600&h=900');
+
+  return (
+    <div className="relative -mt-14 overflow-hidden bg-gray-950 pt-14 md:-mt-16 md:pt-16">
+      {/* Destination photo background — visible when expanded, faded when collapsed */}
+      <img
+        src={headerPhoto}
+        alt={weather.name}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${open ? 'opacity-50' : 'opacity-20'}`}
+      />
+      <div className={`absolute inset-0 bg-gradient-to-b transition-all duration-700 ${open ? 'from-gray-900/85 via-gray-900/60 to-gray-900/95' : 'from-gray-900 via-gray-900/90 to-gray-800'}`} />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(250,168,54,0.16),transparent_55%)]" />
+
+      <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-primary">我的登機證</p>
+            <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">Boarding Passes</h1>
+            <p className="mt-2 text-xs text-white/70">共 {passCount} 張登機證 · 已支援離線存取</p>
+          </div>
+          <button type="button" onClick={onAddCheckIn} className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/20">
+            + 新增報到
+          </button>
+        </div>
+
+        {/* Toggle pill - travel tips entry inside header */}
+        {pass && (
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="mt-5 flex w-full items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/10 px-5 py-4 text-left backdrop-blur transition hover:bg-white/15"
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                <Umbrella className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Travel Tips</p>
+                <h2 className="text-base font-bold text-white">
+                  旅遊小提醒 — {weather.name} <span className="text-primary font-black">{weather.tempHi}°</span>
+                  <WeatherIcon className="ml-1 inline h-4 w-4 align-middle text-amber-300" />
+                </h2>
+              </div>
+            </div>
+            <span className={`inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white transition-transform ${open ? 'rotate-180' : ''}`} style={{ transformOrigin: 'center' }}>
+              <ChevronDown className="h-3.5 w-3.5" />
+              {open ? '收起' : 'Show more'}
+            </span>
+          </button>
+        )}
+
+        {/* Expanded tip cards */}
+        {open && pass && (
+          <div className="mt-4 animate-fade-in-delay-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Weather */}
+            <div className="relative overflow-hidden rounded-2xl bg-gray-900/80 backdrop-blur p-5 text-white ring-1 ring-white/10">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-primary">
+                    <MapPin className="h-3 w-3" /> {weather.name} · {pass.flight.to}
+                  </p>
+                  <p className="mt-3 text-5xl font-black leading-none tracking-tighter">
+                    {weather.tempHi}°
+                  </p>
+                  <p className="mt-1 text-xs font-bold opacity-70">最低 {weather.tempLo}°</p>
+                </div>
+                <WeatherIcon className="h-12 w-12 text-amber-300 drop-shadow-lg" />
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2 border-t border-white/10 pt-3 text-[11px]">
+                <div className="flex items-center gap-1.5"><Droplets className="h-3.5 w-3.5 opacity-80" />濕度 {weather.humidity}%</div>
+                <div className="flex items-center gap-1.5"><Wind className="h-3.5 w-3.5 opacity-80" />風速 {weather.wind} km/h</div>
+              </div>
+              <div className="mt-3 grid grid-cols-4 gap-1 rounded-lg bg-black/30 p-2">
+                {weather.forecast.map((f) => (
+                  <div key={f.day} className="flex flex-col items-center gap-0.5 text-[10px]">
+                    <span className="opacity-80">{f.day}</span>
+                    <ForecastIcon icon={f.icon} className="h-4 w-4" />
+                    <span className="font-bold">{f.hi}°</span>
+                    <span className="opacity-60">{f.lo}°</span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 rounded-lg bg-white/10 p-2 text-[11px] leading-relaxed">💡 {weather.hint}</p>
+            </div>
+
+            {/* Travel insurance */}
+            <div className="overflow-hidden rounded-2xl bg-white/95 backdrop-blur text-gray-900 ring-1 ring-white/10">
+              <div className="bg-gradient-to-br from-primary to-primary-dark px-5 py-4 text-white">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">Tigerair Care</p>
+                    <h3 className="text-base font-bold">旅平險加保</h3>
+                  </div>
+                </div>
+              </div>
+              <div className="p-5">
+                <ul className="space-y-2 text-xs">
+                  <li className="flex items-center gap-2 rounded-lg bg-orange-50/80 px-3 py-2"><Shield className="h-3.5 w-3.5 text-primary" />醫療給付最高 <span className="font-bold text-primary">200 萬</span></li>
+                  <li className="flex items-center gap-2 rounded-lg bg-orange-50/80 px-3 py-2"><Shield className="h-3.5 w-3.5 text-primary" />行李遺失賠償 <span className="font-bold text-primary">30,000</span></li>
+                  <li className="flex items-center gap-2 rounded-lg bg-orange-50/80 px-3 py-2"><Shield className="h-3.5 w-3.5 text-primary" />班機延誤 <span className="font-bold text-primary">4 小時起賠</span></li>
+                </ul>
+                <button type="button" className="mt-4 w-full rounded-lg bg-primary px-3 py-2.5 text-xs font-bold text-white shadow hover:bg-primary-dark">
+                  立即加保 NT$ 320 起
+                </button>
+              </div>
+            </div>
+
+            {/* Hotel */}
+            <div className="overflow-hidden rounded-2xl bg-white/95 backdrop-blur ring-1 ring-white/10">
+              <div className="bg-gradient-to-br from-amber-500 to-primary px-5 py-4 text-white">
+                <div className="flex items-center gap-2">
+                  <BedDouble className="h-5 w-5" />
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">Hotels</p>
+                    <h3 className="text-base font-bold">{weather.name} 熱門住宿</h3>
+                  </div>
+                </div>
+              </div>
+              <div className="p-5">
+                <p className="mb-3 text-xs text-gray-700">搭配機票享 8 折</p>
+                <div className="space-y-2">
+                  {hotels.map((h) => (
+                    <div key={h.name} className="flex items-center gap-3 rounded-xl border border-gray-100 p-2">
+                      <img src={h.img} alt={h.name} className="h-12 w-14 flex-shrink-0 rounded-lg object-cover" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs font-bold text-gray-900">{h.name}</p>
+                        <p className="text-[10px] text-gray-500">{h.area}</p>
+                        <p className="text-xs font-black text-primary">NT$ {h.price.toLocaleString()}<span className="text-[10px] font-normal text-gray-400">/晚</span></p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button type="button" className="mt-4 w-full rounded-lg border-2 border-primary px-3 py-2 text-xs font-bold text-primary hover:bg-primary hover:text-white">
+                  查看更多住宿
+                </button>
+              </div>
+            </div>
+
+            {/* Airport transit */}
+            <div className="overflow-hidden rounded-2xl bg-white/95 backdrop-blur ring-1 ring-white/10">
+              <div className="bg-gradient-to-br from-sky-500 to-sky-700 px-5 py-4 text-white">
+                <div className="flex items-center gap-2">
+                  <Train className="h-5 w-5" />
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">Transit</p>
+                    <h3 className="text-base font-bold">機場交通建議</h3>
+                  </div>
+                </div>
+              </div>
+              <div className="p-5 space-y-2 text-xs text-gray-700">
+                <div className="rounded-lg bg-sky-50/70 p-3">
+                  <p className="font-bold text-sky-700">🚆 機場快線</p>
+                  <p className="mt-1 text-[11px]">{weather.name}車站 · 約 42 分鐘 · NT$ 290</p>
+                </div>
+                <div className="rounded-lg bg-sky-50/70 p-3">
+                  <p className="font-bold text-sky-700">🚌 機場巴士</p>
+                  <p className="mt-1 text-[11px]">市中心 · 約 75 分鐘 · NT$ 150</p>
+                </div>
+                <div className="rounded-lg bg-sky-50/70 p-3">
+                  <p className="font-bold text-sky-700">🚇 地鐵直達</p>
+                  <p className="mt-1 text-[11px]">轉乘 1 次 · 約 60 分鐘 · NT$ 180</p>
+                </div>
+                <button type="button" className="mt-2 w-full rounded-lg bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700">
+                  查看路線地圖
+                </button>
+              </div>
+            </div>
+
+            {/* Taxi booking */}
+            <div className="overflow-hidden rounded-2xl bg-white/95 backdrop-blur ring-1 ring-white/10">
+              <div className="bg-gradient-to-br from-yellow-400 to-amber-600 px-5 py-4 text-gray-900">
+                <div className="flex items-center gap-2">
+                  <Car className="h-5 w-5" />
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wide opacity-80">Airport Taxi</p>
+                    <h3 className="text-base font-bold">出租車預訂</h3>
+                  </div>
+                </div>
+              </div>
+              <div className="p-5 text-xs text-gray-700">
+                <p>事先預訂機場到飯店的接送，落地直接搭車不用排隊。</p>
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between rounded-lg bg-amber-50 px-3 py-2">
+                    <span className="font-semibold">🚕 一般房車 (4 人)</span>
+                    <span className="font-bold text-amber-700">NT$ 950</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg bg-amber-50 px-3 py-2">
+                    <span className="font-semibold">🚐 商務廂車 (7 人)</span>
+                    <span className="font-bold text-amber-700">NT$ 1,480</span>
+                  </div>
+                </div>
+                <button type="button" className="mt-4 w-full rounded-lg bg-amber-600 px-3 py-2 text-xs font-bold text-white hover:bg-amber-700">
+                  立即預訂接送
+                </button>
+              </div>
+            </div>
+
+            {/* eSIM */}
+            <div className="relative overflow-hidden rounded-2xl bg-white/95 backdrop-blur ring-1 ring-white/10">
+              <span className="absolute right-3 top-3 rounded-full bg-violet-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white">點數可折抵</span>
+              <div className="bg-gradient-to-br from-violet-500 to-fuchsia-600 px-5 py-4 text-white">
+                <div className="flex items-center gap-2">
+                  <Wifi className="h-5 w-5" />
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">eSIM</p>
+                    <h3 className="text-base font-bold">虎航 eSIM 上網卡</h3>
+                  </div>
+                </div>
+              </div>
+              <div className="p-5 text-xs text-gray-700">
+                <p>掃 QR 碼即可下載 eSIM，落地自動連網，免換卡免插卡。</p>
+                <div className="mt-3 space-y-1.5">
+                  <div className="flex items-center justify-between rounded-lg bg-violet-50 px-3 py-2">
+                    <span className="font-semibold">📶 5 天無限上網</span>
+                    <span className="text-right">
+                      <span className="block font-bold text-violet-700">NT$ 380</span>
+                      <span className="text-[9px] text-violet-500 flex items-center gap-0.5 justify-end"><Coins className="h-2.5 w-2.5" />可折 380 點</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg bg-violet-50 px-3 py-2">
+                    <span className="font-semibold">📶 10 天 30GB</span>
+                    <span className="text-right">
+                      <span className="block font-bold text-violet-700">NT$ 580</span>
+                      <span className="text-[9px] text-violet-500 flex items-center gap-0.5 justify-end"><Coins className="h-2.5 w-2.5" />可折 580 點</span>
+                    </span>
+                  </div>
+                </div>
+                <button type="button" className="mt-4 w-full rounded-lg bg-violet-600 px-3 py-2 text-xs font-bold text-white hover:bg-violet-700">
+                  立即購買 eSIM
+                </button>
+              </div>
+            </div>
+
+            {/* AI Trip Planning CTA */}
+            <button
+              type="button"
+              onClick={onOpenAi}
+              className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-fuchsia-600 to-violet-600 p-6 text-left text-white shadow-2xl shadow-primary/30 transition hover:scale-[1.02] sm:col-span-2 lg:col-span-3"
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.18),transparent_60%)]" />
+              <div className="relative flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur">
+                    <Sparkles className="h-6 w-6 animate-pulse" />
+                  </span>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-90">AI Trip Planner</p>
+                    <h3 className="text-lg font-bold sm:text-xl">幫我安排 {weather.name} 行程</h3>
+                    <p className="mt-1 text-xs opacity-90">AI 根據你的航班自動規劃酒店、門票、餐廳、交通 — 可一鍵訂購</p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-bold backdrop-blur transition group-hover:bg-white/25">
+                  ✨ 開始安排 →
+                </span>
+              </div>
+            </button>
+
+            <p className="text-[11px] text-white/50 sm:col-span-2 lg:col-span-3">* 以上資訊為示範用，實際請依當地公告與保單條款為準。</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const BoardingPasses = () => {
   const navigate = useNavigate();
   const { passes, removePass } = useBoardingPasses();
@@ -681,13 +966,7 @@ const BoardingPasses = () => {
   if (passes.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(250,168,54,0.16),transparent_55%)]" />
-          <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
-            <p className="text-sm font-semibold text-primary">我的登機證</p>
-            <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">Boarding Passes</h1>
-          </div>
-        </div>
+        <TipsHeader pass={null} passCount={0} onAddCheckIn={() => navigate('/checkin')} onOpenAi={() => navigate('/my-trips')} />
         <div className="mx-auto max-w-md px-4 py-16 text-center">
           <Smartphone className="mx-auto h-14 w-14 text-gray-300" />
           <p className="mt-3 text-gray-600">尚未有登機證</p>
@@ -702,21 +981,12 @@ const BoardingPasses = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-12">
-      <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(250,168,54,0.16),transparent_55%)]" />
-        <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-primary">我的登機證</p>
-              <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">Boarding Passes</h1>
-              <p className="mt-2 text-xs text-white/70">共 {passes.length} 張登機證 · 已支援離線存取</p>
-            </div>
-            <button type="button" onClick={() => navigate('/checkin')} className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/20">
-              + 新增報到
-            </button>
-          </div>
-        </div>
-      </div>
+      <TipsHeader
+        pass={activePass}
+        passCount={passes.length}
+        onAddCheckIn={() => navigate('/checkin')}
+        onOpenAi={() => navigate('/my-trips', { state: { destination: activePass?.flight?.to, destinationName: (destinationData[activePass?.flight?.to]?.name || activePass?.flight?.toName), pass: activePass } })}
+      />
 
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
         {passes.length > 1 && (
@@ -737,9 +1007,6 @@ const BoardingPasses = () => {
         )}
 
         {activePass && <BoardingPassCard pass={activePass} onRemove={removePass} platform={platform} />}
-
-        {/* Travel tips — clearly separated below boarding pass */}
-        {activePass && <TravelTips pass={activePass} />}
 
         {/* Mobile offline notice */}
         {isMobile && (

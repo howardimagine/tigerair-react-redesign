@@ -382,9 +382,9 @@ const AddOns = () => {
                 <div className="flex-1">
                   <h2 className="text-base font-bold text-gray-900">座位已選擇</h2>
                   <p className="mt-1 text-sm text-gray-600">
-                    去程 {(incoming.seats.outbound || []).filter(Boolean).join(' / ')}
+                    去程 {(incoming.seats.outbound || []).filter((s) => typeof s === 'string').join(' / ')}
                     {tripType !== 'oneway' && (
-                      <>　·　回程 {(incoming.seats.return || []).filter(Boolean).join(' / ')}</>
+                      <>　·　回程 {(incoming.seats.return || []).filter((s) => typeof s === 'string').join(' / ')}</>
                     )}
                     {incoming.seatSurchargeTotal > 0 && (
                       <>（額外座位費 NT$ {incoming.seatSurchargeTotal.toLocaleString()}）</>

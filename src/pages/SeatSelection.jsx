@@ -32,15 +32,17 @@ const generateOccupied = (seed) => {
   return set;
 };
 
-const SeatGrid = ({ direction, selectedSeatsForDirection, onSeatToggle, activePassengerIdx, occupied, bundleIncludesSeat }) => {
-  const flatSelected = new Set(selectedSeatsForDirection.filter(Boolean));
-  const activeSeat = selectedSeatsForDirection[activePassengerIdx];
+const SeatGrid = ({ direction, selectedSeatsForDirection, onSeatToggle, activePassengerIdx, occupied, bundleIncludesSeat, infantAttachMap }) => {
+  // infantAttachMap: { [seatId]: true } — seats where an infant is attached
+  const flatSelected = new Set(selectedSeatsForDirection.filter((s) => typeof s === 'string'));
+  const activeSeat = typeof selectedSeatsForDirection[activePassengerIdx] === 'string' ? selectedSeatsForDirection[activePassengerIdx] : null;
 
   const renderSeat = (row, col) => {
     const seatId = `${row}${col}`;
     const isOccupied = occupied.has(seatId);
     const isMine = activeSeat === seatId;
     const isOtherPassenger = !isMine && flatSelected.has(seatId);
+    const hasInfant = infantAttachMap?.[seatId];
     const type = seatTypeFor(row);
     const price = seatPrice(row, bundleIncludesSeat);
 
@@ -52,16 +54,20 @@ const SeatGrid = ({ direction, selectedSeatsForDirection, onSeatToggle, activePa
     else if (type === 'exit') base += ' bg-sky-50 text-sky-700 hover:bg-sky-100 hover:border-sky-300';
     else base += ' bg-gray-100 text-gray-700 hover:bg-orange-50 hover:border-primary/40';
 
+    // Infant attached — overlay a dashed outline + tiny baby emoji corner
+    if (hasInfant) base += ' relative ring-2 ring-pink-500 ring-offset-1';
+
     return (
       <button
         key={seatId}
         type="button"
         disabled={isOccupied || isOtherPassenger}
-        title={`${seatId} · ${price === 0 ? '免費' : `+NT$ ${price}`}`}
+        title={`${seatId} · ${price === 0 ? '免費' : `+NT$ ${price}`}${hasInfant ? ' · 嬰兒同座' : ''}`}
         onClick={() => onSeatToggle(seatId, price)}
         className={base}
       >
         {col}
+        {hasInfant && <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-pink-500 text-[8px] text-white">👶</span>}
       </button>
     );
   };
@@ -103,17 +109,43 @@ const SeatSelection = () => {
   const passengerCounts = incoming.passengerCounts || { adult: 2, child: 0, infant: 0 };
   const form = incoming.form || { from: 'TPE', to: 'NRT' };
 
-  const passengerCount = (passengerCounts.adult || 0) + (passengerCounts.child || 0);
+  // Build full passenger list including infants for the tab strip
+  const passengerList = useMemo(() => {
+    if (incoming.passengers?.length) {
+      return incoming.passengers.map((p, idx) => ({ idx, type: p.type || 'adult' }));
+    }
+    const list = [];
+    let idx = 0;
+    for (let i = 0; i < (passengerCounts.adult || 0); i += 1) list.push({ idx: idx++, type: 'adult' });
+    for (let i = 0; i < (passengerCounts.child || 0); i += 1) list.push({ idx: idx++, type: 'child' });
+    for (let i = 0; i < (passengerCounts.infant || 0); i += 1) list.push({ idx: idx++, type: 'infant' });
+    return list;
+  }, [incoming.passengers, passengerCounts]);
+
+  const seatPassengerIndices = passengerList.filter((p) => p.type !== 'infant').map((p) => p.idx);
+  const infantPassengerIndices = passengerList.filter((p) => p.type === 'infant').map((p) => p.idx);
+  const totalPassengers = passengerList.length;
+
   const [activeDirection, setActiveDirection] = useState('outbound');
-  const [activePassenger, setActivePassenger] = useState(0);
+  const [activePassenger, setActivePassenger] = useState(passengerList[0]?.idx ?? 0);
+  // selections: index → seat string (for seat passengers) | adult-idx number (for infant)
   const [selections, setSelections] = useState({
-    outbound: Array.from({ length: passengerCount }, () => null),
-    return: Array.from({ length: passengerCount }, () => null),
+    outbound: Array.from({ length: totalPassengers }, () => null),
+    return: Array.from({ length: totalPassengers }, () => null),
   });
   const [extraPrices, setExtraPrices] = useState({
-    outbound: Array.from({ length: passengerCount }, () => 0),
-    return: Array.from({ length: passengerCount }, () => 0),
+    outbound: Array.from({ length: totalPassengers }, () => 0),
+    return: Array.from({ length: totalPassengers }, () => 0),
   });
+
+  const isInfant = (idx) => passengerList.find((p) => p.idx === idx)?.type === 'infant';
+  const adultsWithSeats = (direction) =>
+    seatPassengerIndices.filter((i) => selections[direction][i] !== null);
+  // For a given direction, find which adult an infant is attached to (or null)
+  const getInfantAttachAdult = (direction, infantIdx) => selections[direction][infantIdx];
+  // For a given direction, find which infant is attached to an adult
+  const getAdultsInfant = (direction, adultIdx) =>
+    infantPassengerIndices.find((i) => selections[direction][i] === adultIdx);
 
   const occupiedByDirection = useMemo(() => ({
     outbound: generateOccupied('IT210-' + (selectedFlights?.outbound?.flight?.id || 'OUT')),
@@ -137,10 +169,25 @@ const SeatSelection = () => {
     });
   };
 
+  const handleAttachInfantToAdult = (adultIdx) => {
+    if (!isInfant(activePassenger)) return;
+    setSelections((current) => {
+      const next = [...current[activeDirection]];
+      next[activePassenger] = next[activePassenger] === adultIdx ? null : adultIdx;
+      return { ...current, [activeDirection]: next };
+    });
+  };
+
   const passengerName = (i) => {
     const p = incoming.passengers?.[i];
     if (p && (p.firstNameEn || p.lastNameEn)) return `${p.lastNameEn || ''} ${p.firstNameEn || ''}`.trim();
     return `旅客 ${i + 1}`;
+  };
+  const passengerTypeLabel = (i) => {
+    const t = passengerList.find((p) => p.idx === i)?.type;
+    if (t === 'infant') return '嬰兒';
+    if (t === 'child') return '兒童';
+    return '成人';
   };
 
   const seatSurchargeTotal = useMemo(() => {
@@ -151,10 +198,17 @@ const SeatSelection = () => {
   const flightsTotal = (selectedFlights?.outbound?.totalPrice || 0) + (tripType === 'oneway' ? 0 : selectedFlights?.return?.totalPrice || 0);
   const grandTotal = flightsTotal + seatSurchargeTotal;
 
-  const allSeatsPicked = (() => {
-    const allDir = (arr) => arr.every((s) => s);
-    return allDir(selections.outbound) && (tripType === 'oneway' || allDir(selections.return));
-  })();
+  const isDirectionComplete = (direction) => {
+    // Each seat passenger has a seat
+    const seatsOk = seatPassengerIndices.every((i) => selections[direction][i]);
+    // Each infant attached to an adult
+    const infantsOk = infantPassengerIndices.every((i) => {
+      const adultIdx = selections[direction][i];
+      return adultIdx !== null && adultIdx !== undefined && selections[direction][adultIdx];
+    });
+    return seatsOk && infantsOk;
+  };
+  const allSeatsPicked = isDirectionComplete('outbound') && (tripType === 'oneway' || isDirectionComplete('return'));
 
   const handleNext = () => {
     if (!allSeatsPicked) return;
@@ -213,7 +267,7 @@ const SeatSelection = () => {
               {['outbound', 'return'].map((d) => {
                 const isActive = activeDirection === d;
                 const sel = selections[d];
-                const filled = sel.filter(Boolean).length;
+                const filled = sel.filter((v, i) => v !== null && v !== undefined && (isInfant(i) ? sel[v] : true)).length;
                 return (
                   <button
                     key={d}
@@ -225,7 +279,7 @@ const SeatSelection = () => {
                   >
                     {d === 'outbound' ? '去程' : '回程'} {form.from} → {form.to}
                     <span className={`rounded-full px-2 py-0.5 text-[10px] ${isActive ? 'bg-white/15 text-white' : 'bg-gray-100 text-gray-600'}`}>
-                      {filled}/{passengerCount}
+                      {filled}/{totalPassengers}
                     </span>
                   </button>
                 );
@@ -236,22 +290,36 @@ const SeatSelection = () => {
           {/* Passenger tabs */}
           <div className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
             <div className="flex flex-wrap gap-2">
-              {Array.from({ length: passengerCount }).map((_, i) => {
+              {passengerList.map((p) => {
+                const i = p.idx;
                 const isActive = i === activePassenger;
+                const isInf = p.type === 'infant';
                 const picked = selections[activeDirection][i];
+                const displayPick = isInf
+                  ? (typeof picked === 'number' ? `依附 ${passengerName(picked)}` : '')
+                  : picked;
+                const accent = isInf ? 'ring-pink-300' : 'ring-gray-200';
                 return (
                   <button
                     key={i}
                     type="button"
                     onClick={() => setActivePassenger(i)}
                     className={`flex flex-1 items-center gap-2 rounded-xl px-3 py-2 text-sm transition sm:flex-none sm:min-w-40 ${
-                      isActive ? 'bg-primary text-white shadow-md' : 'bg-gray-50 text-gray-700 hover:bg-orange-50'
+                      isActive
+                        ? isInf ? 'bg-pink-500 text-white shadow-md' : 'bg-primary text-white shadow-md'
+                        : `bg-gray-50 text-gray-700 hover:bg-orange-50 ring-1 ${accent}`
                     }`}
                   >
-                    <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold ${isActive ? 'bg-white text-primary' : 'bg-white text-gray-600 ring-1 ring-gray-200'}`}>{i + 1}</span>
-                    <span className="flex-1 truncate text-left text-xs font-bold">{passengerName(i)}</span>
-                    {picked ? (
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${isActive ? 'bg-white/15 text-white' : 'bg-emerald-100 text-emerald-700'}`}>{picked}</span>
+                    <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold ${
+                      isActive ? 'bg-white text-gray-900' : 'bg-white text-gray-600 ring-1 ring-gray-200'
+                    }`}>{isInf ? '👶' : i + 1}</span>
+                    <span className="flex-1 truncate text-left text-xs font-bold">
+                      {passengerName(i)} <span className={`ml-1 text-[9px] font-normal ${isActive ? 'opacity-80' : 'opacity-60'}`}>{passengerTypeLabel(i)}</span>
+                    </span>
+                    {displayPick ? (
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                        isActive ? 'bg-white/15 text-white' : (isInf ? 'bg-pink-100 text-pink-700' : 'bg-emerald-100 text-emerald-700')
+                      }`}>{displayPick}</span>
                     ) : (
                       <span className={`text-[10px] ${isActive ? 'text-white/70' : 'text-gray-400'}`}>待選</span>
                     )}
@@ -261,39 +329,95 @@ const SeatSelection = () => {
             </div>
           </div>
 
-          {/* Seat map */}
-          <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-primary"><Armchair className="h-5 w-5" /></span>
+          {/* Active panel: seat map (for seat passengers) OR infant attach (for infants) */}
+          {isInfant(activePassenger) ? (
+            <section className="rounded-2xl border border-pink-200 bg-pink-50/50 p-5 shadow-sm sm:p-6">
+              <div className="mb-3 flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-100 text-pink-600 text-lg">👶</span>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">座位圖 — {passengerName(activePassenger)}</h2>
-                  <p className="text-xs text-gray-500">{activeDirection === 'return' ? `回程 ${form.to} → ${form.from}` : `去程 ${form.from} → ${form.to}`} · {selectedFlights[activeDirection]?.flight?.id}</p>
+                  <h2 className="text-lg font-bold text-gray-900">嬰兒安排 — {passengerName(activePassenger)}</h2>
+                  <p className="text-xs text-pink-700">2 歲以下嬰兒不需獨立座位，請選擇一位成人依附（嬰兒將與該成人同座）</p>
                 </div>
               </div>
-              {bundleIncludesSeat && (
-                <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">方案已含座位 · 免加價</span>
-              )}
-            </div>
 
-            <div className="mb-3 flex flex-wrap items-center justify-center gap-3 text-[10px] text-gray-600">
-              <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-gray-100 ring-1 ring-gray-200" /> 可選</span>
-              <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-amber-100 ring-1 ring-amber-300" /> 前排 +NT$ 300</span>
-              <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-sky-100 ring-1 ring-sky-300" /> 緊急出口 +NT$ 200</span>
-              <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-primary ring-1 ring-primary" /> 你的選擇</span>
-              <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-emerald-100 ring-1 ring-emerald-300" /> 同行旅客</span>
-              <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-gray-200" /> 已佔用</span>
-            </div>
+              <div className="rounded-xl bg-white p-4 ring-1 ring-pink-100">
+                <p className="mb-3 text-xs font-bold text-gray-700">選擇依附的成人</p>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {seatPassengerIndices.map((aIdx) => {
+                    const adultIsAdult = passengerList.find((p) => p.idx === aIdx)?.type === 'adult';
+                    if (!adultIsAdult) return null;
+                    const isAttached = selections[activeDirection][activePassenger] === aIdx;
+                    const adultSeat = selections[activeDirection][aIdx];
+                    return (
+                      <button
+                        key={aIdx}
+                        type="button"
+                        onClick={() => handleAttachInfantToAdult(aIdx)}
+                        className={`flex items-center justify-between gap-3 rounded-xl border-2 p-3 text-left transition ${
+                          isAttached ? 'border-pink-500 bg-pink-50' : 'border-gray-200 hover:border-pink-300'
+                        }`}
+                      >
+                        <div>
+                          <p className="text-sm font-bold text-gray-900">{passengerName(aIdx)}</p>
+                          <p className="text-[11px] text-gray-500">
+                            {adultSeat ? `座位 ${adultSeat}` : '尚未選座位'}
+                          </p>
+                        </div>
+                        {isAttached && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-pink-500 px-2.5 py-1 text-[10px] font-bold text-white">
+                            <Check className="h-3 w-3" /> 已依附
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-3 text-[11px] text-gray-500">提示：被依附的成人座位上會出現 <span className="inline-block h-3 w-3 rounded-sm bg-gray-100 align-middle ring-2 ring-pink-500" /> 粉色外框 + 👶 標記。</p>
+              </div>
+            </section>
+          ) : (
+            <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-primary"><Armchair className="h-5 w-5" /></span>
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">座位圖 — {passengerName(activePassenger)}</h2>
+                    <p className="text-xs text-gray-500">{activeDirection === 'return' ? `回程 ${form.to} → ${form.from}` : `去程 ${form.from} → ${form.to}`} · {selectedFlights[activeDirection]?.flight?.id}</p>
+                  </div>
+                </div>
+                {bundleIncludesSeat && (
+                  <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">方案已含座位 · 免加價</span>
+                )}
+              </div>
 
-            <SeatGrid
-              direction={activeDirection}
-              selectedSeatsForDirection={selections[activeDirection]}
-              onSeatToggle={handleSeatToggle}
-              activePassengerIdx={activePassenger}
-              occupied={occupiedByDirection[activeDirection]}
-              bundleIncludesSeat={bundleIncludesSeat}
-            />
-          </section>
+              <div className="mb-3 flex flex-wrap items-center justify-center gap-3 text-[10px] text-gray-600">
+                <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-gray-100 ring-1 ring-gray-200" /> 可選</span>
+                <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-amber-100 ring-1 ring-amber-300" /> 前排 +NT$ 300</span>
+                <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-sky-100 ring-1 ring-sky-300" /> 緊急出口 +NT$ 200</span>
+                <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-primary ring-1 ring-primary" /> 你的選擇</span>
+                <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-emerald-100 ring-1 ring-emerald-300" /> 同行旅客</span>
+                <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-gray-100 ring-2 ring-pink-500" /> 嬰兒同座</span>
+                <span className="inline-flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-gray-200" /> 已佔用</span>
+              </div>
+
+              <SeatGrid
+                direction={activeDirection}
+                selectedSeatsForDirection={selections[activeDirection]}
+                onSeatToggle={handleSeatToggle}
+                activePassengerIdx={activePassenger}
+                occupied={occupiedByDirection[activeDirection]}
+                bundleIncludesSeat={bundleIncludesSeat}
+                infantAttachMap={infantPassengerIndices.reduce((acc, iIdx) => {
+                  const attachedAdult = selections[activeDirection][iIdx];
+                  if (typeof attachedAdult === 'number') {
+                    const adultSeat = selections[activeDirection][attachedAdult];
+                    if (typeof adultSeat === 'string') acc[adultSeat] = true;
+                  }
+                  return acc;
+                }, {})}
+              />
+            </section>
+          )}
         </div>
 
         {/* Right: sidebar */}
@@ -306,12 +430,27 @@ const SeatSelection = () => {
                   <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-primary">
                     {d === 'return' ? '回程' : '去程'} · {selectedFlights[d]?.flight?.id}
                   </p>
-                  {Array.from({ length: passengerCount }).map((_, i) => (
-                    <div key={i} className="flex items-center justify-between border-b border-white py-1.5 last:border-b-0 text-xs">
-                      <span className="text-gray-600">{passengerName(i)}</span>
-                      <span className="font-bold text-gray-900">{selections[d][i] || '—'}</span>
-                    </div>
-                  ))}
+                  {passengerList.map((p) => {
+                    const i = p.idx;
+                    const val = selections[d][i];
+                    let display = '—';
+                    if (p.type === 'infant') {
+                      if (typeof val === 'number') {
+                        const adultSeat = selections[d][val];
+                        display = adultSeat ? `依附 ${passengerName(val)} (${adultSeat})` : `依附 ${passengerName(val)}`;
+                      }
+                    } else if (typeof val === 'string') {
+                      display = val;
+                    }
+                    return (
+                      <div key={i} className="flex items-center justify-between border-b border-white py-1.5 last:border-b-0 text-xs">
+                        <span className="text-gray-600">
+                          {p.type === 'infant' && '👶 '}{passengerName(i)}
+                        </span>
+                        <span className={`font-bold ${p.type === 'infant' ? 'text-pink-600' : 'text-gray-900'}`}>{display}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               ))}
             </div>
@@ -345,7 +484,7 @@ const SeatSelection = () => {
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 py-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold text-gray-500">已選 {Object.values(selections).flat().filter(Boolean).length} / {passengerCount * (tripType === 'oneway' ? 1 : 2)} 座位</p>
+            <p className="text-xs font-semibold text-gray-500">已選 {Object.values(selections).flat().filter((v) => v !== null && v !== undefined).length} / {totalPassengers * (tripType === 'oneway' ? 1 : 2)} 旅客</p>
             <p className="text-xl font-black text-gray-900"><span className="mr-1 text-xs font-bold">TWD</span>{grandTotal.toLocaleString()}</p>
           </div>
           <div className="flex items-center gap-2">

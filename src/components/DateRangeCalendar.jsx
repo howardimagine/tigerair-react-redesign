@@ -4,8 +4,12 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const weekdays = ['\u65e5', '\u4e00', '\u4e8c', '\u4e09', '\u56db', '\u4e94', '\u516d'];
 
-const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange, tripType, readOnly = false, openTrigger = 0 }) => {
+const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange, tripType, readOnly = false, openTrigger = 0, onOpenChange }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (onOpenChange) onOpenChange(isOpen);
+  }, [isOpen, onOpenChange]);
   const [activeField, setActiveField] = useState('depart');
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const calendarRef = useRef(null);

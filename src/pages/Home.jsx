@@ -189,9 +189,10 @@ const Home = () => {
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromoCode, setAppliedPromoCode] = useState('');
   const [isPassengerOpen, setIsPassengerOpen] = useState(false);
-  const [passengerCounts, setPassengerCounts] = useState({ adult: 2, child: 0, infant: 0 });
+  const [passengerCounts, setPassengerCounts] = useState({ adult: 2, child: 0, infant: 1 });
   const passengerDropdownRef = useRef(null);
   const [calendarOpenTrigger, setCalendarOpenTrigger] = useState(0);
+  const [isDateOpen, setIsDateOpen] = useState(false);
   const [isOpeningMap, setIsOpeningMap] = useState(false);
   const searchFormRef = useRef(null);
   const parallaxRef = useRef(null);
@@ -429,7 +430,7 @@ const Home = () => {
         </div>
 
         {/* Search Card — merged into Hero, glass */}
-        <div ref={searchFormRef} className={`relative z-10 mx-auto max-w-7xl pl-12 pr-16 pt-10 transition-all duration-500 sm:pl-20 sm:pr-24 sm:pt-14 ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
+        <div ref={searchFormRef} className={`relative mx-auto max-w-7xl pl-12 pr-16 pt-10 transition-all duration-500 sm:pl-20 sm:pr-24 sm:pt-14 ${isDateOpen ? 'z-[65]' : 'z-10'} ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
           <div className="rounded-2xl border border-white/25 bg-white/15 p-5 shadow-2xl shadow-black/30 backdrop-blur-2xl sm:p-6 md:px-8 md:py-6">
             <form onSubmit={handleSearch}>
               <div className="grid grid-cols-1 gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr] lg:items-end">
@@ -470,6 +471,7 @@ const Home = () => {
                   onReturnChange={date => setForm((current) => ({ ...current, returnDate: date }))}
                   tripType={tripType}
                   openTrigger={calendarOpenTrigger}
+                  onOpenChange={setIsDateOpen}
                 />
 
                 <div ref={passengerDropdownRef} className="relative rounded-lg border border-gray-200 bg-white/70 backdrop-blur-sm transition hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">

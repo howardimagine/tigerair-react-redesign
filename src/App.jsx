@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SavedTravelersProvider } from './context/SavedTravelersContext';
 import { BoardingPassesProvider } from './context/BoardingPassesContext';
+import { CreditCardsProvider } from './context/CreditCardsContext';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -15,6 +16,7 @@ import SeatSelection from './pages/SeatSelection';
 import AddOns from './pages/AddOns';
 import SavedTravelers from './pages/SavedTravelers';
 import BoardingPasses from './pages/BoardingPasses';
+import MyTrips from './pages/MyTrips';
 import Confirmation from './pages/Confirmation';
 import Member from './pages/Member';
 import Orders from './pages/Orders';
@@ -42,6 +44,7 @@ function App() {
   return (
     <AuthProvider>
       <SavedTravelersProvider>
+        <CreditCardsProvider>
         <BoardingPassesProvider>
         <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
           <ScrollToTop />
@@ -63,6 +66,7 @@ function App() {
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/checkin" element={<CheckIn />} />
               <Route path="/boarding-passes" element={<BoardingPasses />} />
+              <Route path="/my-trips" element={<MyTrips />} />
               <Route path="/support" element={<Support />} />
               <Route path="/fare-map" element={<LowFareMap />} />
               <Route path="/schedule" element={<Schedule />} />
@@ -74,6 +78,7 @@ function App() {
           </Layout>
         </BrowserRouter>
         </BoardingPassesProvider>
+        </CreditCardsProvider>
       </SavedTravelersProvider>
     </AuthProvider>
   );
