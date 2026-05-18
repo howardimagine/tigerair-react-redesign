@@ -546,8 +546,8 @@ const SearchResults = () => {
         )}
 
         {filtered.length > 0 && (
-          <div className="sticky bottom-0 z-30 mt-6 border-t border-gray-200 bg-white/95 pt-3 pb-4 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.15)] backdrop-blur">
-            <div className="flex flex-row items-center justify-between gap-3">
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 pt-3 pb-4 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur sm:px-6 lg:px-8">
+            <div className="mx-auto flex max-w-7xl flex-row items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold text-gray-500">
                   {selectedFlights.outbound?.bundle?.title}

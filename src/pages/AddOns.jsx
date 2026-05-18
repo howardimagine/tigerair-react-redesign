@@ -438,7 +438,7 @@ const AddOns = () => {
         </aside>
       </div>
 
-      <div className="sticky bottom-0 z-30 mt-8 border-t border-gray-200 bg-white/95 px-4 py-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.15)] backdrop-blur sm:px-6 lg:px-8">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 py-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold text-gray-500">步驟 4 / 4 · 加購</p>
