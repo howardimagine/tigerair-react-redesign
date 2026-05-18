@@ -25,6 +25,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      # SPA fallback: copy index.html to 404.html so client-side routes (e.g.
+      # /search, /seat, /passengers) work on hard-reload via GitHub Pages.
+      - run: cp dist/index.html dist/404.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
