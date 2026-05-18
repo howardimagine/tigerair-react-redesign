@@ -151,14 +151,12 @@ const GenAnimation = ({ destinationName, onDone }) => {
 
   return (
     <div className="flex flex-col items-center justify-center px-4 py-20 text-center">
-      <div className="relative flex h-32 w-32 items-center justify-center">
-        {/* Spinning ring — primary only */}
-        <div className="absolute inset-0 animate-spin rounded-full bg-gradient-to-tr from-primary via-amber-400 to-primary" style={{ animationDuration: '2s' }} />
-        <div className="absolute inset-2 rounded-full bg-gray-950" />
-        <Sparkles className="relative h-10 w-10 animate-pulse text-primary" />
+      <div className="relative flex h-24 w-24 items-center justify-center">
+        <div className="absolute inset-0 animate-spin rounded-full border-2 border-white/10 border-t-primary" style={{ animationDuration: '1.4s' }} />
+        <Sparkles className="relative h-7 w-7 text-primary" />
       </div>
-      <h2 className="mt-8 text-2xl font-black text-white sm:text-3xl">
-        AI <span className="text-primary">正在為你規劃旅程</span>
+      <h2 className="mt-7 text-xl font-semibold text-white sm:text-2xl">
+        正在為你規劃旅程
       </h2>
       <div className="mt-6 w-full max-w-md space-y-2">
         {stages.slice(0, stageIdx + 1).map((s, i) => (
@@ -185,12 +183,12 @@ const GenAnimation = ({ destinationName, onDone }) => {
 const TimelineNode = ({ children, last }) => (
   <div className="flex gap-4">
     <div className="flex flex-col items-center">
-      <div className="z-10 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white ring-4 ring-primary/20">
+      <div className="z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-primary/40 bg-gray-900 text-primary">
         {children.icon}
       </div>
-      {!last && <div className="my-2 flex-1 w-px bg-white/15" />}
+      {!last && <div className="my-2 flex-1 w-px bg-white/10" />}
     </div>
-    <div className={`flex-1 ${last ? 'pb-0' : 'pb-8'}`}>
+    <div className={`flex-1 ${last ? 'pb-0' : 'pb-7'}`}>
       {children.content}
     </div>
   </div>
@@ -231,53 +229,53 @@ const buildTimeline = (plan, startDate) => {
 };
 
 const ItemCard = ({ item }) => {
+  const baseClasses = 'rounded-lg border border-white/10 bg-white/5 px-4 py-3 transition hover:border-white/20';
   if (item._type === 'attraction') {
     return (
-      <div className="rounded-2xl bg-white/8 p-3 ring-1 ring-white/10 backdrop-blur transition hover:bg-white/12">
+      <div className={baseClasses}>
         <div className="flex items-start gap-3">
-          <Ticket className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+          <Ticket className="mt-0.5 h-4 w-4 flex-shrink-0 text-white/40" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-white">{item.name}</p>
-            <p className="mt-0.5 text-[11px] text-white/60">{item.kind}</p>
+            <p className="text-sm font-semibold text-white">{item.name}</p>
+            <p className="mt-0.5 text-[11px] text-white/50">{item.kind}</p>
           </div>
-          <span className="text-xs font-bold text-primary">
-            {item.price === 0 ? '免費' : `NT$ ${item.price.toLocaleString()}`}
-          </span>
-        </div>
-        <div className="mt-2 flex items-center justify-end">
-          <button type="button" className="text-[11px] font-semibold text-primary hover:underline">
-            訂購門票 →
-          </button>
+          <div className="text-right">
+            <span className="block text-xs font-semibold text-white">
+              {item.price === 0 ? '免費' : `NT$ ${item.price.toLocaleString()}`}
+            </span>
+            <button type="button" className="mt-1 text-[11px] text-primary hover:underline">
+              訂購門票
+            </button>
+          </div>
         </div>
       </div>
     );
   }
   if (item._type === 'restaurant') {
     return (
-      <div className="rounded-2xl bg-white/8 p-3 ring-1 ring-white/10 backdrop-blur">
+      <div className={baseClasses}>
         <div className="flex items-start gap-3">
-          <Utensils className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+          <Utensils className="mt-0.5 h-4 w-4 flex-shrink-0 text-white/40" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-white">{item.name}</p>
-            <p className="mt-0.5 text-[11px] text-white/60">{item.kind} · 人均 NT$ {item.avgPrice}</p>
+            <p className="text-sm font-semibold text-white">{item.name}</p>
+            <p className="mt-0.5 text-[11px] text-white/50">{item.kind} · 人均 NT$ {item.avgPrice}</p>
           </div>
-          <button type="button" className="text-[11px] font-semibold text-primary hover:underline whitespace-nowrap">
-            訂位 →
+          <button type="button" className="self-center whitespace-nowrap text-[11px] text-primary hover:underline">
+            訂位
           </button>
         </div>
       </div>
     );
   }
-  // transit
   return (
-    <div className="rounded-2xl bg-white/8 p-3 ring-1 ring-white/10 backdrop-blur">
+    <div className={baseClasses}>
       <div className="flex items-start gap-3">
-        <Train className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+        <Train className="mt-0.5 h-4 w-4 flex-shrink-0 text-white/40" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-white">{item.item}</p>
-          <p className="mt-0.5 text-[11px] text-white/60">{item.mode}</p>
+          <p className="text-sm font-semibold text-white">{item.item}</p>
+          <p className="mt-0.5 text-[11px] text-white/50">{item.mode}</p>
         </div>
-        <span className="text-xs font-bold text-primary whitespace-nowrap">NT$ {item.price.toLocaleString()}</span>
+        <span className="self-center whitespace-nowrap text-xs font-semibold text-white">NT$ {item.price.toLocaleString()}</span>
       </div>
     </div>
   );
@@ -289,44 +287,41 @@ const TripPlanContent = ({ plan, onRegen, startDate }) => {
 
   return (
     <div className="space-y-5">
-      {/* Hero block — orange only */}
-      <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-amber-500/10 to-orange-500/5 ring-1 ring-white/10">
-        <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-primary">AI Trip Plan</p>
-            <h2 className="mt-0.5 text-xl font-bold text-white sm:text-2xl">{plan.dateRange} · {plan.name}之旅</h2>
-            <p className="mt-1 text-xs text-white/70">{plan.duration} · 2 大人 1 嬰兒 · 預估 NT$ {total.toLocaleString()}</p>
-          </div>
-          <button
-            type="button"
-            onClick={onRegen}
-            className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-white backdrop-blur transition hover:bg-white/20"
-          >
-            <RotateCw className="h-3.5 w-3.5" /> 重新生成
-          </button>
+      {/* Trip summary */}
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-white/10 pb-5">
+        <div>
+          <h2 className="text-2xl font-bold text-white sm:text-3xl">{plan.name}之旅</h2>
+          <p className="mt-1 text-xs text-white/60">{plan.dateRange} · {plan.duration} · 2 大人 1 嬰兒 · 預估 NT$ {total.toLocaleString()}</p>
         </div>
+        <button
+          type="button"
+          onClick={onRegen}
+          className="inline-flex items-center gap-1.5 rounded-md border border-white/15 px-3 py-1.5 text-xs text-white/80 transition hover:border-white/30 hover:text-white"
+        >
+          <RotateCw className="h-3 w-3" /> 重新生成
+        </button>
       </div>
 
       {/* Hotels */}
-      <section className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur">
-        <div className="mb-3 flex items-center gap-2 text-white">
-          <Hotel className="h-5 w-5 text-primary" />
-          <h3 className="text-base font-bold">建議入住 · {plan.hotels[0].nights} 晚</h3>
+      <section>
+        <div className="mb-3 flex items-center gap-2">
+          <Hotel className="h-4 w-4 text-white/60" />
+          <h3 className="text-sm font-semibold text-white">建議入住 · {plan.hotels[0].nights} 晚</h3>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {plan.hotels.map((h, idx) => (
-            <div key={h.name} className={`overflow-hidden rounded-2xl bg-gray-900/60 backdrop-blur ${idx === 0 ? 'ring-2 ring-primary' : 'ring-1 ring-white/10'}`}>
-              <img src={h.img} alt={h.name} className="h-32 w-full object-cover" />
+            <div key={h.name} className={`overflow-hidden rounded-lg border ${idx === 0 ? 'border-primary/50' : 'border-white/10'} bg-white/5`}>
+              <img src={h.img} alt={h.name} className="h-28 w-full object-cover" />
               <div className="p-3 text-white">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-sm font-bold">{h.name}</p>
-                  {idx === 0 && <span className="rounded-full bg-primary px-2 py-0.5 text-[9px] font-bold">推薦</span>}
+                  <p className="truncate text-sm font-semibold">{h.name}</p>
+                  {idx === 0 && <span className="rounded border border-primary/40 px-1.5 py-0.5 text-[9px] font-semibold text-primary">推薦</span>}
                 </div>
-                <p className="mt-0.5 text-[10px] text-white/60">{h.area} · {'★'.repeat(h.stars)}</p>
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="text-sm font-black text-primary">NT$ {h.price.toLocaleString()}</span>
-                  <button type="button" className="text-[11px] font-semibold text-primary hover:underline">
-                    立即預訂 →
+                <p className="mt-0.5 text-[11px] text-white/50">{h.area} · {'★'.repeat(h.stars)}</p>
+                <div className="mt-3 flex items-baseline justify-between">
+                  <span className="text-sm font-semibold text-white">NT$ {h.price.toLocaleString()}</span>
+                  <button type="button" className="text-[11px] text-primary hover:underline">
+                    立即預訂
                   </button>
                 </div>
               </div>
@@ -336,25 +331,25 @@ const TripPlanContent = ({ plan, onRegen, startDate }) => {
       </section>
 
       {/* Timeline */}
-      <section className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur sm:p-6">
-        <div className="mb-4 flex items-center gap-2 text-white">
-          <Calendar className="h-5 w-5 text-primary" />
-          <h3 className="text-base font-bold">行程安排</h3>
+      <section>
+        <div className="mb-4 flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-white/60" />
+          <h3 className="text-sm font-semibold text-white">行程安排</h3>
         </div>
 
         <div>
           {timeline.map((day, idx) => (
             <TimelineNode key={day.num} last={idx === timeline.length - 1}>
               {{
-                icon: <span className="text-xs font-bold">{day.num}</span>,
+                icon: <span className="text-[11px] font-semibold">{day.num}</span>,
                 content: (
                   <div>
-                    <div className="mb-3 flex items-baseline gap-2">
-                      <p className="text-xs font-bold uppercase tracking-widest text-primary">Day {day.num}</p>
-                      <p className="font-mono text-sm font-bold text-white">{day.date}</p>
+                    <div className="mb-2.5 flex items-baseline gap-2">
+                      <p className="text-xs font-semibold tracking-wide text-white">Day {day.num}</p>
+                      <p className="font-mono text-xs text-white/50">{day.date}</p>
                     </div>
                     {day.items.length === 0 ? (
-                      <p className="rounded-2xl bg-white/5 p-3 text-xs italic text-white/40 ring-1 ring-white/5">自由活動 — 跟 AI 對話加入更多安排</p>
+                      <p className="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 text-xs text-white/40">自由活動 — 與 AI 對話加入安排</p>
                     ) : (
                       <div className="space-y-2">
                         {day.items.map((item, i) => <ItemCard key={i} item={item} />)}
@@ -368,18 +363,16 @@ const TripPlanContent = ({ plan, onRegen, startDate }) => {
         </div>
       </section>
 
-      {/* Total + bulk order — orange/amber, no purple */}
-      <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-amber-500 p-5 text-white shadow-2xl shadow-primary/30">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Total</p>
-            <p className="mt-1 text-3xl font-black">NT$ {total.toLocaleString()}</p>
-            <p className="text-xs opacity-80">含飯店 + 門票 + 交通（餐廳費用另計）</p>
-          </div>
-          <button type="button" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-black text-primary shadow-lg transition hover:scale-105">
-            <ShoppingCart className="h-4 w-4" /> 一鍵全部訂購
-          </button>
+      {/* Total + bulk order */}
+      <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/5 p-4">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-white/50">總計</p>
+          <p className="mt-0.5 text-2xl font-semibold text-white">NT$ {total.toLocaleString()}</p>
+          <p className="text-[10px] text-white/40">含飯店、門票、交通（餐廳費用另計）</p>
         </div>
+        <button type="button" className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark">
+          <ShoppingCart className="h-4 w-4" /> 一鍵全部訂購
+        </button>
       </section>
     </div>
   );
@@ -403,19 +396,16 @@ const ChatPanel = ({ onAsk }) => {
   };
 
   return (
-    <div className="flex h-[480px] flex-col rounded-2xl bg-white/5 ring-1 ring-white/10">
-      <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3 text-white">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-primary"><Bot className="h-4 w-4" /></span>
-        <div className="flex-1">
-          <p className="text-sm font-bold">Trip AI</p>
-          <p className="text-[10px] text-emerald-400">● 線上中</p>
-        </div>
+    <div className="flex h-[480px] flex-col rounded-lg border border-white/10 bg-white/[0.03]">
+      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+        <p className="text-xs font-semibold tracking-wide text-white">調整這份行程</p>
+        <p className="text-[10px] text-white/40">與 AI 對話</p>
       </div>
-      <div className="flex-1 space-y-3 overflow-y-auto p-4">
+      <div className="flex-1 space-y-2.5 overflow-y-auto p-4">
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed ${
-              m.role === 'user' ? 'bg-primary text-white' : 'bg-white/10 text-white'
+            <div className={`max-w-[80%] rounded-md px-3 py-2 text-xs leading-relaxed ${
+              m.role === 'user' ? 'bg-primary text-white' : 'border border-white/10 bg-white/[0.04] text-white/85'
             }`}>
               {m.text}
             </div>
@@ -427,10 +417,10 @@ const ChatPanel = ({ onAsk }) => {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="告訴 AI 你想怎麼調整..."
-          className="flex-1 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-primary focus:outline-none"
+          placeholder="例如：換成更便宜的飯店"
+          className="flex-1 rounded-md border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-primary focus:outline-none"
         />
-        <button type="submit" className="rounded-lg bg-primary px-3 py-2 text-white hover:bg-primary-dark">
+        <button type="submit" className="rounded-md bg-primary px-3 py-2 text-white hover:bg-primary-dark">
           <Send className="h-4 w-4" />
         </button>
       </form>
@@ -471,45 +461,38 @@ const MyTrips = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
+    <div className="min-h-screen bg-gray-950">
       {/* Header */}
-      <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-black via-gray-950 to-gray-900 pt-14 md:-mt-16 md:pt-16">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(250,168,54,0.18),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_60%,rgba(251,191,36,0.15),transparent_50%)]" />
-        <div className="relative mx-auto max-w-7xl px-4 pb-6 pt-6 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-amber-500 text-white shadow-lg shadow-primary/40">
-                <Sparkles className="h-6 w-6" />
-              </span>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-primary">AI Trip Planner</p>
-                <h1 className="text-xl font-bold text-white sm:text-2xl">我的行程 — {destinationName}</h1>
-                <p className="mt-0.5 text-xs text-white/60">{dateRange} · AI 自動規劃 · 隨時與 AI 對話調整</p>
-              </div>
+      <div className="relative -mt-14 border-b border-white/5 bg-gray-950 pt-14 md:-mt-16 md:pt-16">
+        <div className="relative mx-auto max-w-7xl px-4 pb-6 pt-7 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-white/40">My Trip</p>
+              <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">我的行程 — {destinationName}</h1>
+              <p className="mt-1 text-xs text-white/50">{dateRange} · 由 AI 規劃 · 可即時對話調整</p>
             </div>
-            <button type="button" onClick={() => navigate(-1)} className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/20">
+            <button type="button" onClick={() => navigate(-1)} className="rounded-md border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white">
               返回登機證
             </button>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
         {generating ? (
           <GenAnimation destinationName={destinationName} onDone={() => setGenerating(false)} />
         ) : (
-          <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+          <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
             <TripPlanContent plan={plan} onRegen={handleRegen} startDate={passes.find((p) => p.flight.to === destinationCode)?.flight?.date || '2026-06-15'} />
             <aside className="lg:sticky lg:top-20 lg:self-start">
               <ChatPanel onAsk={() => {/* noop in demo */}} />
-              <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-[11px] text-white/60">
-                <p className="font-bold text-white/80">⚡ 快速試試</p>
+              <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-[11px] text-white/50">
+                <p className="text-white/70">試試這些</p>
                 <ul className="mt-2 space-y-1">
-                  <li>· 「換成更便宜的飯店」</li>
-                  <li>· 「我喜歡親子景點」</li>
-                  <li>· 「素食餐廳推薦」</li>
-                  <li>· 「Day 3 改成自由活動」</li>
+                  <li>· 換成更便宜的飯店</li>
+                  <li>· 我喜歡親子景點</li>
+                  <li>· 素食餐廳推薦</li>
+                  <li>· Day 3 改成自由活動</li>
                 </ul>
               </div>
             </aside>
