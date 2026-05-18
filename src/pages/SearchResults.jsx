@@ -225,7 +225,7 @@ const SearchResults = () => {
     passengers: 1,
   });
   const [isPassengerOpen, setIsPassengerOpen] = useState(false);
-  const [passengerCounts, setPassengerCounts] = useState({ adult: 2, child: 0, infant: 0 });
+  const [passengerCounts, setPassengerCounts] = useState({ adult: 2, child: 0, infant: 1 });
   const defaultBundle = fareBundles.find((b) => b.recommended) || fareBundles[1] || fareBundles[0];
   const buildDefaultSelection = (flight) => ({
     flight,

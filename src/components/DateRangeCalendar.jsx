@@ -300,12 +300,14 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
 
       {isOpen && (
         <>
+          {/* Backdrop starts below the input row so the search form stays fully visible */}
           <div
-            className="fixed inset-0 z-[60] bg-black/55 backdrop-blur-sm"
+            className="fixed inset-x-0 bottom-0 z-[60] bg-black/30"
+            style={{ top: calendarRef.current ? `${calendarRef.current.getBoundingClientRect().bottom + 12}px` : '50%' }}
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-        <div ref={dropdownRef} className="absolute left-0 top-full z-[70] mt-2 w-full rounded-2xl bg-white p-5 shadow-2xl lg:left-[calc(-100%-0.5rem)] lg:w-[calc(200%+0.5rem)]">
+        <div ref={dropdownRef} className="absolute left-0 top-full z-[70] mt-2 w-full rounded-2xl bg-white p-5 shadow-2xl ring-1 ring-black/5 lg:left-[calc(-100%-0.5rem)] lg:w-[calc(200%+0.5rem)]">
           <div className="mb-4 flex items-center justify-between">
             <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="rounded p-1 transition hover:bg-gray-100">
               <ChevronLeft className="h-5 w-5 text-gray-600" />
