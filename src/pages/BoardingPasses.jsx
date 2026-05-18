@@ -48,6 +48,192 @@ const Barcode = ({ seed }) => {
   );
 };
 
+// Shared wallet/PDF/remove actions row used by both layouts
+const ActionsRow = ({ pass, platform, onRemove, handleWallet, compact = false }) => (
+  <div className={`flex flex-col gap-2 sm:flex-row sm:items-center ${compact ? '' : 'mt-4'}`}>
+    {platform === 'android' ? (
+      <button
+        type="button"
+        onClick={() => handleWallet('google')}
+        className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-black"
+      >
+        <Wallet className="h-5 w-5" />
+        <span className="text-left leading-tight">
+          <span className="block text-[10px] font-normal opacity-80">加入</span>
+          <span className="block">Google Wallet</span>
+        </span>
+      </button>
+    ) : (
+      <button
+        type="button"
+        onClick={() => handleWallet('apple')}
+        className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-gray-800"
+      >
+        <Apple className="h-5 w-5" />
+        <span className="text-left leading-tight">
+          <span className="block text-[10px] font-normal opacity-80">加入</span>
+          <span className="block">Apple Wallet</span>
+        </span>
+      </button>
+    )}
+    <button
+      type="button"
+      className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-xs font-semibold text-gray-700 transition hover:border-primary hover:text-primary"
+    >
+      <Download className="h-4 w-4" />
+      下載 PDF
+    </button>
+    <button
+      type="button"
+      onClick={() => onRemove(pass.id)}
+      className="ml-auto inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-semibold text-gray-500 transition hover:border-rose-300 hover:text-rose-600"
+    >
+      <Trash2 className="h-3.5 w-3.5" />
+      移除登機證
+    </button>
+  </div>
+);
+
+// Vertical barcode (rotated)
+const VerticalBarcode = ({ seed }) => {
+  const bars = useBarcodeBars(seed || 'demo');
+  return (
+    <div className="flex h-full w-7 flex-col items-center gap-[1px] overflow-hidden rounded-sm bg-white py-2">
+      {bars.slice(0, 60).map((w, i) => (
+        <span
+          key={i}
+          className="block w-full"
+          style={{ height: `${w}px`, backgroundColor: i % 2 === 0 ? '#111' : 'transparent' }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// Desktop horizontal layout — main white section + orange right stub
+const HorizontalTicket = ({ pass }) => (
+  <div className="relative flex overflow-hidden rounded-3xl bg-white shadow-2xl shadow-black/15 ring-1 ring-black/5">
+    {/* Left main section (white) */}
+    <div className="relative flex-1 p-8">
+      {/* Top row: route + barcode */}
+      <div className="flex items-start justify-between gap-6">
+        <div>
+          <h2 className="flex items-baseline gap-3 font-mono text-5xl font-black tracking-tight text-gray-900">
+            <span>{pass.flight.from}</span>
+            <span className="text-primary text-4xl">›</span>
+            <span>{pass.flight.to}</span>
+          </h2>
+          <div className="mt-1 flex gap-12 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+            <span>{pass.flight.fromName}</span>
+            <span>{pass.flight.toName}</span>
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-2">
+          <div className="w-64">
+            <Barcode seed={pass.bookingRef} />
+          </div>
+          <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            Checked in
+          </div>
+        </div>
+      </div>
+
+      {/* Info grid */}
+      <div className="mt-10 grid grid-cols-4 gap-6">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Passenger</p>
+          <p className="mt-1 text-xl font-bold tracking-tight text-gray-900">{pass.passengerName}</p>
+        </div>
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Terminal</p>
+          <p className="mt-1 text-xl font-bold tracking-tight text-gray-900">{pass.flight.terminal}</p>
+        </div>
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Flight</p>
+          <p className="mt-1 text-xl font-bold tracking-tight text-gray-900">{pass.flight.flightNumber}</p>
+        </div>
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Seat</p>
+          <p className="mt-1 text-xl font-bold tracking-tight text-gray-900">{pass.seat}</p>
+        </div>
+      </div>
+
+      {/* Boarding + secondary */}
+      <div className="mt-6 grid grid-cols-2 gap-6">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Boarding</p>
+          <p className="mt-1 font-mono text-3xl font-black tracking-tight text-primary">
+            {pass.flight.boardingTime} <span className="text-xl text-primary/80">· {pass.flight.date}</span>
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Gate · Counter</p>
+          <p className="mt-1 font-mono text-2xl font-black tracking-tight text-gray-900">
+            {pass.flight.gate} <span className="text-base text-gray-400">·</span> {pass.flight.counter}
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-6 text-[10px] uppercase tracking-widest text-gray-400">
+        Booking {pass.bookingRef}　·　{pass.flight.depart} → {pass.flight.arrive}
+      </p>
+    </div>
+
+    {/* Perforation between main and stub */}
+    <div className="relative flex w-px items-stretch bg-gray-100 before:absolute before:-top-2 before:left-1/2 before:h-4 before:w-4 before:-translate-x-1/2 before:rounded-full before:bg-gray-50 before:content-[''] after:absolute after:-bottom-2 after:left-1/2 after:h-4 after:w-4 after:-translate-x-1/2 after:rounded-full after:bg-gray-50 after:content-['']">
+      <span className="my-3 block border-l-2 border-dashed border-gray-300" />
+    </div>
+
+    {/* Right orange stub */}
+    <div
+      className="relative flex w-56 flex-col gap-4 bg-primary p-6 text-gray-900"
+      style={{
+        backgroundImage:
+          'radial-gradient(circle, rgba(255,255,255,0.18) 1.5px, transparent 1.6px)',
+        backgroundSize: '14px 14px',
+      }}
+    >
+      <div>
+        <h3 className="flex items-baseline gap-2 font-mono text-2xl font-black tracking-tight">
+          <span>{pass.flight.from}</span>
+          <span>›</span>
+          <span>{pass.flight.to}</span>
+        </h3>
+        <div className="mt-1 flex gap-3 text-[9px] font-bold uppercase tracking-widest text-gray-900/70">
+          <span>{pass.flight.fromName}</span>
+          <span>{pass.flight.toName}</span>
+        </div>
+      </div>
+
+      <div className="flex flex-1 items-stretch gap-3">
+        <div className="flex flex-1 flex-col justify-end gap-3 text-[10px]">
+          <div>
+            <p className="font-bold uppercase tracking-widest text-gray-900/60">Flight</p>
+            <p className="mt-0.5 font-mono text-base font-black tracking-tight">{pass.flight.flightNumber}</p>
+          </div>
+          <div>
+            <p className="font-bold uppercase tracking-widest text-gray-900/60">Seat</p>
+            <p className="mt-0.5 font-mono text-base font-black tracking-tight">{pass.seat}</p>
+          </div>
+          <div>
+            <p className="font-bold uppercase tracking-widest text-gray-900/60">Date</p>
+            <p className="mt-0.5 font-mono text-sm font-bold">{pass.flight.date.slice(5)}</p>
+          </div>
+        </div>
+        <VerticalBarcode seed={pass.bookingRef + pass.seat} />
+      </div>
+
+      <div className="flex items-center gap-2 border-t border-gray-900/15 pt-3">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-900/85 text-white">
+          <span className="text-[10px] font-bold">IT</span>
+        </span>
+        <span className="text-[9px] font-bold uppercase tracking-widest text-gray-900/60">Tigerair Taiwan</span>
+      </div>
+    </div>
+  </div>
+);
+
 const BoardingPassCard = ({ pass, onRemove, platform }) => {
   const qrUrl = `${QR_API}${encodeURIComponent(buildQrData(pass))}`;
   const handleWallet = (kind) => {
@@ -55,7 +241,17 @@ const BoardingPassCard = ({ pass, onRemove, platform }) => {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl shadow-black/15 ring-1 ring-black/5">
+    <>
+      {/* Desktop: horizontal ticket */}
+      <div className="hidden md:block">
+        <HorizontalTicket pass={pass} />
+        <div className="mt-4">
+          <ActionsRow pass={pass} platform={platform} onRemove={onRemove} handleWallet={handleWallet} compact />
+        </div>
+      </div>
+
+      {/* Mobile: original vertical card */}
+      <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl shadow-black/15 ring-1 ring-black/5 md:hidden">
       {/* White header strip */}
       <div className="relative flex items-center justify-between bg-white px-6 py-5">
         <span className="text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">{pass.flight.from}</span>
@@ -210,7 +406,8 @@ const BoardingPassCard = ({ pass, onRemove, platform }) => {
           移除
         </button>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
