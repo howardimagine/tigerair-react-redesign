@@ -701,240 +701,133 @@ const TipsHeader = ({ pass, passCount, onAddCheckIn, onOpenAi }) => {
           </button>
         </div>
 
-        {/* Toggle pill - travel tips entry inside header */}
+        {/* Travel tips entry — compact pill matching 地圖搜尋 style */}
         {pass && (
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            className="mt-5 flex w-full items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/10 px-5 py-4 text-left backdrop-blur transition hover:bg-white/15"
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 text-primary">
-                <Umbrella className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Travel Tips</p>
-                <h2 className="text-base font-bold text-white">
-                  旅遊小提醒 — {weather.name} <span className="text-primary font-black">{weather.tempHi}°</span>
-                  <WeatherIcon className="ml-1 inline h-4 w-4 align-middle text-amber-300" />
-                </h2>
-              </div>
-            </div>
-            <span className={`inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white transition-transform ${open ? 'rotate-180' : ''}`} style={{ transformOrigin: 'center' }}>
-              <ChevronDown className="h-3.5 w-3.5" />
-              {open ? '收起' : 'Show more'}
-            </span>
-          </button>
+          <div className="mt-5 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-gray-900/60 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-gray-900/80"
+            >
+              <Umbrella className="h-4 w-4 text-primary" />
+              旅遊小提醒
+              <ChevronDown className={`h-4 w-4 text-white/70 transition-transform ${open ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
         )}
 
-        {/* Expanded tip cards */}
+        {/* Expanded tip cards — refined, calmer palette */}
         {open && pass && (
-          <div className="mt-4 animate-fade-in-delay-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 animate-fade-in-delay-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {/* Weather */}
-            <div className="relative overflow-hidden rounded-2xl bg-gray-900/80 backdrop-blur p-5 text-white ring-1 ring-white/10">
-              <div className="flex items-start justify-between">
+            <div className="rounded-3xl bg-white/95 p-5 text-gray-900 backdrop-blur">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-primary">
-                    <MapPin className="h-3 w-3" /> {weather.name} · {pass.flight.to}
-                  </p>
-                  <p className="mt-3 text-5xl font-black leading-none tracking-tighter">
-                    {weather.tempHi}°
-                  </p>
-                  <p className="mt-1 text-xs font-bold opacity-70">最低 {weather.tempLo}°</p>
+                  <p className="text-xs font-semibold text-gray-500">☀️ 當地天氣</p>
+                  <p className="mt-1 text-sm font-bold text-gray-900">{weather.name} · {pass.flight.to}</p>
+                  <p className="mt-3 text-5xl font-black leading-none tracking-tighter">{weather.tempHi}°</p>
+                  <p className="mt-1 text-xs text-gray-500">最低 {weather.tempLo}° · 濕度 {weather.humidity}% · 風速 {weather.wind} km/h</p>
                 </div>
-                <WeatherIcon className="h-12 w-12 text-amber-300 drop-shadow-lg" />
+                <WeatherIcon className="h-10 w-10 text-amber-400" />
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-2 border-t border-white/10 pt-3 text-[11px]">
-                <div className="flex items-center gap-1.5"><Droplets className="h-3.5 w-3.5 opacity-80" />濕度 {weather.humidity}%</div>
-                <div className="flex items-center gap-1.5"><Wind className="h-3.5 w-3.5 opacity-80" />風速 {weather.wind} km/h</div>
-              </div>
-              <div className="mt-3 grid grid-cols-4 gap-1 rounded-lg bg-black/30 p-2">
+              <div className="mt-4 grid grid-cols-4 gap-2 rounded-2xl bg-gray-50 p-3">
                 {weather.forecast.map((f) => (
-                  <div key={f.day} className="flex flex-col items-center gap-0.5 text-[10px]">
-                    <span className="opacity-80">{f.day}</span>
-                    <ForecastIcon icon={f.icon} className="h-4 w-4" />
+                  <div key={f.day} className="flex flex-col items-center gap-0.5 text-[10px] text-gray-700">
+                    <span className="text-gray-500">{f.day}</span>
+                    <ForecastIcon icon={f.icon} className="h-4 w-4 text-gray-600" />
                     <span className="font-bold">{f.hi}°</span>
-                    <span className="opacity-60">{f.lo}°</span>
+                    <span className="text-gray-400">{f.lo}°</span>
                   </div>
                 ))}
               </div>
-              <p className="mt-3 rounded-lg bg-white/10 p-2 text-[11px] leading-relaxed">💡 {weather.hint}</p>
+              <p className="mt-3 text-xs leading-relaxed text-gray-600">{weather.hint}</p>
             </div>
 
             {/* Travel insurance */}
-            <div className="overflow-hidden rounded-2xl bg-white/95 backdrop-blur text-gray-900 ring-1 ring-white/10">
-              <div className="bg-gradient-to-br from-primary to-primary-dark px-5 py-4 text-white">
-                <div className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">Tigerair Care</p>
-                    <h3 className="text-base font-bold">旅平險加保</h3>
-                  </div>
-                </div>
-              </div>
-              <div className="p-5">
-                <ul className="space-y-2 text-xs">
-                  <li className="flex items-center gap-2 rounded-lg bg-orange-50/80 px-3 py-2"><Shield className="h-3.5 w-3.5 text-primary" />醫療給付最高 <span className="font-bold text-primary">200 萬</span></li>
-                  <li className="flex items-center gap-2 rounded-lg bg-orange-50/80 px-3 py-2"><Shield className="h-3.5 w-3.5 text-primary" />行李遺失賠償 <span className="font-bold text-primary">30,000</span></li>
-                  <li className="flex items-center gap-2 rounded-lg bg-orange-50/80 px-3 py-2"><Shield className="h-3.5 w-3.5 text-primary" />班機延誤 <span className="font-bold text-primary">4 小時起賠</span></li>
-                </ul>
-                <button type="button" className="mt-4 w-full rounded-lg bg-primary px-3 py-2.5 text-xs font-bold text-white shadow hover:bg-primary-dark">
-                  立即加保 NT$ 320 起
-                </button>
-              </div>
+            <div className="rounded-3xl bg-white/95 p-5 text-gray-900 backdrop-blur">
+              <p className="text-xs font-semibold text-gray-500">🛡️ Tigerair Care</p>
+              <h3 className="mt-1 text-sm font-bold text-gray-900">旅平險加保</h3>
+              <ul className="mt-3 space-y-1.5 text-xs text-gray-700">
+                <li className="flex items-center justify-between"><span>醫療給付</span><span className="font-bold">最高 200 萬</span></li>
+                <li className="flex items-center justify-between"><span>行李遺失</span><span className="font-bold">賠償 30,000</span></li>
+                <li className="flex items-center justify-between"><span>班機延誤</span><span className="font-bold">4 小時起賠</span></li>
+              </ul>
+              <p className="mt-4 text-xs text-gray-600">NT$ 320 起 / 趟</p>
+              <button type="button" className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+                了解更多 →
+              </button>
             </div>
 
             {/* Hotel */}
-            <div className="overflow-hidden rounded-2xl bg-white/95 backdrop-blur ring-1 ring-white/10">
-              <div className="bg-gradient-to-br from-amber-500 to-primary px-5 py-4 text-white">
-                <div className="flex items-center gap-2">
-                  <BedDouble className="h-5 w-5" />
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">Hotels</p>
-                    <h3 className="text-base font-bold">{weather.name} 熱門住宿</h3>
-                  </div>
-                </div>
-              </div>
-              <div className="p-5">
-                <p className="mb-3 text-xs text-gray-700">搭配機票享 8 折</p>
-                <div className="space-y-2">
-                  {hotels.map((h) => (
-                    <div key={h.name} className="flex items-center gap-3 rounded-xl border border-gray-100 p-2">
-                      <img src={h.img} alt={h.name} className="h-12 w-14 flex-shrink-0 rounded-lg object-cover" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-bold text-gray-900">{h.name}</p>
-                        <p className="text-[10px] text-gray-500">{h.area}</p>
-                        <p className="text-xs font-black text-primary">NT$ {h.price.toLocaleString()}<span className="text-[10px] font-normal text-gray-400">/晚</span></p>
-                      </div>
+            <div className="rounded-3xl bg-white/95 p-5 text-gray-900 backdrop-blur">
+              <p className="text-xs font-semibold text-gray-500">🏨 熱門住宿</p>
+              <h3 className="mt-1 text-sm font-bold text-gray-900">{weather.name} 合作飯店 · 享 8 折</h3>
+              <div className="mt-3 space-y-2">
+                {hotels.slice(0, 2).map((h) => (
+                  <div key={h.name} className="flex items-center gap-3 rounded-2xl bg-gray-50 p-2">
+                    <img src={h.img} alt={h.name} className="h-11 w-14 flex-shrink-0 rounded-xl object-cover" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-bold text-gray-900">{h.name}</p>
+                      <p className="text-[10px] text-gray-500">{h.area} · NT$ {h.price.toLocaleString()}/晚</p>
                     </div>
-                  ))}
-                </div>
-                <button type="button" className="mt-4 w-full rounded-lg border-2 border-primary px-3 py-2 text-xs font-bold text-primary hover:bg-primary hover:text-white">
-                  查看更多住宿
-                </button>
+                  </div>
+                ))}
               </div>
+              <button type="button" className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+                了解更多 →
+              </button>
             </div>
 
-            {/* Airport transit */}
-            <div className="overflow-hidden rounded-2xl bg-white/95 backdrop-blur ring-1 ring-white/10">
-              <div className="bg-gradient-to-br from-sky-500 to-sky-700 px-5 py-4 text-white">
-                <div className="flex items-center gap-2">
-                  <Train className="h-5 w-5" />
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">Transit</p>
-                    <h3 className="text-base font-bold">機場交通建議</h3>
-                  </div>
-                </div>
+            {/* Transport (merged transit + taxi) */}
+            <div className="rounded-3xl bg-white/95 p-5 text-gray-900 backdrop-blur">
+              <p className="text-xs font-semibold text-gray-500">🚆 機場交通與接送</p>
+              <h3 className="mt-1 text-sm font-bold text-gray-900">大眾運輸 + 出租車選擇</h3>
+              <div className="mt-3 space-y-1.5 text-xs text-gray-700">
+                <div className="flex items-center justify-between"><span>🚆 機場快線</span><span className="text-gray-500">42 分 · NT$ 290</span></div>
+                <div className="flex items-center justify-between"><span>🚌 機場巴士</span><span className="text-gray-500">75 分 · NT$ 150</span></div>
+                <div className="flex items-center justify-between"><span>🚇 地鐵</span><span className="text-gray-500">60 分 · NT$ 180</span></div>
+                <div className="my-2 h-px bg-gray-100" />
+                <div className="flex items-center justify-between"><span>🚕 房車接送 (4 人)</span><span className="text-gray-500">NT$ 950</span></div>
+                <div className="flex items-center justify-between"><span>🚐 商務廂車 (7 人)</span><span className="text-gray-500">NT$ 1,480</span></div>
               </div>
-              <div className="p-5 space-y-2 text-xs text-gray-700">
-                <div className="rounded-lg bg-sky-50/70 p-3">
-                  <p className="font-bold text-sky-700">🚆 機場快線</p>
-                  <p className="mt-1 text-[11px]">{weather.name}車站 · 約 42 分鐘 · NT$ 290</p>
-                </div>
-                <div className="rounded-lg bg-sky-50/70 p-3">
-                  <p className="font-bold text-sky-700">🚌 機場巴士</p>
-                  <p className="mt-1 text-[11px]">市中心 · 約 75 分鐘 · NT$ 150</p>
-                </div>
-                <div className="rounded-lg bg-sky-50/70 p-3">
-                  <p className="font-bold text-sky-700">🚇 地鐵直達</p>
-                  <p className="mt-1 text-[11px]">轉乘 1 次 · 約 60 分鐘 · NT$ 180</p>
-                </div>
-                <button type="button" className="mt-2 w-full rounded-lg bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700">
-                  查看路線地圖
-                </button>
-              </div>
-            </div>
-
-            {/* Taxi booking */}
-            <div className="overflow-hidden rounded-2xl bg-white/95 backdrop-blur ring-1 ring-white/10">
-              <div className="bg-gradient-to-br from-yellow-400 to-amber-600 px-5 py-4 text-gray-900">
-                <div className="flex items-center gap-2">
-                  <Car className="h-5 w-5" />
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wide opacity-80">Airport Taxi</p>
-                    <h3 className="text-base font-bold">出租車預訂</h3>
-                  </div>
-                </div>
-              </div>
-              <div className="p-5 text-xs text-gray-700">
-                <p>事先預訂機場到飯店的接送，落地直接搭車不用排隊。</p>
-                <div className="mt-3 space-y-2">
-                  <div className="flex items-center justify-between rounded-lg bg-amber-50 px-3 py-2">
-                    <span className="font-semibold">🚕 一般房車 (4 人)</span>
-                    <span className="font-bold text-amber-700">NT$ 950</span>
-                  </div>
-                  <div className="flex items-center justify-between rounded-lg bg-amber-50 px-3 py-2">
-                    <span className="font-semibold">🚐 商務廂車 (7 人)</span>
-                    <span className="font-bold text-amber-700">NT$ 1,480</span>
-                  </div>
-                </div>
-                <button type="button" className="mt-4 w-full rounded-lg bg-amber-600 px-3 py-2 text-xs font-bold text-white hover:bg-amber-700">
-                  立即預訂接送
-                </button>
-              </div>
+              <button type="button" className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+                了解更多 →
+              </button>
             </div>
 
             {/* eSIM */}
-            <div className="relative overflow-hidden rounded-2xl bg-white/95 backdrop-blur ring-1 ring-white/10">
-              <span className="absolute right-3 top-3 rounded-full bg-violet-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white">點數可折抵</span>
-              <div className="bg-gradient-to-br from-violet-500 to-fuchsia-600 px-5 py-4 text-white">
-                <div className="flex items-center gap-2">
-                  <Wifi className="h-5 w-5" />
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">eSIM</p>
-                    <h3 className="text-base font-bold">虎航 eSIM 上網卡</h3>
-                  </div>
-                </div>
+            <div className="relative rounded-3xl bg-white/95 p-5 text-gray-900 backdrop-blur">
+              <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-bold text-primary">
+                <Coins className="h-2.5 w-2.5" /> 點數可折抵
+              </span>
+              <p className="text-xs font-semibold text-gray-500">📶 eSIM 上網卡</p>
+              <h3 className="mt-1 text-sm font-bold text-gray-900">虎航 eSIM · 落地自動連網</h3>
+              <div className="mt-3 space-y-1.5 text-xs text-gray-700">
+                <div className="flex items-center justify-between"><span>5 天無限上網</span><span className="font-bold">NT$ 380</span></div>
+                <div className="flex items-center justify-between"><span>10 天 30GB</span><span className="font-bold">NT$ 580</span></div>
               </div>
-              <div className="p-5 text-xs text-gray-700">
-                <p>掃 QR 碼即可下載 eSIM，落地自動連網，免換卡免插卡。</p>
-                <div className="mt-3 space-y-1.5">
-                  <div className="flex items-center justify-between rounded-lg bg-violet-50 px-3 py-2">
-                    <span className="font-semibold">📶 5 天無限上網</span>
-                    <span className="text-right">
-                      <span className="block font-bold text-violet-700">NT$ 380</span>
-                      <span className="text-[9px] text-violet-500 flex items-center gap-0.5 justify-end"><Coins className="h-2.5 w-2.5" />可折 380 點</span>
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between rounded-lg bg-violet-50 px-3 py-2">
-                    <span className="font-semibold">📶 10 天 30GB</span>
-                    <span className="text-right">
-                      <span className="block font-bold text-violet-700">NT$ 580</span>
-                      <span className="text-[9px] text-violet-500 flex items-center gap-0.5 justify-end"><Coins className="h-2.5 w-2.5" />可折 580 點</span>
-                    </span>
-                  </div>
-                </div>
-                <button type="button" className="mt-4 w-full rounded-lg bg-violet-600 px-3 py-2 text-xs font-bold text-white hover:bg-violet-700">
-                  立即購買 eSIM
-                </button>
-              </div>
+              <button type="button" className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+                了解更多 →
+              </button>
             </div>
 
-            {/* AI Trip Planning CTA */}
+            {/* AI Trip Planning — compact card matching others */}
             <button
               type="button"
               onClick={onOpenAi}
-              className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-fuchsia-600 to-violet-600 p-6 text-left text-white shadow-2xl shadow-primary/30 transition hover:scale-[1.02] sm:col-span-2 lg:col-span-3"
+              className="group rounded-3xl bg-white/95 p-5 text-left text-gray-900 backdrop-blur transition hover:bg-white"
             >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.18),transparent_60%)]" />
-              <div className="relative flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur">
-                    <Sparkles className="h-6 w-6 animate-pulse" />
-                  </span>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-90">AI Trip Planner</p>
-                    <h3 className="text-lg font-bold sm:text-xl">幫我安排 {weather.name} 行程</h3>
-                    <p className="mt-1 text-xs opacity-90">AI 根據你的航班自動規劃酒店、門票、餐廳、交通 — 可一鍵訂購</p>
-                  </div>
-                </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-bold backdrop-blur transition group-hover:bg-white/25">
-                  ✨ 開始安排 →
-                </span>
-              </div>
+              <p className="flex items-center gap-1 text-xs font-semibold text-gray-500">
+                <Sparkles className="h-3 w-3 text-primary" /> AI 行程規劃
+              </p>
+              <h3 className="mt-1 text-sm font-bold text-gray-900">幫我安排 {weather.name} 行程</h3>
+              <p className="mt-2 text-xs leading-relaxed text-gray-600">
+                自動規劃酒店、門票、餐廳、交通，可與 AI 對話即時調整。
+              </p>
+              <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary group-hover:underline">
+                開始安排 →
+              </span>
             </button>
-
-            <p className="text-[11px] text-white/50 sm:col-span-2 lg:col-span-3">* 以上資訊為示範用，實際請依當地公告與保單條款為準。</p>
           </div>
         )}
       </div>
