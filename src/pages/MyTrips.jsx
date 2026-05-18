@@ -136,7 +136,7 @@ const GenAnimation = ({ destinationName, onDone }) => {
     `根據 ${destinationName || '目的地'} 天氣與季節挑選熱門景點...`,
     '比對合作飯店價格與評價...',
     '安排每日餐廳與交通建議...',
-    '客製化你的專屬行程 ✨',
+    '客製化你的專屬行程',
   ];
   const [stageIdx, setStageIdx] = useState(0);
 
@@ -152,15 +152,13 @@ const GenAnimation = ({ destinationName, onDone }) => {
   return (
     <div className="flex flex-col items-center justify-center px-4 py-20 text-center">
       <div className="relative flex h-32 w-32 items-center justify-center">
-        {/* Spinning gradient ring */}
-        <div className="absolute inset-0 animate-spin rounded-full bg-gradient-to-tr from-primary via-fuchsia-500 to-violet-600" style={{ animationDuration: '2s' }} />
+        {/* Spinning ring — primary only */}
+        <div className="absolute inset-0 animate-spin rounded-full bg-gradient-to-tr from-primary via-amber-400 to-primary" style={{ animationDuration: '2s' }} />
         <div className="absolute inset-2 rounded-full bg-gray-950" />
         <Sparkles className="relative h-10 w-10 animate-pulse text-primary" />
       </div>
       <h2 className="mt-8 text-2xl font-black text-white sm:text-3xl">
-        <span className="bg-gradient-to-r from-primary via-fuchsia-400 to-violet-300 bg-clip-text text-transparent">
-          AI 正在為你規劃旅程
-        </span>
+        AI <span className="text-primary">正在為你規劃旅程</span>
       </h2>
       <div className="mt-6 w-full max-w-md space-y-2">
         {stages.slice(0, stageIdx + 1).map((s, i) => (
@@ -184,13 +182,115 @@ const GenAnimation = ({ destinationName, onDone }) => {
   );
 };
 
-const TripPlanContent = ({ plan, onRegen }) => {
+const TimelineNode = ({ children, last }) => (
+  <div className="flex gap-4">
+    <div className="flex flex-col items-center">
+      <div className="z-10 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white ring-4 ring-primary/20">
+        {children.icon}
+      </div>
+      {!last && <div className="my-2 flex-1 w-px bg-white/15" />}
+    </div>
+    <div className={`flex-1 ${last ? 'pb-0' : 'pb-8'}`}>
+      {children.content}
+    </div>
+  </div>
+);
+
+const formatDate = (start, offsetDays) => {
+  const d = new Date(start);
+  d.setDate(d.getDate() + offsetDays);
+  return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+};
+
+const buildTimeline = (plan, startDate) => {
+  const totalDays = 5; // 5 days, 4 nights
+  const days = Array.from({ length: totalDays }, (_, i) => ({
+    num: i + 1,
+    date: formatDate(startDate, i),
+    items: [],
+  }));
+  // Day 1: arrival transit
+  const arrival = plan.transit.find((t) => t.day === 1);
+  if (arrival) days[0].items.push({ ...arrival, _type: 'transit' });
+  // Each day's attractions
+  plan.attractions.forEach((a) => {
+    const dIdx = Math.min((a.day || 1) - 1, totalDays - 2);
+    days[dIdx].items.push({ ...a, _type: 'attraction' });
+  });
+  // Spread restaurants — 1 per day from day 1 onwards
+  plan.restaurants.slice(0, totalDays - 1).forEach((r, i) => {
+    days[i].items.push({ ...r, _type: 'restaurant' });
+  });
+  // Departure transit on last day
+  const dep = plan.transit.find((t) => t.day === 5 || t.day === totalDays);
+  if (dep) days[totalDays - 1].items.push({ ...dep, _type: 'transit' });
+  // Daily-passes/transit
+  const daily = plan.transit.find((t) => t.day === '每日');
+  if (daily) days[0].items.push({ ...daily, _type: 'transit', dailyPass: true });
+  return days;
+};
+
+const ItemCard = ({ item }) => {
+  if (item._type === 'attraction') {
+    return (
+      <div className="rounded-2xl bg-white/8 p-3 ring-1 ring-white/10 backdrop-blur transition hover:bg-white/12">
+        <div className="flex items-start gap-3">
+          <Ticket className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-white">{item.name}</p>
+            <p className="mt-0.5 text-[11px] text-white/60">{item.kind}</p>
+          </div>
+          <span className="text-xs font-bold text-primary">
+            {item.price === 0 ? '免費' : `NT$ ${item.price.toLocaleString()}`}
+          </span>
+        </div>
+        <div className="mt-2 flex items-center justify-end">
+          <button type="button" className="text-[11px] font-semibold text-primary hover:underline">
+            訂購門票 →
+          </button>
+        </div>
+      </div>
+    );
+  }
+  if (item._type === 'restaurant') {
+    return (
+      <div className="rounded-2xl bg-white/8 p-3 ring-1 ring-white/10 backdrop-blur">
+        <div className="flex items-start gap-3">
+          <Utensils className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-white">{item.name}</p>
+            <p className="mt-0.5 text-[11px] text-white/60">{item.kind} · 人均 NT$ {item.avgPrice}</p>
+          </div>
+          <button type="button" className="text-[11px] font-semibold text-primary hover:underline whitespace-nowrap">
+            訂位 →
+          </button>
+        </div>
+      </div>
+    );
+  }
+  // transit
+  return (
+    <div className="rounded-2xl bg-white/8 p-3 ring-1 ring-white/10 backdrop-blur">
+      <div className="flex items-start gap-3">
+        <Train className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold text-white">{item.item}</p>
+          <p className="mt-0.5 text-[11px] text-white/60">{item.mode}</p>
+        </div>
+        <span className="text-xs font-bold text-primary whitespace-nowrap">NT$ {item.price.toLocaleString()}</span>
+      </div>
+    </div>
+  );
+};
+
+const TripPlanContent = ({ plan, onRegen, startDate }) => {
   const total = plan.hotels[0].price + plan.attractions.reduce((s, a) => s + a.price, 0) + plan.transit.reduce((s, a) => s + a.price, 0);
+  const timeline = buildTimeline(plan, startDate);
 
   return (
-    <div className="space-y-4">
-      {/* Hero block */}
-      <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary/15 via-fuchsia-500/10 to-violet-500/10 ring-1 ring-white/10">
+    <div className="space-y-5">
+      {/* Hero block — orange only */}
+      <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-amber-500/10 to-orange-500/5 ring-1 ring-white/10">
         <div className="flex flex-wrap items-center justify-between gap-3 p-5">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-primary">AI Trip Plan</p>
@@ -208,25 +308,25 @@ const TripPlanContent = ({ plan, onRegen }) => {
       </div>
 
       {/* Hotels */}
-      <section className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
+      <section className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur">
         <div className="mb-3 flex items-center gap-2 text-white">
           <Hotel className="h-5 w-5 text-primary" />
-          <h3 className="text-base font-bold">建議入住</h3>
+          <h3 className="text-base font-bold">建議入住 · {plan.hotels[0].nights} 晚</h3>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {plan.hotels.map((h, idx) => (
-            <div key={h.name} className={`overflow-hidden rounded-xl bg-gray-900/70 ring-1 ${idx === 0 ? 'ring-primary' : 'ring-white/10'}`}>
+            <div key={h.name} className={`overflow-hidden rounded-2xl bg-gray-900/60 backdrop-blur ${idx === 0 ? 'ring-2 ring-primary' : 'ring-1 ring-white/10'}`}>
               <img src={h.img} alt={h.name} className="h-32 w-full object-cover" />
               <div className="p-3 text-white">
                 <div className="flex items-center justify-between gap-2">
                   <p className="truncate text-sm font-bold">{h.name}</p>
                   {idx === 0 && <span className="rounded-full bg-primary px-2 py-0.5 text-[9px] font-bold">推薦</span>}
                 </div>
-                <p className="mt-0.5 text-[10px] text-white/60">{h.area} · {'★'.repeat(h.stars)} · {h.nights} 晚</p>
+                <p className="mt-0.5 text-[10px] text-white/60">{h.area} · {'★'.repeat(h.stars)}</p>
                 <div className="mt-2 flex items-center justify-between">
                   <span className="text-sm font-black text-primary">NT$ {h.price.toLocaleString()}</span>
-                  <button type="button" className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-[11px] font-bold text-white hover:bg-primary-dark">
-                    <ShoppingCart className="h-3 w-3" /> 一鍵預訂
+                  <button type="button" className="text-[11px] font-semibold text-primary hover:underline">
+                    立即預訂 →
                   </button>
                 </div>
               </div>
@@ -235,78 +335,41 @@ const TripPlanContent = ({ plan, onRegen }) => {
         </div>
       </section>
 
-      {/* Daily attractions */}
-      <section className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
-        <div className="mb-3 flex items-center gap-2 text-white">
-          <Ticket className="h-5 w-5 text-primary" />
-          <h3 className="text-base font-bold">門票 & 景點</h3>
+      {/* Timeline */}
+      <section className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur sm:p-6">
+        <div className="mb-4 flex items-center gap-2 text-white">
+          <Calendar className="h-5 w-5 text-primary" />
+          <h3 className="text-base font-bold">行程安排</h3>
         </div>
-        <div className="space-y-2">
-          {plan.attractions.map((a) => (
-            <div key={a.name} className="flex items-center gap-3 rounded-lg bg-gray-900/70 p-3 text-white ring-1 ring-white/10">
-              <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/20 text-xs font-bold text-primary">
-                Day {a.day}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="truncate text-sm font-bold">{a.name}</p>
-                <p className="text-[10px] text-white/60">{a.kind}</p>
-              </div>
-              <span className="text-sm font-bold text-primary">
-                {a.price === 0 ? '免費' : `NT$ ${a.price.toLocaleString()}`}
-              </span>
-              <button type="button" className="rounded-lg bg-primary px-3 py-1.5 text-[11px] font-bold text-white hover:bg-primary-dark">
-                訂購
-              </button>
-            </div>
+
+        <div>
+          {timeline.map((day, idx) => (
+            <TimelineNode key={day.num} last={idx === timeline.length - 1}>
+              {{
+                icon: <span className="text-xs font-bold">{day.num}</span>,
+                content: (
+                  <div>
+                    <div className="mb-3 flex items-baseline gap-2">
+                      <p className="text-xs font-bold uppercase tracking-widest text-primary">Day {day.num}</p>
+                      <p className="font-mono text-sm font-bold text-white">{day.date}</p>
+                    </div>
+                    {day.items.length === 0 ? (
+                      <p className="rounded-2xl bg-white/5 p-3 text-xs italic text-white/40 ring-1 ring-white/5">自由活動 — 跟 AI 對話加入更多安排</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {day.items.map((item, i) => <ItemCard key={i} item={item} />)}
+                      </div>
+                    )}
+                  </div>
+                ),
+              }}
+            </TimelineNode>
           ))}
         </div>
       </section>
 
-      {/* Restaurants */}
-      <section className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
-        <div className="mb-3 flex items-center gap-2 text-white">
-          <Utensils className="h-5 w-5 text-primary" />
-          <h3 className="text-base font-bold">必吃餐廳</h3>
-        </div>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {plan.restaurants.map((r) => (
-            <div key={r.name} className="flex items-center justify-between gap-2 rounded-lg bg-gray-900/70 p-3 text-white ring-1 ring-white/10">
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold">{r.name}</p>
-                <p className="text-[10px] text-white/60">{r.kind} · 人均 NT$ {r.avgPrice}</p>
-              </div>
-              <button type="button" className="rounded-lg border border-white/20 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-white/10">
-                訂位
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Transit */}
-      <section className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
-        <div className="mb-3 flex items-center gap-2 text-white">
-          <Train className="h-5 w-5 text-primary" />
-          <h3 className="text-base font-bold">交通安排</h3>
-        </div>
-        <div className="space-y-2">
-          {plan.transit.map((t, i) => (
-            <div key={i} className="flex items-center gap-3 rounded-lg bg-gray-900/70 p-3 text-white ring-1 ring-white/10">
-              <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/20 text-[10px] font-bold text-primary">
-                {typeof t.day === 'number' ? `Day ${t.day}` : t.day}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="truncate text-sm font-bold">{t.item}</p>
-                <p className="text-[10px] text-white/60">{t.mode}</p>
-              </div>
-              <span className="text-sm font-bold text-primary">NT$ {t.price.toLocaleString()}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Total + bulk order */}
-      <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-fuchsia-600 to-violet-600 p-5 text-white shadow-2xl shadow-primary/30">
+      {/* Total + bulk order — orange/amber, no purple */}
+      <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-amber-500 p-5 text-white shadow-2xl shadow-primary/30">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Total</p>
@@ -412,11 +475,11 @@ const MyTrips = () => {
       {/* Header */}
       <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-black via-gray-950 to-gray-900 pt-14 md:-mt-16 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(250,168,54,0.18),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_60%,rgba(168,85,247,0.18),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_60%,rgba(251,191,36,0.15),transparent_50%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-6 pt-6 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-violet-600 text-white shadow-lg shadow-primary/40">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-amber-500 text-white shadow-lg shadow-primary/40">
                 <Sparkles className="h-6 w-6" />
               </span>
               <div>
@@ -437,7 +500,7 @@ const MyTrips = () => {
           <GenAnimation destinationName={destinationName} onDone={() => setGenerating(false)} />
         ) : (
           <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-            <TripPlanContent plan={plan} onRegen={handleRegen} />
+            <TripPlanContent plan={plan} onRegen={handleRegen} startDate={passes.find((p) => p.flight.to === destinationCode)?.flight?.date || '2026-06-15'} />
             <aside className="lg:sticky lg:top-20 lg:self-start">
               <ChatPanel onAsk={() => {/* noop in demo */}} />
               <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-[11px] text-white/60">
