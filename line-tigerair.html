@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tigerair Line 報到通知</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 20px;
+    background: #e5e7eb;
+    font-family: "PingFang TC", "Microsoft JhengHei", "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+
+  /* iPhone frame */
+  .phone {
+    width: 380px;
+    height: 780px;
+    background: #1a1a1a;
+    border-radius: 56px;
+    padding: 12px;
+    position: relative;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.25), 0 0 0 2px #2a2a2a;
+  }
+  .phone::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 56px;
+    box-shadow: inset 0 0 0 4px #3a3a3a;
+    pointer-events: none;
+  }
+  .screen {
+    width: 100%;
+    height: 100%;
+    background: #a8c5e3;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Dynamic island */
+  .island {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 34px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 10;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 0;
+    color: #000;
+    font-size: 15px;
+    font-weight: 600;
+    position: relative;
+    z-index: 5;
+  }
+  .status-bar .right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .battery {
+    width: 24px;
+    height: 12px;
+    border: 1px solid #000;
+    border-radius: 3px;
+    position: relative;
+    padding: 1px;
+  }
+  .battery::after {
+    content: "";
+    position: absolute;
+    right: -3px;
+    top: 3px;
+    width: 2px;
+    height: 4px;
+    background: #000;
+    border-radius: 0 1px 1px 0;
+  }
+  .battery .fill {
+    width: 90%;
+    height: 100%;
+    background: #34c759;
+    border-radius: 1px;
+  }
+
+  /* Line header */
+  .line-header {
+    background: rgba(255,255,255,0.0);
+    padding: 6px 14px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1a1a1a;
+  }
+  .line-header .icon-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .line-header .title {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 15px;
+    font-weight: 600;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .verified {
+    width: 16px;
+    height: 16px;
+    background: #1a1a1a;
+    color: #fff;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    flex-shrink: 0;
+  }
+
+  /* Chat area (sky background) */
+  .chat-area {
+    flex: 1;
+    background:
+      radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.6) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 90%, rgba(255,255,255,0.5) 0%, transparent 50%),
+      linear-gradient(180deg, #a8c5e3 0%, #c5d9ec 70%, #d8e5f0 100%);
+    padding: 8px 14px 0;
+    overflow-y: auto;
+    position: relative;
+  }
+  .chat-area::after {
+    content: "";
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.4) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Message group */
+  .msg-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+    align-items: flex-start;
+  }
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  .avatar .logo-mark {
+    width: 28px;
+    height: 28px;
+    background: #ff6e14;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+    font-style: italic;
+  }
+
+  /* Message card */
+  .msg-content {
+    flex: 1;
+    min-width: 0;
+  }
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    max-width: 260px;
+  }
+  .card .banner {
+    background: #ff6e14;
+    color: #fff;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card .banner .bell {
+    opacity: 0.9;
+  }
+  .card .body {
+    padding: 14px 14px 12px;
+  }
+  .card .subtitle {
+    font-size: 13px;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+  .card .title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #1a1a1a;
+    line-height: 1.35;
+    margin-bottom: 10px;
+  }
+  .card .title .accent {
+    color: #ff6e14;
+  }
+  .divider {
+    height: 1px;
+    background: #ececec;
+    margin: 8px 0 10px;
+  }
+  .card .meta {
+    font-size: 11px;
+    color: #999;
+    margin-bottom: 2px;
+  }
+  .card .meta-val {
+    font-size: 13px;
+    color: #1a1a1a;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card .info {
+    font-size: 12px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .card .info strong {
+    color: #1a1a1a;
+  }
+  .card .btn {
+    display: block;
+    background: #f2f2f2;
+    color: #1a1a1a;
+    text-align: center;
+    padding: 11px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .card .footer-note {
+    background: #fafafa;
+    color: #999;
+    font-size: 11px;
+    padding: 9px 14px;
+    line-height: 1.5;
+  }
+
+  .timestamp {
+    font-size: 10px;
+    color: #5a6b7d;
+    text-align: right;
+    margin-top: 2px;
+    margin-right: 4px;
+  }
+
+  /* Bottom input bar */
+  .input-bar {
+    background: #fff;
+    border-top: 1px solid #e5e5e5;
+    padding: 10px 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .input-bar .kb {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .input-bar .menu {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    color: #1a1a1a;
+    font-weight: 500;
+  }
+  .input-bar .menu .arrow-up {
+    font-size: 10px;
+    color: #1a1a1a;
+    margin-left: 4px;
+  }
+
+  /* Home indicator */
+  .home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 134px;
+    height: 5px;
+    background: #1a1a1a;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="island"></div>
+  <div class="screen">
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <div class="left">9:41</div>
+      <div class="right">
+        <!-- signal -->
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="#000"><rect x="0" y="7" width="3" height="4" rx="0.5"/><rect x="4.5" y="5" width="3" height="6" rx="0.5"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
+        <!-- 4G -->
+        <span style="font-size:13px;font-weight:600;">4G</span>
+        <!-- battery -->
+        <div class="battery"><div class="fill"></div></div>
+      </div>
+    </div>
+
+    <!-- LINE Header -->
+    <div class="line-header">
+      <div class="icon-btn">
+        <svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 2 2 9 9 16"/></svg>
+      </div>
+      <div class="title">
+        <span class="verified">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="#fff"><path d="M12 1l3 5 6 1-4 4 1 6-6-3-6 3 1-6-4-4 6-1z"/></svg>
+        </span>
+        tigerair 台灣虎航
+      </div>
+      <div class="icon-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <div class="icon-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg>
+      </div>
+      <div class="icon-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+      </div>
+    </div>
+
+    <!-- Chat area -->
+    <div class="chat-area">
+
+      <div class="msg-group">
+        <div class="avatar">
+          <div class="logo-mark">t</div>
+        </div>
+        <div class="msg-content">
+          <div class="card">
+            <div class="banner">
+              <span>官方帳號個人服務通知</span>
+              <span class="bell">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a7 7 0 0 0-7 7v4l-2 3v1h18v-1l-2-3V9a7 7 0 0 0-7-7zm0 20a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22z"/></svg>
+              </span>
+            </div>
+            <div class="body">
+              <div class="subtitle">航班報到通知</div>
+              <div class="title">您的航班即將於 <span class="accent">24小時內</span> 起飛，請準時報到</div>
+
+              <div class="divider"></div>
+
+              <div class="meta">航班 / 訂位代號</div>
+              <div class="meta-val">IT505　·　TGW88K</div>
+
+              <div class="info">
+                <strong>桃園 TPE</strong> → <strong>普吉島 HKT</strong><br>
+                2026/05/20 (三) 起飛 14:55<br>
+                線上報到開放至 起飛前 90 分鐘
+              </div>
+
+              <a href="#" class="btn">查看報到通知單</a>
+            </div>
+            <div class="footer-note">
+              此訊息作為個人服務之通知，您可以點擊以參考相關說明。
+            </div>
+          </div>
+          <div class="timestamp">下午 2:30</div>
+        </div>
+      </div>
+
+      <div class="msg-group" style="margin-top: 10px;">
+        <div class="avatar">
+          <div class="logo-mark">t</div>
+        </div>
+        <div class="msg-content">
+          <div class="card">
+            <div class="banner">
+              <span>官方帳號個人服務通知</span>
+              <span class="bell">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a7 7 0 0 0-7 7v4l-2 3v1h18v-1l-2-3V9a7 7 0 0 0-7-7zm0 20a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22z"/></svg>
+              </span>
+            </div>
+            <div class="body">
+              <div class="subtitle">行前小提醒</div>
+              <div class="title">別忘了 <span class="accent">託運行李</span> 加購及預選座位</div>
+
+              <div class="divider"></div>
+
+              <div class="info">
+                行李加購：起飛前 4 小時截止<br>
+                預選座位：起飛前 48 小時截止<br>
+                預訂餐點：起飛前 24 小時截止
+              </div>
+
+              <a href="#" class="btn">前往管理行程</a>
+            </div>
+            <div class="footer-note">
+              此訊息作為個人服務之通知，您可以點擊以參考相關說明。
+            </div>
+          </div>
+          <div class="timestamp">下午 2:31</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Input bar -->
+    <div class="input-bar">
+      <div class="kb">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6.01" y2="10"/><line x1="10" y1="10" x2="10.01" y2="10"/><line x1="14" y1="10" x2="14.01" y2="10"/><line x1="18" y1="10" x2="18.01" y2="10"/><line x1="7" y1="14" x2="17" y2="14"/></svg>
+      </div>
+      <div class="menu">
+        選單 <span class="arrow-up">▲</span>
+      </div>
+    </div>
+
+    <div class="home-indicator"></div>
+
+  </div>
+</div>
+
+</body>
+</html>
