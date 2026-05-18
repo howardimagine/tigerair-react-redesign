@@ -61,12 +61,12 @@ const heroSlides = [
     img: 'https://images.unsplash.com/photo-1637073758540-f2aaec39e9c3?w=1920&h=900&fit=crop',
   },
   {
-    place: 'Bangkok',
-    name: '曼谷',
-    code: 'BKK',
-    fare: '3,999',
-    subtitle: '逃離寒冬擁抱暖陽，立刻出發享受熱帶放鬆之旅',
-    img: 'https://images.unsplash.com/photo-1562602833-0f4ab2fc46e3?w=1920&h=900&fit=crop',
+    place: 'Phuket',
+    name: '普吉島',
+    code: 'HKT',
+    fare: '4,299',
+    subtitle: '逃離寒冬擁抱暖陽，享受安達曼海的熱帶島嶼假期',
+    img: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=1920&h=900&fit=crop',
   },
 ];
 
