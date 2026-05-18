@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Plane, Wallet, Download, WifiOff, Apple, Smartphone, Building2, Trash2,
-  Cloud, CloudRain, Sun, Shield, BedDouble, Umbrella, MapPin, Thermometer, Wind, Droplets,
+  Plane, Wallet, Download, WifiOff, Apple, Smartphone, Trash2,
+  Cloud, CloudRain, Sun, Shield, BedDouble, Umbrella, MapPin, Wind, Droplets, ChevronDown,
 } from 'lucide-react';
 import { useBoardingPasses } from '../context/BoardingPassesContext';
 
@@ -48,64 +48,45 @@ const Barcode = ({ seed }) => {
   );
 };
 
-// Shared wallet/PDF/remove actions row used by both layouts
-const ActionsRow = ({ pass, platform, onRemove, handleWallet, compact = false }) => (
-  <div className={`flex flex-col gap-2 sm:flex-row sm:items-center ${compact ? '' : 'mt-4'}`}>
-    {platform === 'android' ? (
-      <button
-        type="button"
-        onClick={() => handleWallet('google')}
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-black"
-      >
-        <Wallet className="h-5 w-5" />
-        <span className="text-left leading-tight">
-          <span className="block text-[10px] font-normal opacity-80">加入</span>
-          <span className="block">Google Wallet</span>
-        </span>
-      </button>
-    ) : (
-      <button
-        type="button"
-        onClick={() => handleWallet('apple')}
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-gray-800"
-      >
-        <Apple className="h-5 w-5" />
-        <span className="text-left leading-tight">
-          <span className="block text-[10px] font-normal opacity-80">加入</span>
-          <span className="block">Apple Wallet</span>
-        </span>
-      </button>
-    )}
-    <button
-      type="button"
-      className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-xs font-semibold text-gray-700 transition hover:border-primary hover:text-primary"
-    >
-      <Download className="h-4 w-4" />
-      下載 PDF
-    </button>
-    <button
-      type="button"
-      onClick={() => onRemove(pass.id)}
-      className="ml-auto inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-semibold text-gray-500 transition hover:border-rose-300 hover:text-rose-600"
-    >
-      <Trash2 className="h-3.5 w-3.5" />
-      移除登機證
-    </button>
-  </div>
-);
-
-// Vertical barcode (rotated)
-const VerticalBarcode = ({ seed }) => {
-  const bars = useBarcodeBars(seed || 'demo');
+// Shared wallet/PDF/remove actions row — all buttons same height & style
+const ActionsRow = ({ pass, platform, onRemove, handleWallet }) => {
+  const baseBtn = 'inline-flex h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition';
   return (
-    <div className="flex h-full w-7 flex-col items-center gap-[1px] overflow-hidden rounded-sm bg-white py-2">
-      {bars.slice(0, 60).map((w, i) => (
-        <span
-          key={i}
-          className="block w-full"
-          style={{ height: `${w}px`, backgroundColor: i % 2 === 0 ? '#111' : 'transparent' }}
-        />
-      ))}
+    <div className="flex flex-wrap items-center gap-2">
+      {platform === 'android' ? (
+        <button
+          type="button"
+          onClick={() => handleWallet('google')}
+          className={`${baseBtn} bg-gray-900 text-white shadow hover:bg-black`}
+        >
+          <Wallet className="h-4 w-4" />
+          加入 Google Wallet
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => handleWallet('apple')}
+          className={`${baseBtn} bg-black text-white shadow hover:bg-gray-800`}
+        >
+          <Apple className="h-4 w-4" />
+          加入 Apple Wallet
+        </button>
+      )}
+      <button
+        type="button"
+        className={`${baseBtn} border border-gray-200 bg-white text-gray-700 hover:border-primary hover:text-primary`}
+      >
+        <Download className="h-4 w-4" />
+        下載 PDF
+      </button>
+      <button
+        type="button"
+        onClick={() => onRemove(pass.id)}
+        className={`${baseBtn} ml-auto border border-gray-200 bg-white text-gray-500 hover:border-rose-300 hover:text-rose-600`}
+      >
+        <Trash2 className="h-4 w-4" />
+        移除登機證
+      </button>
     </div>
   );
 };
@@ -187,15 +168,15 @@ const HorizontalTicket = ({ pass }) => (
 
     {/* Right orange stub */}
     <div
-      className="relative flex w-56 flex-col gap-4 bg-primary p-6 text-gray-900"
+      className="relative flex w-64 flex-col bg-primary p-6 text-gray-900"
       style={{
         backgroundImage:
-          'radial-gradient(circle, rgba(255,255,255,0.18) 1.5px, transparent 1.6px)',
-        backgroundSize: '14px 14px',
+          'radial-gradient(circle, rgba(255,255,255,0.2) 1.5px, transparent 1.6px)',
+        backgroundSize: '16px 16px',
       }}
     >
       <div>
-        <h3 className="flex items-baseline gap-2 font-mono text-2xl font-black tracking-tight">
+        <h3 className="flex items-baseline gap-2 font-mono text-3xl font-black tracking-tight">
           <span>{pass.flight.from}</span>
           <span>›</span>
           <span>{pass.flight.to}</span>
@@ -206,22 +187,26 @@ const HorizontalTicket = ({ pass }) => (
         </div>
       </div>
 
-      <div className="flex flex-1 items-stretch gap-3">
-        <div className="flex flex-1 flex-col justify-end gap-3 text-[10px]">
+      <div className="my-6 flex flex-1 flex-col justify-center gap-5">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Seat</p>
+          <p className="mt-0.5 font-mono text-5xl font-black leading-none tracking-tighter">{pass.seat}</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <p className="font-bold uppercase tracking-widest text-gray-900/60">Flight</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Flight</p>
             <p className="mt-0.5 font-mono text-base font-black tracking-tight">{pass.flight.flightNumber}</p>
           </div>
           <div>
-            <p className="font-bold uppercase tracking-widest text-gray-900/60">Seat</p>
-            <p className="mt-0.5 font-mono text-base font-black tracking-tight">{pass.seat}</p>
-          </div>
-          <div>
-            <p className="font-bold uppercase tracking-widest text-gray-900/60">Date</p>
-            <p className="mt-0.5 font-mono text-sm font-bold">{pass.flight.date.slice(5)}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Gate</p>
+            <p className="mt-0.5 font-mono text-base font-black tracking-tight">{pass.flight.gate}</p>
           </div>
         </div>
-        <VerticalBarcode seed={pass.bookingRef + pass.seat} />
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Boarding</p>
+          <p className="mt-0.5 font-mono text-xl font-black tracking-tight">{pass.flight.boardingTime}</p>
+          <p className="text-[10px] font-bold text-gray-900/70">{pass.flight.date}</p>
+        </div>
       </div>
 
       <div className="flex items-center gap-2 border-t border-gray-900/15 pt-3">
@@ -246,7 +231,7 @@ const BoardingPassCard = ({ pass, onRemove, platform }) => {
       <div className="hidden md:block">
         <HorizontalTicket pass={pass} />
         <div className="mt-4">
-          <ActionsRow pass={pass} platform={platform} onRemove={onRemove} handleWallet={handleWallet} compact />
+          <ActionsRow pass={pass} platform={platform} onRemove={onRemove} handleWallet={handleWallet} />
         </div>
       </div>
 
@@ -411,13 +396,63 @@ const BoardingPassCard = ({ pass, onRemove, platform }) => {
   );
 };
 
-// Mock destination weather data
+// Mock destination data — weather + city photo
 const destinationData = {
-  NRT: { name: '東京', tempHi: 22, tempLo: 14, condition: 'sunny', humidity: 58, wind: 12, hint: '建議帶薄外套，午後可能短暫陣雨' },
-  KIX: { name: '大阪', tempHi: 25, tempLo: 16, condition: 'cloudy', humidity: 62, wind: 8, hint: '舒適氣溫，適合戶外散步賞景' },
-  OKA: { name: '沖繩', tempHi: 28, tempLo: 22, condition: 'sunny', humidity: 75, wind: 18, hint: '紫外線強，請帶防曬與帽子' },
-  ICN: { name: '首爾', tempHi: 8, tempLo: -2, condition: 'snow', humidity: 50, wind: 15, hint: '低溫降雪，建議厚外套與防滑鞋' },
-  BKK: { name: '曼谷', tempHi: 34, tempLo: 26, condition: 'sunny', humidity: 70, wind: 6, hint: '炎熱潮濕，多補水並避免日曬高峰' },
+  NRT: {
+    name: '東京', tempHi: 22, tempLo: 14, condition: 'sunny', humidity: 58, wind: 12,
+    hint: '建議帶薄外套，午後可能短暫陣雨',
+    photo: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=900&h=600&fit=crop',
+    forecast: [
+      { day: '今', icon: 'sunny', hi: 22, lo: 14 },
+      { day: '明', icon: 'cloudy', hi: 21, lo: 13 },
+      { day: '三', icon: 'rain', hi: 19, lo: 12 },
+      { day: '四', icon: 'sunny', hi: 23, lo: 15 },
+    ],
+  },
+  KIX: {
+    name: '大阪', tempHi: 25, tempLo: 16, condition: 'cloudy', humidity: 62, wind: 8,
+    hint: '舒適氣溫，適合戶外散步賞景',
+    photo: 'https://images.unsplash.com/photo-1604834733992-8453fdf4ba68?w=900&h=600&fit=crop',
+    forecast: [
+      { day: '今', icon: 'cloudy', hi: 25, lo: 16 },
+      { day: '明', icon: 'sunny', hi: 26, lo: 17 },
+      { day: '三', icon: 'sunny', hi: 27, lo: 18 },
+      { day: '四', icon: 'cloudy', hi: 24, lo: 15 },
+    ],
+  },
+  OKA: {
+    name: '沖繩', tempHi: 28, tempLo: 22, condition: 'sunny', humidity: 75, wind: 18,
+    hint: '紫外線強，請帶防曬與帽子',
+    photo: 'https://images.unsplash.com/photo-1610971250019-f677bc1300be?w=900&h=600&fit=crop',
+    forecast: [
+      { day: '今', icon: 'sunny', hi: 28, lo: 22 },
+      { day: '明', icon: 'sunny', hi: 29, lo: 23 },
+      { day: '三', icon: 'rain', hi: 26, lo: 22 },
+      { day: '四', icon: 'sunny', hi: 28, lo: 23 },
+    ],
+  },
+  ICN: {
+    name: '首爾', tempHi: 8, tempLo: -2, condition: 'snow', humidity: 50, wind: 15,
+    hint: '低溫降雪，建議厚外套與防滑鞋',
+    photo: 'https://images.unsplash.com/photo-1637073758540-f2aaec39e9c3?w=900&h=600&fit=crop',
+    forecast: [
+      { day: '今', icon: 'snow', hi: 8, lo: -2 },
+      { day: '明', icon: 'cloudy', hi: 6, lo: -3 },
+      { day: '三', icon: 'snow', hi: 4, lo: -5 },
+      { day: '四', icon: 'sunny', hi: 9, lo: -1 },
+    ],
+  },
+  BKK: {
+    name: '曼谷', tempHi: 34, tempLo: 26, condition: 'sunny', humidity: 70, wind: 6,
+    hint: '炎熱潮濕，多補水並避免日曬高峰',
+    photo: 'https://images.unsplash.com/photo-1562602833-0f4ab2fc46e3?w=900&h=600&fit=crop',
+    forecast: [
+      { day: '今', icon: 'sunny', hi: 34, lo: 26 },
+      { day: '明', icon: 'sunny', hi: 35, lo: 27 },
+      { day: '三', icon: 'rain', hi: 32, lo: 26 },
+      { day: '四', icon: 'cloudy', hi: 33, lo: 26 },
+    ],
+  },
 };
 
 const conditionIcon = (condition) => {
@@ -427,105 +462,197 @@ const conditionIcon = (condition) => {
   return Sun;
 };
 
+const ForecastIcon = ({ icon, className }) => {
+  const Icon = icon === 'snow' ? Cloud : icon === 'cloudy' ? Cloud : icon === 'rain' ? CloudRain : Sun;
+  return <Icon className={className} />;
+};
+
+// Hotel data per destination
+const hotelData = {
+  NRT: [
+    { name: '東京新宿 京王廣場大飯店', area: '新宿', price: 4200, img: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=400&h=240&fit=crop' },
+    { name: 'Shibuya Sky Hotel', area: '澀谷', price: 3600, img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=240&fit=crop' },
+  ],
+  KIX: [
+    { name: '大阪難波光芒飯店', area: '難波', price: 3200, img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=240&fit=crop' },
+    { name: 'Cross Hotel Osaka', area: '心齋橋', price: 3800, img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&h=240&fit=crop' },
+  ],
+  OKA: [
+    { name: '沖繩海濱度假村', area: '那霸', price: 4500, img: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=240&fit=crop' },
+    { name: 'Hyatt Regency Naha', area: '國際通', price: 5200, img: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&h=240&fit=crop' },
+  ],
+  ICN: [
+    { name: '首爾明洞 N 酒店', area: '明洞', price: 2800, img: 'https://images.unsplash.com/photo-1455587734955-081b22074882?w=400&h=240&fit=crop' },
+    { name: 'L7 Gangnam', area: '江南', price: 3400, img: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=400&h=240&fit=crop' },
+  ],
+  BKK: [
+    { name: 'Bangkok Marriott', area: '素坤逸', price: 3200, img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=240&fit=crop' },
+    { name: 'Park Hyatt Bangkok', area: '帕林普', price: 5800, img: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=400&h=240&fit=crop' },
+  ],
+};
+
 const TravelTips = ({ pass }) => {
-  const weather = destinationData[pass.flight.to] || { name: pass.flight.to, tempHi: 24, tempLo: 18, condition: 'sunny', humidity: 60, wind: 10, hint: '一切看起來都不錯，準備出發吧！' };
+  const [open, setOpen] = useState(false);
+  const fallback = {
+    name: pass.flight.to, tempHi: 24, tempLo: 18, condition: 'sunny', humidity: 60, wind: 10,
+    hint: '一切看起來都不錯，準備出發吧！',
+    photo: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=900&h=600&fit=crop',
+    forecast: [
+      { day: '今', icon: 'sunny', hi: 24, lo: 18 },
+      { day: '明', icon: 'cloudy', hi: 23, lo: 17 },
+      { day: '三', icon: 'sunny', hi: 25, lo: 19 },
+      { day: '四', icon: 'rain', hi: 22, lo: 17 },
+    ],
+  };
+  const weather = destinationData[pass.flight.to] || fallback;
+  const hotels = hotelData[pass.flight.to] || [];
   const WeatherIcon = conditionIcon(weather.condition);
 
   return (
-    <section className="mt-8 rounded-3xl border border-sky-200/60 bg-sky-50/50 p-1">
-      <div className="rounded-[20px] bg-white p-5 sm:p-6">
-        <div className="mb-5 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-100 text-sky-600">
-              <Umbrella className="h-4 w-4" />
-            </span>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-sky-600">Travel Tips</p>
-              <h2 className="text-lg font-bold text-gray-900">旅遊小提醒</h2>
-            </div>
-          </div>
-          <span className="rounded-full bg-sky-100 px-3 py-1 text-[11px] font-bold text-sky-700">
-            飛航資訊以外的貼心整理
+    <section className="mt-6">
+      {/* Toggle button */}
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 rounded-2xl border border-orange-100 bg-white px-5 py-4 shadow-sm transition hover:border-primary hover:shadow-md"
+      >
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-primary">
+            <Umbrella className="h-5 w-5" />
           </span>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-3">
-          {/* Weather */}
-          <div className="rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-500 p-5 text-white">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide opacity-90">
-                  <MapPin className="h-3 w-3" /> {weather.name} · {pass.flight.to}
-                </p>
-                <p className="mt-2 text-4xl font-black">{weather.tempHi}°<span className="text-xl font-bold opacity-70">/ {weather.tempLo}°</span></p>
-              </div>
-              <WeatherIcon className="h-10 w-10 opacity-90" />
-            </div>
-            <div className="mt-4 grid grid-cols-2 gap-2 border-t border-white/20 pt-3 text-[11px]">
-              <div className="flex items-center gap-1.5">
-                <Droplets className="h-3 w-3 opacity-80" />
-                濕度 {weather.humidity}%
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Wind className="h-3 w-3 opacity-80" />
-                風速 {weather.wind} km/h
-              </div>
-            </div>
-            <p className="mt-3 text-xs leading-5 opacity-90">{weather.hint}</p>
-          </div>
-
-          {/* Travel insurance */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-            <div className="flex items-start gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-                <Shield className="h-4 w-4" />
-              </span>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-700">Insurance</p>
-                <h3 className="text-base font-bold text-gray-900">旅平險加保</h3>
-              </div>
-            </div>
-            <p className="mt-3 text-sm text-gray-700">飛行中享有意外醫療、行李遺失、班機延誤等多重保障。</p>
-            <ul className="mt-3 space-y-1.5 text-xs text-gray-600">
-              <li className="flex items-start gap-1.5"><span className="mt-1 h-1 w-1 rounded-full bg-emerald-500" /> 醫療給付最高 200 萬</li>
-              <li className="flex items-start gap-1.5"><span className="mt-1 h-1 w-1 rounded-full bg-emerald-500" /> 行李遺失賠償 30,000</li>
-              <li className="flex items-start gap-1.5"><span className="mt-1 h-1 w-1 rounded-full bg-emerald-500" /> 班機延誤 4 小時起賠</li>
-            </ul>
-            <button type="button" className="mt-4 w-full rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-emerald-700">
-              立即加保 NT$ 320 起
-            </button>
-          </div>
-
-          {/* Hotel */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-            <div className="flex items-start gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-100 text-rose-600">
-                <BedDouble className="h-4 w-4" />
-              </span>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-rose-600">Stay</p>
-                <h3 className="text-base font-bold text-gray-900">{weather.name}熱門住宿</h3>
-              </div>
-            </div>
-            <p className="mt-3 text-sm text-gray-700">搭配機票折扣，於合作飯店預訂享 8 折優惠。</p>
-            <div className="mt-3 space-y-2">
-              <div className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-xs">
-                <span className="font-semibold text-gray-700">市中心商務飯店</span>
-                <span className="font-bold text-rose-600">NT$ 2,400</span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-xs">
-                <span className="font-semibold text-gray-700">設計型旅店</span>
-                <span className="font-bold text-rose-600">NT$ 3,100</span>
-              </div>
-            </div>
-            <button type="button" className="mt-4 w-full rounded-lg bg-rose-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-rose-700">
-              查看更多住宿
-            </button>
+          <div className="text-left">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Travel Tips</p>
+            <h2 className="text-base font-bold text-gray-900">旅遊小提醒 — {weather.name} {weather.tempHi}° <WeatherIcon className="inline h-4 w-4 align-middle text-amber-500" /></h2>
           </div>
         </div>
+        <span className={`inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white transition ${open ? 'rotate-180' : ''}`} style={{ transformOrigin: 'center' }}>
+          <ChevronDown className="h-3.5 w-3.5" />
+          {open ? '收起' : 'Show more'}
+        </span>
+      </button>
 
-        <p className="mt-4 text-[11px] text-gray-400">* 以上資訊為示範用，實際請依當地公告與保單條款為準。</p>
-      </div>
+      {open && (
+        <div className="mt-3 animate-fade-in-delay-2 grid gap-4 lg:grid-cols-3">
+          {/* Weather card with destination photo */}
+          <div className="relative overflow-hidden rounded-2xl bg-gray-900 text-white shadow-lg lg:col-span-1">
+            <img
+              src={weather.photo}
+              alt={weather.name}
+              className="absolute inset-0 h-full w-full object-cover opacity-60"
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary/40 to-gray-900/80" />
+            <div className="relative p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest opacity-90">
+                    <MapPin className="h-3 w-3" /> {weather.name} · {pass.flight.to}
+                  </p>
+                  <p className="mt-3 text-6xl font-black leading-none tracking-tighter">
+                    {weather.tempHi}°
+                  </p>
+                  <p className="mt-1 text-xs font-bold opacity-80">最低 {weather.tempLo}°</p>
+                </div>
+                <div className="relative">
+                  <WeatherIcon className="h-14 w-14 drop-shadow-lg" />
+                </div>
+              </div>
+
+              <div className="mt-5 grid grid-cols-2 gap-2 border-t border-white/20 pt-3 text-[11px]">
+                <div className="flex items-center gap-1.5">
+                  <Droplets className="h-3.5 w-3.5 opacity-80" />
+                  濕度 {weather.humidity}%
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Wind className="h-3.5 w-3.5 opacity-80" />
+                  風速 {weather.wind} km/h
+                </div>
+              </div>
+
+              {/* 4-day forecast */}
+              <div className="mt-3 grid grid-cols-4 gap-1 rounded-xl bg-black/30 p-2 backdrop-blur">
+                {weather.forecast.map((f) => (
+                  <div key={f.day} className="flex flex-col items-center gap-0.5 text-[10px]">
+                    <span className="font-bold opacity-80">{f.day}</span>
+                    <ForecastIcon icon={f.icon} className="h-4 w-4" />
+                    <span className="font-bold">{f.hi}°</span>
+                    <span className="opacity-60">{f.lo}°</span>
+                  </div>
+                ))}
+              </div>
+
+              <p className="mt-3 rounded-lg bg-white/15 p-2 text-[11px] leading-relaxed backdrop-blur">
+                💡 {weather.hint}
+              </p>
+            </div>
+          </div>
+
+          {/* Travel insurance — tigerair orange */}
+          <div className="overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-sm">
+            <div className="bg-gradient-to-br from-primary to-primary-dark px-5 py-4 text-white">
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">Tigerair Care</p>
+                  <h3 className="text-base font-bold">旅平險加保</h3>
+                </div>
+              </div>
+            </div>
+            <div className="p-5">
+              <p className="text-sm text-gray-700">飛行中享有意外醫療、行李遺失、班機延誤等多重保障。</p>
+              <ul className="mt-3 space-y-2 text-xs">
+                <li className="flex items-center gap-2 rounded-lg bg-orange-50/60 px-3 py-2 text-gray-700">
+                  <Shield className="h-3.5 w-3.5 text-primary" />
+                  醫療給付最高 <span className="font-bold text-primary">200 萬</span>
+                </li>
+                <li className="flex items-center gap-2 rounded-lg bg-orange-50/60 px-3 py-2 text-gray-700">
+                  <Shield className="h-3.5 w-3.5 text-primary" />
+                  行李遺失賠償 <span className="font-bold text-primary">30,000</span>
+                </li>
+                <li className="flex items-center gap-2 rounded-lg bg-orange-50/60 px-3 py-2 text-gray-700">
+                  <Shield className="h-3.5 w-3.5 text-primary" />
+                  班機延誤 <span className="font-bold text-primary">4 小時起賠</span>
+                </li>
+              </ul>
+              <button type="button" className="mt-4 w-full rounded-lg bg-primary px-3 py-2.5 text-xs font-bold text-white shadow transition hover:bg-primary-dark">
+                立即加保 NT$ 320 起
+              </button>
+            </div>
+          </div>
+
+          {/* Hotel — with photos */}
+          <div className="overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-sm">
+            <div className="bg-gradient-to-br from-amber-500 to-primary px-5 py-4 text-white">
+              <div className="flex items-center gap-2">
+                <BedDouble className="h-5 w-5" />
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wide opacity-90">Hotels</p>
+                  <h3 className="text-base font-bold">{weather.name} 熱門住宿</h3>
+                </div>
+              </div>
+            </div>
+            <div className="p-5">
+              <p className="mb-3 text-xs text-gray-700">搭配機票享 8 折合作飯店優惠</p>
+              <div className="space-y-2">
+                {hotels.map((h) => (
+                  <div key={h.name} className="flex items-center gap-3 rounded-xl border border-gray-100 p-2 transition hover:border-primary/40 hover:shadow-sm">
+                    <img src={h.img} alt={h.name} className="h-14 w-16 flex-shrink-0 rounded-lg object-cover" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-bold text-gray-900">{h.name}</p>
+                      <p className="text-[10px] text-gray-500">{h.area}</p>
+                      <p className="mt-0.5 text-xs font-black text-primary">NT$ {h.price.toLocaleString()}<span className="text-[10px] font-normal text-gray-400"> /晚</span></p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button type="button" className="mt-4 w-full rounded-lg border-2 border-primary bg-white px-3 py-2 text-xs font-bold text-primary transition hover:bg-primary hover:text-white">
+                查看更多住宿
+              </button>
+            </div>
+          </div>
+
+          <p className="text-[11px] text-gray-400 lg:col-span-3">* 以上資訊為示範用，實際請依當地公告與保單條款為準。</p>
+        </div>
+      )}
     </section>
   );
 };
@@ -591,7 +718,7 @@ const BoardingPasses = () => {
         </div>
       </div>
 
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
         {passes.length > 1 && (
           <div className="mb-4 flex flex-wrap gap-2">
             {passes.map((p, idx) => (
