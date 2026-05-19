@@ -430,7 +430,7 @@ const Home = () => {
         </div>
 
         {/* Search Card — merged into Hero, glass */}
-        <div ref={searchFormRef} className={`relative mx-auto max-w-7xl pl-12 pr-16 pt-10 transition-all duration-500 sm:pl-20 sm:pr-24 sm:pt-14 ${isDateOpen ? 'z-[65]' : 'z-10'} ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
+        <div ref={searchFormRef} className={`relative mx-auto max-w-7xl px-4 pt-10 transition-all duration-500 sm:pl-20 sm:pr-24 sm:pt-14 ${isDateOpen ? 'z-[65]' : 'z-10'} ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
           <div className="rounded-2xl border border-white/25 bg-white/15 p-5 shadow-2xl shadow-black/30 backdrop-blur-2xl sm:p-6 md:px-8 md:py-6">
             <form onSubmit={handleSearch}>
               <div className="grid grid-cols-1 gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr] lg:items-end">
