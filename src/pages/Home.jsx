@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { PlaneLanding, PlaneTakeoff } from 'lucide-react';
 import {
@@ -118,13 +119,25 @@ const destinationAirportGroups = [
   },
 ];
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1024);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return isMobile;
+};
+
 const AirportDropdown = ({ value, onChange, label, groups, Icon, roundedClass = 'rounded-lg' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const selectedAirport = groups.flatMap((group) => group.airports).find((airport) => airport.value === value);
   const buttonRoundedClass = roundedClass.replace('-ml-px', '').trim();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
+    if (isMobile) return undefined;
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
@@ -136,7 +149,44 @@ const AirportDropdown = ({ value, onChange, label, groups, Icon, roundedClass = 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [isMobile]);
+
+  const list = (
+    <>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-base font-bold text-gray-900">{label}</h3>
+        <button
+          type="button"
+          onClick={() => setIsOpen(false)}
+          className="rounded-full p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+          aria-label="關閉"
+        >
+          <XMarkIcon className="h-5 w-5" />
+        </button>
+      </div>
+      {groups.map((group) => (
+        <div key={group.country} className="mb-3 last:mb-0">
+          <div className="mb-1 rounded bg-gray-50 px-3 py-2 text-xs font-bold text-gray-500">{group.country}</div>
+          <div className="space-y-1">
+            {group.airports.map((airport) => (
+              <button
+                key={airport.value}
+                type="button"
+                onClick={() => {
+                  onChange(airport.value);
+                  setIsOpen(false);
+                }}
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition hover:bg-orange-50 hover:text-primary ${value === airport.value ? 'bg-orange-50 text-primary' : 'text-gray-700'}`}
+              >
+                <span>{airport.label}</span>
+                <span className="text-xs font-semibold text-gray-400">{airport.value}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+  );
 
   return (
     <div ref={dropdownRef} className={`relative border border-gray-200 bg-white/70 backdrop-blur-sm transition hover:z-10 hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${roundedClass}`}>
@@ -151,30 +201,20 @@ const AirportDropdown = ({ value, onChange, label, groups, Icon, roundedClass = 
         <ChevronDownIcon className={`h-4 w-4 shrink-0 text-gray-600 transition ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
-      {isOpen && (
+      {isOpen && !isMobile && (
         <div className="absolute left-0 top-full z-50 mt-2 max-h-96 w-80 overflow-y-auto rounded-xl border border-gray-100 bg-white p-3 shadow-xl">
-          {groups.map((group) => (
-            <div key={group.country} className="mb-3 last:mb-0">
-              <div className="mb-1 rounded bg-gray-50 px-3 py-2 text-xs font-bold text-gray-500">{group.country}</div>
-              <div className="space-y-1">
-                {group.airports.map((airport) => (
-                  <button
-                    key={airport.value}
-                    type="button"
-                    onClick={() => {
-                      onChange(airport.value);
-                      setIsOpen(false);
-                    }}
-                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition hover:bg-orange-50 hover:text-primary ${value === airport.value ? 'bg-orange-50 text-primary' : 'text-gray-700'}`}
-                  >
-                    <span>{airport.label}</span>
-                    <span className="text-xs font-semibold text-gray-400">{airport.value}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
+          {list}
         </div>
+      )}
+
+      {isOpen && isMobile && typeof document !== 'undefined' && createPortal(
+        <>
+          <div className="fixed inset-0 z-[100] bg-black/40" onClick={() => setIsOpen(false)} aria-hidden="true" />
+          <div className="fixed left-1/2 top-1/2 z-[110] max-h-[85vh] w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl ring-1 ring-black/5">
+            {list}
+          </div>
+        </>,
+        document.body
       )}
     </div>
   );
@@ -191,6 +231,7 @@ const Home = () => {
   const [isPassengerOpen, setIsPassengerOpen] = useState(false);
   const [passengerCounts, setPassengerCounts] = useState({ adult: 2, child: 0, infant: 1 });
   const passengerDropdownRef = useRef(null);
+  const isMobile = useIsMobile();
   const [calendarOpenTrigger, setCalendarOpenTrigger] = useState(0);
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [isOpeningMap, setIsOpeningMap] = useState(false);
@@ -321,6 +362,7 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    if (isMobile) return undefined;
     const handleClickOutside = (event) => {
       if (passengerDropdownRef.current && !passengerDropdownRef.current.contains(event.target)) {
         setIsPassengerOpen(false);
@@ -332,7 +374,7 @@ const Home = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [isMobile]);
 
   const activeHeroRoute = heroSlides[activeHeroSlide];
 
@@ -486,7 +528,7 @@ const Home = () => {
                       {passengerSummary}
                     </button>
                   </div>
-                  {isPassengerOpen && (
+                  {isPassengerOpen && !isMobile && (
                     <div className="absolute left-0 top-full z-50 mt-2 w-72 rounded-xl border border-gray-100 bg-white p-4 shadow-xl">
                       {[
                         { key: 'adult', label: '成人' },
@@ -496,25 +538,45 @@ const Home = () => {
                         <div key={passenger.key} className="flex items-center justify-between border-b border-gray-100 py-3 last:border-b-0">
                           <span className="text-sm font-medium text-gray-800">{passenger.label}</span>
                           <div className="flex items-center gap-3">
-                            <button
-                              type="button"
-                              onClick={() => updatePassengerCount(passenger.key, -1)}
-                              className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-lg font-semibold text-gray-500 transition hover:border-primary hover:text-primary"
-                            >
-                              -
-                            </button>
+                            <button type="button" onClick={() => updatePassengerCount(passenger.key, -1)} className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-lg font-semibold text-gray-500 transition hover:border-primary hover:text-primary">-</button>
                             <span className="w-5 text-center text-sm font-bold text-gray-900">{passengerCounts[passenger.key]}</span>
-                            <button
-                              type="button"
-                              onClick={() => updatePassengerCount(passenger.key, 1)}
-                              className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-lg font-semibold text-gray-500 transition hover:border-primary hover:text-primary"
-                            >
-                              +
-                            </button>
+                            <button type="button" onClick={() => updatePassengerCount(passenger.key, 1)} className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-lg font-semibold text-gray-500 transition hover:border-primary hover:text-primary">+</button>
                           </div>
                         </div>
                       ))}
                     </div>
+                  )}
+                  {isPassengerOpen && isMobile && typeof document !== 'undefined' && createPortal(
+                    <>
+                      <div className="fixed inset-0 z-[100] bg-black/40" onClick={() => setIsPassengerOpen(false)} aria-hidden="true" />
+                      <div className="fixed left-1/2 top-1/2 z-[110] w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-5 shadow-2xl ring-1 ring-black/5">
+                        <div className="mb-3 flex items-center justify-between">
+                          <h3 className="text-base font-bold text-gray-900">旅客人數</h3>
+                          <button type="button" onClick={() => setIsPassengerOpen(false)} className="rounded-full p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700" aria-label="關閉">
+                            <XMarkIcon className="h-5 w-5" />
+                          </button>
+                        </div>
+                        {[
+                          { key: 'adult', label: '成人', sub: '12 歲以上' },
+                          { key: 'child', label: '兒童', sub: '2-11 歲' },
+                          { key: 'infant', label: '嬰兒', sub: '未滿 2 歲' },
+                        ].map((passenger) => (
+                          <div key={passenger.key} className="flex items-center justify-between border-b border-gray-100 py-3 last:border-b-0">
+                            <div>
+                              <p className="text-sm font-semibold text-gray-800">{passenger.label}</p>
+                              <p className="text-xs text-gray-500">{passenger.sub}</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <button type="button" onClick={() => updatePassengerCount(passenger.key, -1)} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-lg font-semibold text-gray-500 transition hover:border-primary hover:text-primary">-</button>
+                              <span className="w-5 text-center text-sm font-bold text-gray-900">{passengerCounts[passenger.key]}</span>
+                              <button type="button" onClick={() => updatePassengerCount(passenger.key, 1)} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-lg font-semibold text-gray-500 transition hover:border-primary hover:text-primary">+</button>
+                            </div>
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => setIsPassengerOpen(false)} className="mt-4 w-full rounded-lg bg-primary px-4 py-3 text-sm font-bold text-white transition hover:bg-primary-dark">完成</button>
+                      </div>
+                    </>,
+                    document.body
                   )}
                 </div>
               </div>
