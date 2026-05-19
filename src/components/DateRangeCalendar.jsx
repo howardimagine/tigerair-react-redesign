@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { CalendarDaysIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -12,8 +13,15 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
   }, [isOpen, onOpenChange]);
   const [activeField, setActiveField] = useState('depart');
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1024);
   const calendarRef = useRef(null);
   const isOneWay = tripType === 'oneway';
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -251,6 +259,40 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
     );
   };
 
+  const renderCalendarBody = () => (
+    <>
+      <div className="mb-4 flex items-center justify-between">
+        <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="rounded p-1 transition hover:bg-gray-100">
+          <ChevronLeft className="h-5 w-5 text-gray-600" />
+        </button>
+        <div className="flex gap-2 rounded-full bg-gray-100 p-1 text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => setActiveField('depart')}
+            className={`rounded-full px-3 py-1 ${activeField === 'depart' ? 'bg-white text-primary shadow-sm' : 'text-gray-500'}`}
+          >
+            {'去程'}
+          </button>
+          {!isOneWay && (
+            <button
+              type="button"
+              onClick={() => setActiveField('return')}
+              className={`rounded-full px-3 py-1 ${activeField === 'return' ? 'bg-white text-primary shadow-sm' : 'text-gray-500'}`}
+            >
+              {'回程'}
+            </button>
+          )}
+        </div>
+        <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))} className="rounded p-1 transition hover:bg-gray-100">
+          <ChevronRight className="h-5 w-5 text-gray-600" />
+        </button>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        {[0, 1].map((index) => renderMonth(generateMonth(index), index))}
+      </div>
+    </>
+  );
+
   return (
     <div ref={calendarRef} className="relative grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-0">
       <div
@@ -305,47 +347,30 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
         )}
       </div>
 
-      {isOpen && (
+      {isOpen && isMobile && typeof document !== 'undefined' && createPortal(
         <>
-          {/* Mobile: full backdrop. Desktop: starts below input row so form stays visible. */}
           <div
-            className="fixed inset-0 z-[60] bg-black/40 lg:bottom-0 lg:inset-x-0"
-            style={typeof window !== 'undefined' && window.innerWidth >= 1024 && calendarRef.current
-              ? { top: `${calendarRef.current.getBoundingClientRect().bottom + 12}px`, background: 'rgba(0,0,0,0.3)' }
-              : undefined}
+            className="fixed inset-0 z-[100] bg-black/40"
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-        <div ref={dropdownRef} className="fixed left-1/2 top-1/2 z-[70] max-h-[80vh] w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl ring-1 ring-black/5 lg:absolute lg:left-[calc(-100%-0.5rem)] lg:top-full lg:mt-2 lg:w-[calc(200%+0.5rem)] lg:translate-x-0 lg:translate-y-0 lg:p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="rounded p-1 transition hover:bg-gray-100">
-              <ChevronLeft className="h-5 w-5 text-gray-600" />
-            </button>
-            <div className="flex gap-2 rounded-full bg-gray-100 p-1 text-xs font-semibold">
-              <button
-                type="button"
-                onClick={() => setActiveField('depart')}
-                className={`rounded-full px-3 py-1 ${activeField === 'depart' ? 'bg-white text-primary shadow-sm' : 'text-gray-500'}`}
-              >
-                {'\u53bb\u7a0b'}
-              </button>
-              {!isOneWay && (
-                <button
-                  type="button"
-                  onClick={() => setActiveField('return')}
-                  className={`rounded-full px-3 py-1 ${activeField === 'return' ? 'bg-white text-primary shadow-sm' : 'text-gray-500'}`}
-                >
-                  {'\u56de\u7a0b'}
-                </button>
-              )}
-            </div>
-            <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))} className="rounded p-1 transition hover:bg-gray-100">
-              <ChevronRight className="h-5 w-5 text-gray-600" />
-            </button>
+          <div ref={dropdownRef} className="fixed left-1/2 top-1/2 z-[110] max-h-[85vh] w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl ring-1 ring-black/5">
+            {renderCalendarBody()}
           </div>
-          <div className="grid gap-4 lg:grid-cols-2">
-            {[0, 1].map((index) => renderMonth(generateMonth(index), index))}
-          </div>
+        </>,
+        document.body
+      )}
+
+      {isOpen && !isMobile && (
+        <>
+          <div
+            className="fixed inset-x-0 bottom-0 z-[60] bg-black/30"
+            style={{ top: calendarRef.current ? `${calendarRef.current.getBoundingClientRect().bottom + 12}px` : '50%' }}
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+        <div ref={dropdownRef} className="absolute left-[calc(-100%-0.5rem)] top-full z-[70] mt-2 w-[calc(200%+0.5rem)] rounded-2xl bg-white p-5 shadow-2xl ring-1 ring-black/5">
+          {renderCalendarBody()}
         </div>
         </>
       )}
