@@ -470,9 +470,22 @@ const Home = () => {
             </div>
           </div>
         </div>
+
+        {/* Map search entrance — stays inside hero */}
+        <div className={`relative mt-6 flex justify-center transition-all duration-500 ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
+          <button
+            type="button"
+            onClick={handleOpenMap}
+            className="group inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-5 py-2.5 text-sm font-semibold text-white shadow-lg backdrop-blur transition hover:bg-white/25"
+          >
+            <MapPinIcon className="h-4 w-4 text-primary" />
+            地圖搜尋
+            <ChevronDownIcon className="h-4 w-4 transition group-hover:translate-y-1" />
+          </button>
+        </div>
       </div>
 
-      {/* Search + Map section — sits below hero on mobile, overlaps into hero on desktop */}
+      {/* Search section — sits below hero on mobile, overlaps into hero on desktop */}
       <div className="relative lg:-mt-72">
         {/* Search Card — glass over hero on desktop, normal section below hero on mobile */}
         <div ref={searchFormRef} className={`relative mx-auto max-w-7xl px-4 pt-6 transition-all duration-500 lg:pl-20 lg:pr-24 lg:pt-0 ${isDateOpen ? 'z-[65]' : 'z-10'} ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
@@ -609,18 +622,6 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Map search entrance */}
-        <div className={`relative mt-6 flex justify-center transition-all duration-500 ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
-          <button
-            type="button"
-            onClick={handleOpenMap}
-            className="group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 shadow-md transition hover:border-primary hover:text-primary lg:border-white/30 lg:bg-white/15 lg:text-white lg:shadow-lg lg:backdrop-blur lg:hover:bg-white/25 lg:hover:text-white"
-          >
-            <MapPinIcon className="h-4 w-4 text-primary" />
-            地圖搜尋
-            <ChevronDownIcon className="h-4 w-4 transition group-hover:translate-y-1" />
-          </button>
-        </div>
       </div>
 
       {isPromoOpen && (
