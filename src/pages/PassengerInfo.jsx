@@ -473,7 +473,7 @@ const PassengerInfo = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(250,168,54,0.16),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
           <p className="text-xs font-semibold text-primary">Step 2 / 4</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">填寫旅客資料</h1>
+          <h1 className="mt-1 text-3xl font-black tracking-tight text-white sm:text-4xl">填寫旅客資料</h1>
           <div className="mt-3 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <div className="flex w-max items-center gap-2 whitespace-nowrap">
               <span className="shrink-0 rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 機票</span>

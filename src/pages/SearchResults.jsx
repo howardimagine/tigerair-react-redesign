@@ -474,7 +474,7 @@ const SearchResults = () => {
         <div className="relative mx-auto max-w-7xl px-4 pb-5 pt-5 sm:px-6 lg:px-8">
           <div className="space-y-1 text-white">
             <p className="text-xs font-semibold text-primary">{'Step 1 / 4'}</p>
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{fromName} → {toName}</h1>
+            <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{fromName} → {toName}</h1>
             <p className="text-xs text-white/60">{'選擇航班'}</p>
           </div>
           <div className="mt-3 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

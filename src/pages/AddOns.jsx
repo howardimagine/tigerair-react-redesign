@@ -280,7 +280,7 @@ const AddOns = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(250,168,54,0.16),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
           <p className="text-xs font-semibold text-primary">Step 4 / 4</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">加購行李與餐食</h1>
+          <h1 className="mt-1 text-3xl font-black tracking-tight text-white sm:text-4xl">加購行李與餐食</h1>
           <p className="mt-1 text-xs text-white/60">行李、機上餐食可額外加購</p>
           <div className="mt-3 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <div className="flex w-max items-center gap-2 whitespace-nowrap">
@@ -297,33 +297,35 @@ const AddOns = () => {
         <div className="space-y-6">
           {/* Passenger tabs */}
           <section className="rounded-2xl border border-gray-100 bg-white p-2 shadow-sm sm:p-3">
-            <div className="flex flex-wrap gap-2">
-              {Array.from({ length: passengerCount }).map((_, i) => {
-                const isActive = i === activePassenger;
-                const hasSel = passengerHasSelection(i);
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => setActivePassenger(i)}
-                    className={`group flex flex-1 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition sm:flex-none sm:min-w-44 ${
-                      isActive
-                        ? 'bg-primary text-white shadow-md'
-                        : 'bg-gray-50 text-gray-700 hover:bg-orange-50'
-                    }`}
-                  >
-                    <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
-                      isActive ? 'bg-white text-primary' : 'bg-white text-gray-600 ring-1 ring-gray-200'
-                    }`}>
-                      {i + 1}
-                    </span>
-                    <span className="flex-1 truncate text-xs font-bold sm:text-sm">{passengerName(i)}</span>
-                    {hasSel && (
-                      <Check className={`h-3.5 w-3.5 ${isActive ? 'text-white' : 'text-emerald-500'}`} />
-                    )}
-                  </button>
-                );
-              })}
+            <div className="-mx-2 overflow-x-auto px-2 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex w-max gap-2 whitespace-nowrap sm:w-auto sm:flex-wrap">
+                {Array.from({ length: passengerCount }).map((_, i) => {
+                  const isActive = i === activePassenger;
+                  const hasSel = passengerHasSelection(i);
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setActivePassenger(i)}
+                      className={`group flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition sm:min-w-44 ${
+                        isActive
+                          ? 'bg-primary text-white shadow-md'
+                          : 'bg-gray-50 text-gray-700 hover:bg-orange-50'
+                      }`}
+                    >
+                      <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                        isActive ? 'bg-white text-primary' : 'bg-white text-gray-600 ring-1 ring-gray-200'
+                      }`}>
+                        {i + 1}
+                      </span>
+                      <span className="truncate text-xs font-bold sm:text-sm">{passengerName(i)}</span>
+                      {hasSel && (
+                        <Check className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-white' : 'text-emerald-500'}`} />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
             <p className="mt-2 px-2 text-[11px] text-gray-500">為每位旅客個別選擇行李與餐食，切換上方分頁進行設定。</p>
           </section>
