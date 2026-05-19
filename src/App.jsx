@@ -34,7 +34,12 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Reset any lingering body-scroll lock from modal/date-picker components
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = '';
+    }
+    // Use 'instant' to override any in-flight smooth scrolls
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [pathname]);
 
   return null;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plane, CheckCircle2, AlertCircle, Sparkles, Ticket, ScanLine, Briefcase, ArrowRight, Check } from 'lucide-react';
 import { useBoardingPasses } from '../context/BoardingPassesContext';
@@ -459,6 +459,13 @@ const CheckIn = () => {
   const [step, setStep] = useState(0);
   const [selectedPassengerIds, setSelectedPassengerIds] = useState([]);
   const [passportInfo, setPassportInfo] = useState({});
+
+  // Scroll back to top whenever the check-in step changes (steps are
+  // internal state, not separate routes, so the global ScrollToTop in
+  // App.jsx doesn't fire here).
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [step]);
 
   const completeCheckIn = () => {
     const selectedPassengers = DEMO_PASSENGERS.filter((p) => selectedPassengerIds.includes(p.id));
