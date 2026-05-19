@@ -245,9 +245,9 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
   };
 
   return (
-    <div ref={calendarRef} className="relative grid grid-cols-2 gap-0">
+    <div ref={calendarRef} className="relative grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-0">
       <div
-        className={`group relative rounded-l-lg border border-gray-200 bg-white/70 backdrop-blur-sm transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${readOnly ? 'cursor-not-allowed bg-gray-50 opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm'}`}
+        className={`group relative rounded-lg sm:rounded-r-none border border-gray-200 bg-white/70 backdrop-blur-sm transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${readOnly ? 'cursor-not-allowed bg-gray-50 opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm'}`}
         title={readOnly ? '請使用下方月曆選擇日期' : undefined}
       >
         <label className="absolute left-9 top-1.5 z-10 text-xs font-semibold text-gray-600">{'\u51fa\u767c\u65e5'}</label>
@@ -256,7 +256,7 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
           type="button"
           onClick={() => openCalendar('depart')}
           disabled={readOnly}
-          className="mt-1 w-full truncate rounded-l-lg border-0 bg-transparent pb-1.5 pl-9 pr-2 pt-5 text-left text-sm font-medium focus:outline-none disabled:cursor-not-allowed sm:text-base"
+          className="mt-1 w-full truncate rounded-lg sm:rounded-r-none border-0 bg-transparent pb-1.5 pl-9 pr-2 pt-5 text-left text-sm font-medium focus:outline-none disabled:cursor-not-allowed sm:text-base"
         >
           {formatDisplayDate(depart, '\u9078\u65e5\u671f')}
         </button>
@@ -268,7 +268,7 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
       </div>
 
       <div
-        className={`group relative -ml-px rounded-r-lg border border-gray-200 bg-white/70 backdrop-blur-sm transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${isOneWay || readOnly ? 'opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm'}`}
+        className={`group relative rounded-lg sm:-ml-px sm:rounded-l-none border border-gray-200 bg-white/70 backdrop-blur-sm transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${isOneWay || readOnly ? 'opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm'}`}
         title={readOnly ? '請使用下方月曆選擇日期' : undefined}
       >
         <label className="absolute left-9 top-1.5 z-10 text-xs font-semibold text-gray-600">{'\u56de\u7a0b\u65e5'}</label>
@@ -307,7 +307,7 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-        <div ref={dropdownRef} className="absolute left-0 top-full z-[70] mt-2 w-full rounded-2xl bg-white p-5 shadow-2xl ring-1 ring-black/5 lg:left-[calc(-100%-0.5rem)] lg:w-[calc(200%+0.5rem)]">
+        <div ref={dropdownRef} className="absolute left-0 top-full z-[70] mt-2 max-h-[80vh] w-[min(92vw,28rem)] overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl ring-1 ring-black/5 sm:w-full sm:p-5 lg:left-[calc(-100%-0.5rem)] lg:w-[calc(200%+0.5rem)]">
           <div className="mb-4 flex items-center justify-between">
             <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="rounded p-1 transition hover:bg-gray-100">
               <ChevronLeft className="h-5 w-5 text-gray-600" />
@@ -334,7 +334,7 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
               <ChevronRight className="h-5 w-5 text-gray-600" />
             </button>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             {[0, 1].map((index) => renderMonth(generateMonth(index), index))}
           </div>
         </div>

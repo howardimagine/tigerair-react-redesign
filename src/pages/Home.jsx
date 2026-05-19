@@ -445,14 +445,14 @@ const Home = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-0">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-0">
                   <AirportDropdown
                     value={form.from}
                     onChange={value => setForm({...form, from: value})}
                     label="出發地 From"
                     groups={destinationAirportGroups}
                     Icon={PlaneTakeoff}
-                    roundedClass="rounded-l-lg"
+                    roundedClass="rounded-lg sm:rounded-r-none"
                   />
                   <AirportDropdown
                     value={form.to}
@@ -460,7 +460,7 @@ const Home = () => {
                     label="目的地 To"
                     groups={destinationAirportGroups}
                     Icon={PlaneLanding}
-                    roundedClass="-ml-px rounded-r-lg"
+                    roundedClass="rounded-lg sm:-ml-px sm:rounded-l-none"
                   />
                 </div>
 
