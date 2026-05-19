@@ -471,9 +471,11 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Search Card — merged into Hero, glass */}
-        <div ref={searchFormRef} className={`relative mx-auto max-w-7xl px-4 pt-10 transition-all duration-500 sm:pl-20 sm:pr-24 sm:pt-14 ${isDateOpen ? 'z-[65]' : 'z-10'} ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
-          <div className="rounded-2xl border border-white/25 bg-white/15 p-5 shadow-2xl shadow-black/30 backdrop-blur-2xl sm:p-6 md:px-8 md:py-6">
+        {/* Search Card — glass over hero on desktop, sheet below hero on mobile */}
+        <div ref={searchFormRef} className={`relative mx-auto max-w-7xl px-4 pt-8 transition-all duration-500 lg:pl-20 lg:pr-24 lg:pt-14 ${isDateOpen ? 'z-[65]' : 'z-10'} ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
+          {/* Mobile sheet backdrop — covers hero image behind, gives a clean light surface */}
+          <div className="absolute inset-x-0 -bottom-12 top-0 -z-0 rounded-t-3xl bg-gray-50 lg:hidden" aria-hidden />
+          <div className="relative rounded-2xl bg-white p-5 shadow-xl ring-1 ring-gray-200 lg:border lg:border-white/25 lg:bg-white/15 lg:p-6 lg:shadow-2xl lg:shadow-black/30 lg:ring-0 lg:backdrop-blur-2xl xl:px-8 xl:py-6">
             <form onSubmit={handleSearch}>
               <div className="grid grid-cols-1 gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr] lg:items-end">
                 <div className="relative rounded-lg border border-gray-200 bg-white/70 backdrop-blur-sm transition hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm focus-within:ring-2 focus-within:ring-primary/30">
