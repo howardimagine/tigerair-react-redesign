@@ -280,7 +280,7 @@ const AddOns = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(250,168,54,0.16),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
           <p className="text-xs font-semibold text-primary">Step 4 / 4</p>
-          <h1 className="mt-1 text-xl font-bold text-white sm:text-3xl">加購行李與餐食</h1>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">加購行李與餐食</h1>
           <p className="mt-1 text-xs text-white/60">行李、機上餐食可額外加購</p>
           <div className="mt-3 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <div className="flex w-max items-center gap-2 whitespace-nowrap">

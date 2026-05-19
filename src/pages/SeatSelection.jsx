@@ -242,7 +242,7 @@ const SeatSelection = () => {
         <div className="relative mx-auto max-w-7xl px-4 pb-5 pt-5 sm:px-6 lg:px-8">
           <div className="space-y-1 text-white">
             <p className="text-xs font-semibold text-primary">Step 3 / 4</p>
-            <h1 className="text-xl font-bold sm:text-2xl">{'選擇座位'}</h1>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{'選擇座位'}</h1>
           </div>
           <div className="mt-3 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <div className="flex w-max items-center gap-2 whitespace-nowrap">
