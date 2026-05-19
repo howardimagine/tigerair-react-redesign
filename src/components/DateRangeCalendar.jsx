@@ -153,10 +153,17 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
     if (isDateLocked(date, today)) return;
 
     const formattedDate = formatDate(date);
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
 
     if (activeField === 'depart') {
       onDepartChange(formattedDate);
       if (!isOneWay) {
+        if (isMobile) {
+          // Mobile: explicit two-step — close after depart, user taps 回程日 to continue
+          setActiveField('return');
+          setIsOpen(false);
+          return;
+        }
         setActiveField('return');
         return;
       }
@@ -300,14 +307,16 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
 
       {isOpen && (
         <>
-          {/* Backdrop starts below the input row so the search form stays fully visible */}
+          {/* Mobile: full backdrop. Desktop: starts below input row so form stays visible. */}
           <div
-            className="fixed inset-x-0 bottom-0 z-[60] bg-black/30"
-            style={{ top: calendarRef.current ? `${calendarRef.current.getBoundingClientRect().bottom + 12}px` : '50%' }}
+            className="fixed inset-0 z-[60] bg-black/40 lg:bottom-0 lg:inset-x-0"
+            style={typeof window !== 'undefined' && window.innerWidth >= 1024 && calendarRef.current
+              ? { top: `${calendarRef.current.getBoundingClientRect().bottom + 12}px`, background: 'rgba(0,0,0,0.3)' }
+              : undefined}
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-        <div ref={dropdownRef} className="absolute left-0 top-full z-[70] mt-2 max-h-[80vh] w-[min(92vw,28rem)] overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl ring-1 ring-black/5 sm:w-full sm:p-5 lg:left-[calc(-100%-0.5rem)] lg:w-[calc(200%+0.5rem)]">
+        <div ref={dropdownRef} className="fixed left-1/2 top-1/2 z-[70] max-h-[80vh] w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl ring-1 ring-black/5 lg:absolute lg:left-[calc(-100%-0.5rem)] lg:top-full lg:mt-2 lg:w-[calc(200%+0.5rem)] lg:translate-x-0 lg:translate-y-0 lg:p-5">
           <div className="mb-4 flex items-center justify-between">
             <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="rounded p-1 transition hover:bg-gray-100">
               <ChevronLeft className="h-5 w-5 text-gray-600" />
