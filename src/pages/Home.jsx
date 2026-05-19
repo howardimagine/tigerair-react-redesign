@@ -391,7 +391,7 @@ const Home = () => {
   return (
     <div>
       {/* Hero */}
-      <div className="relative -mt-14 bg-gray-900 pb-10 pt-14 sm:pb-16 md:-mt-16 md:pt-16">
+      <div className="relative -mt-14 bg-gray-900 pb-8 pt-14 sm:pb-12 md:-mt-16 md:pt-16 lg:pb-80">
         <div className="absolute inset-0 overflow-hidden">
           <div ref={parallaxRef} className="absolute inset-x-0 -top-12 bottom-0 will-change-transform">
             {heroSlides.map((slide, index) => (
@@ -470,11 +470,12 @@ const Home = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Search Card — glass over hero on desktop, sheet below hero on mobile */}
-        <div ref={searchFormRef} className={`relative mx-auto max-w-7xl px-4 pt-8 transition-all duration-500 lg:pl-20 lg:pr-24 lg:pt-14 ${isDateOpen ? 'z-[65]' : 'z-10'} ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
-          {/* Mobile sheet backdrop — covers hero image behind, gives a clean light surface */}
-          <div className="absolute inset-x-0 -bottom-12 top-0 -z-0 rounded-t-3xl bg-gray-50 lg:hidden" aria-hidden />
+      {/* Search + Map section — sits below hero on mobile, overlaps into hero on desktop */}
+      <div className="relative lg:-mt-72">
+        {/* Search Card — glass over hero on desktop, normal section below hero on mobile */}
+        <div ref={searchFormRef} className={`relative mx-auto max-w-7xl px-4 pt-6 transition-all duration-500 lg:pl-20 lg:pr-24 lg:pt-0 ${isDateOpen ? 'z-[65]' : 'z-10'} ${isOpeningMap ? 'pointer-events-none translate-y-2 opacity-0' : ''}`}>
           <div className="relative rounded-2xl bg-white p-5 shadow-xl ring-1 ring-gray-200 lg:border lg:border-white/25 lg:bg-white/15 lg:p-6 lg:shadow-2xl lg:shadow-black/30 lg:ring-0 lg:backdrop-blur-2xl xl:px-8 xl:py-6">
             <form onSubmit={handleSearch}>
               <div className="grid grid-cols-1 gap-2 lg:grid-cols-[0.8fr_1.7fr_1.7fr_0.8fr] lg:items-end">
@@ -613,7 +614,7 @@ const Home = () => {
           <button
             type="button"
             onClick={handleOpenMap}
-            className="group inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-5 py-2.5 text-sm font-semibold text-white shadow-lg backdrop-blur transition hover:bg-white/25"
+            className="group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 shadow-md transition hover:border-primary hover:text-primary lg:border-white/30 lg:bg-white/15 lg:text-white lg:shadow-lg lg:backdrop-blur lg:hover:bg-white/25 lg:hover:text-white"
           >
             <MapPinIcon className="h-4 w-4 text-primary" />
             地圖搜尋
