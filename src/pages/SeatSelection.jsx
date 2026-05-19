@@ -240,20 +240,22 @@ const SeatSelection = () => {
       <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(250,168,54,0.16),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-5 pt-5 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-white sm:gap-x-3">
-            <span className="text-xs font-semibold text-primary sm:text-sm">Step 3 / 4</span>
-            <h1 className="text-lg font-bold sm:text-2xl">{'選擇座位'}</h1>
+          <div className="space-y-1 text-white">
+            <p className="text-xs font-semibold text-primary">Step 3 / 4</p>
+            <h1 className="text-xl font-bold sm:text-2xl">{'選擇座位'}</h1>
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            {['機票', '旅客資料', '座位', '加購'].map((label, idx) => (
-              <div key={label} className="flex items-center gap-2">
-                <span className={`flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-[11px] font-bold transition ${
-                  idx < 2 ? 'bg-primary text-white' : idx === 2 ? 'bg-white text-gray-900' : 'bg-white/15 text-white/70'
-                }`}>{idx < 2 ? <Check className="h-3 w-3" /> : idx + 1}</span>
-                <span className={`text-[11px] font-semibold sm:text-xs ${idx === 2 ? 'text-white' : 'text-white/60'}`}>{label}</span>
-                {idx < 3 && <span className="mx-0.5 h-px w-5 bg-white/20 sm:w-8" />}
-              </div>
-            ))}
+          <div className="mt-3 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex w-max items-center gap-2 whitespace-nowrap">
+              {['機票', '旅客資料', '座位', '加購'].map((label, idx) => (
+                <div key={label} className="flex shrink-0 items-center gap-2">
+                  <span className={`flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-[11px] font-bold transition ${
+                    idx < 2 ? 'bg-primary text-white' : idx === 2 ? 'bg-white text-gray-900' : 'bg-white/15 text-white/70'
+                  }`}>{idx < 2 ? <Check className="h-3 w-3" /> : idx + 1}</span>
+                  <span className={`text-[11px] font-semibold sm:text-xs ${idx === 2 ? 'text-white' : 'text-white/60'}`}>{label}</span>
+                  {idx < 3 && <span className="mx-0.5 h-px w-5 bg-white/20 sm:w-8" />}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -481,23 +483,23 @@ const SeatSelection = () => {
         </aside>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 py-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold text-gray-500">已選 {Object.values(selections).flat().filter((v) => v !== null && v !== undefined).length} / {totalPassengers * (tripType === 'oneway' ? 1 : 2)} 旅客</p>
-            <p className="text-xl font-black text-gray-900"><span className="mr-1 text-xs font-bold">TWD</span>{grandTotal.toLocaleString()}</p>
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 pt-2.5 pb-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur sm:px-6 sm:pt-3 sm:pb-4 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2">
+          <div className="min-w-0 leading-tight">
+            <p className="text-[10px] font-semibold text-gray-500">{'總計'}</p>
+            <p className="whitespace-nowrap text-lg font-black text-gray-900 sm:text-xl"><span className="mr-1 text-[10px] font-bold">TWD</span>{grandTotal.toLocaleString()}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={() => navigate('/passengers', { state: incoming })} className="rounded-lg border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-primary hover:text-primary">
+          <div className="flex shrink-0 items-center gap-2">
+            <button type="button" onClick={() => navigate('/passengers', { state: incoming })} className="whitespace-nowrap rounded-lg border border-gray-200 px-3 py-2.5 text-xs font-semibold text-gray-700 transition hover:border-primary hover:text-primary sm:px-4 sm:py-3 sm:text-sm">
               上一步
             </button>
             <button
               type="button"
               onClick={handleNext}
               disabled={!allSeatsPicked}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
+              className="whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300 sm:px-6 sm:py-3"
             >
-              下一步：加購 <ArrowRight className="h-4 w-4" />
+              下一步
             </button>
           </div>
         </div>

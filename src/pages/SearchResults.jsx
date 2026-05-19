@@ -472,21 +472,23 @@ const SearchResults = () => {
       <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(250,168,54,0.18),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-5 pt-5 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-white sm:gap-x-3">
-            <span className="text-xs font-semibold text-primary sm:text-sm">{'Step 1 / 4'}</span>
-            <h1 className="text-lg font-bold sm:text-2xl">{fromName} → {toName}</h1>
-            <span className="text-xs text-white/70 sm:text-sm">{tripType === 'oneway' ? '選擇航班' : '選擇航班'}</span>
+          <div className="space-y-1 text-white">
+            <p className="text-xs font-semibold text-primary">{'Step 1 / 4'}</p>
+            <h1 className="text-xl font-bold sm:text-2xl">{fromName} → {toName}</h1>
+            <p className="text-xs text-white/60">{'選擇航班'}</p>
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            {stepLabels.map((s, idx) => (
-              <div key={s.key} className="flex items-center gap-2">
-                <span className={`flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-[11px] font-bold transition ${
-                  idx === currentStepIndex ? 'bg-white text-gray-900' : 'bg-white/15 text-white/70'
-                }`}>{idx + 1}</span>
-                <span className={`text-[11px] font-semibold sm:text-xs ${idx === currentStepIndex ? 'text-white' : 'text-white/60'}`}>{s.label}</span>
-                {idx < stepLabels.length - 1 && <span className="mx-0.5 h-px w-5 bg-white/20 sm:w-8" />}
-              </div>
-            ))}
+          <div className="mt-3 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex w-max items-center gap-2 whitespace-nowrap">
+              {stepLabels.map((s, idx) => (
+                <div key={s.key} className="flex shrink-0 items-center gap-2">
+                  <span className={`flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-[11px] font-bold transition ${
+                    idx === currentStepIndex ? 'bg-white text-gray-900' : 'bg-white/15 text-white/70'
+                  }`}>{idx + 1}</span>
+                  <span className={`text-[11px] font-semibold sm:text-xs ${idx === currentStepIndex ? 'text-white' : 'text-white/60'}`}>{s.label}</span>
+                  {idx < stepLabels.length - 1 && <span className="mx-0.5 h-px w-5 bg-white/20 sm:w-8" />}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -546,15 +548,12 @@ const SearchResults = () => {
         )}
 
         {filtered.length > 0 && (
-          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 pt-3 pb-4 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur sm:px-6 lg:px-8">
-            <div className="mx-auto flex max-w-7xl flex-row items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold text-gray-500">
-                  {selectedFlights.outbound?.bundle?.title}
-                  {tripType !== 'oneway' && selectedFlights.return?.bundle?.title && ` · ${selectedFlights.return.bundle.title}`}
-                </p>
-                <p className="text-xl font-black text-gray-900">
-                  <span className="mr-1 text-xs font-bold">TWD</span>
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 pt-2.5 pb-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur sm:px-6 sm:pt-3 sm:pb-4 lg:px-8">
+            <div className="mx-auto flex max-w-7xl flex-row items-center justify-between gap-2">
+              <div className="min-w-0 leading-tight">
+                <p className="text-[10px] font-semibold text-gray-500">{'總計'}</p>
+                <p className="whitespace-nowrap text-lg font-black text-gray-900 sm:text-xl">
+                  <span className="mr-1 text-[10px] font-bold">TWD</span>
                   {selectedTotalPrice.toLocaleString()}
                 </p>
               </div>
@@ -562,7 +561,7 @@ const SearchResults = () => {
                 type="button"
                 onClick={handleNextStep}
                 disabled={!isFlightSelectionComplete}
-                className="shrink-0 rounded-lg bg-primary px-4 py-3 text-xs font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300 sm:px-6 sm:text-sm"
+                className="shrink-0 whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300 sm:px-6 sm:py-3"
               >
                 {'下一步'}
               </button>

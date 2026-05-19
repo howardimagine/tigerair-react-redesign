@@ -68,20 +68,22 @@ const StepHeader = ({ stepIndex }) => {
     <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(250,168,54,0.16),transparent_55%)]" />
       <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
-        <p className="text-xs font-semibold text-primary sm:text-sm">線上報到</p>
+        <p className="text-xs font-semibold text-primary">線上報到</p>
         <h1 className="mt-1 text-xl font-bold text-white sm:text-3xl">Online Check-in</h1>
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          {steps.map((s, idx) => (
-            <div key={s.label} className="flex items-center gap-2">
-              <span className={`flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-xs font-bold transition ${
-                idx < stepIndex ? 'bg-primary text-white'
-                : idx === stepIndex ? 'bg-white text-gray-900'
-                : 'bg-white/15 text-white/70'
-              }`}>{idx < stepIndex ? <Check className="h-3.5 w-3.5" /> : idx + 1}</span>
-              <span className={`text-xs font-semibold sm:text-sm ${idx === stepIndex ? 'text-white' : 'text-white/60'}`}>{s.label}</span>
-              {idx < steps.length - 1 && <span className="mx-1 h-px w-6 bg-white/20 sm:w-10" />}
-            </div>
-          ))}
+        <div className="mt-3 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex w-max items-center gap-2 whitespace-nowrap">
+            {steps.map((s, idx) => (
+              <div key={s.label} className="flex shrink-0 items-center gap-2">
+                <span className={`flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-[11px] font-bold transition ${
+                  idx < stepIndex ? 'bg-primary text-white'
+                  : idx === stepIndex ? 'bg-white text-gray-900'
+                  : 'bg-white/15 text-white/70'
+                }`}>{idx < stepIndex ? <Check className="h-3 w-3" /> : idx + 1}</span>
+                <span className={`text-[11px] font-semibold sm:text-xs ${idx === stepIndex ? 'text-white' : 'text-white/60'}`}>{s.label}</span>
+                {idx < steps.length - 1 && <span className="mx-0.5 h-px w-5 bg-white/20 sm:w-8" />}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -195,25 +197,19 @@ const FlightConfirmStep = ({ selectedPassengerIds, setSelectedPassengerIds, onBa
 
   return (
     <div className="mx-auto max-w-5xl space-y-5 px-4 py-8 sm:px-6 lg:px-8">
-      <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="mb-4 text-lg font-bold text-gray-900">航班資訊</h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="rounded-xl bg-gray-50 p-4">
-            <p className="text-xs font-semibold text-gray-500">航班 / 日期</p>
-            <p className="mt-1 text-lg font-bold text-primary">{DEMO_FLIGHT.flightNumber}</p>
-            <p className="text-xs text-gray-600">{DEMO_FLIGHT.date}</p>
-          </div>
-          <div className="rounded-xl bg-gray-50 p-4">
-            <p className="text-xs font-semibold text-gray-500">航線</p>
-            <p className="mt-1 text-base font-bold text-gray-900">{DEMO_FLIGHT.from} → {DEMO_FLIGHT.to}</p>
-            <p className="text-xs text-gray-600">{DEMO_FLIGHT.fromName} → {DEMO_FLIGHT.toName}</p>
-          </div>
-          <div className="rounded-xl bg-gray-50 p-4">
-            <p className="text-xs font-semibold text-gray-500">出發 / 抵達</p>
-            <p className="mt-1 text-base font-bold text-gray-900">{DEMO_FLIGHT.depart} → {DEMO_FLIGHT.arrive}</p>
-            <p className="text-xs text-gray-600">登機 {DEMO_FLIGHT.boardingTime} · 登機門 {DEMO_FLIGHT.gate}</p>
-          </div>
+      <section className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm sm:p-5">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <span className="text-xs font-semibold text-gray-500">航班</span>
+          <span className="text-sm font-bold text-primary">{DEMO_FLIGHT.flightNumber}</span>
+          <span className="text-xs text-gray-400">·</span>
+          <span className="text-xs text-gray-600">{DEMO_FLIGHT.date}</span>
         </div>
+        <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <span className="text-sm font-bold text-gray-900">{DEMO_FLIGHT.from} {DEMO_FLIGHT.depart}</span>
+          <span className="text-xs text-gray-400">→</span>
+          <span className="text-sm font-bold text-gray-900">{DEMO_FLIGHT.to} {DEMO_FLIGHT.arrive}</span>
+        </div>
+        <p className="mt-1 text-[11px] text-gray-500">登機 {DEMO_FLIGHT.boardingTime} · 登機門 {DEMO_FLIGHT.gate}</p>
       </section>
 
       <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
@@ -251,7 +247,6 @@ const FlightConfirmStep = ({ selectedPassengerIds, setSelectedPassengerIds, onBa
                     </p>
                   </div>
                 </div>
-                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-600">已訂位</span>
               </button>
             );
           })}
@@ -268,7 +263,7 @@ const FlightConfirmStep = ({ selectedPassengerIds, setSelectedPassengerIds, onBa
           disabled={selectedPassengerIds.length === 0}
           className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
         >
-          下一步：填寫護照資料 <ArrowRight className="h-4 w-4" />
+          下一步
         </button>
       </div>
     </div>

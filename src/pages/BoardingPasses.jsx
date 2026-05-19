@@ -237,90 +237,84 @@ const BoardingPassCard = ({ pass, onRemove, platform }) => {
       </div>
 
       {/* Mobile: original vertical card */}
-      <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl shadow-black/15 ring-1 ring-black/5 md:hidden">
+      <div className="relative overflow-hidden rounded-2xl bg-white shadow-2xl shadow-black/15 ring-1 ring-black/5 md:hidden">
       {/* White header strip */}
-      <div className="relative flex items-center justify-between bg-white px-6 py-5">
-        <span className="text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">{pass.flight.from}</span>
+      <div className="relative flex items-center justify-between bg-white px-5 py-3">
+        <span className="text-2xl font-black tracking-tight text-gray-900">{pass.flight.from}</span>
         <div className="flex flex-col items-center gap-0.5">
-          <Plane className="h-5 w-5 -rotate-12 text-gray-900" />
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">{pass.flight.date.slice(5)}</span>
+          <Plane className="h-4 w-4 -rotate-12 text-gray-900" />
+          <span className="text-[9px] font-semibold uppercase tracking-widest text-gray-400">{pass.flight.date.slice(5)}</span>
         </div>
-        <span className="text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">{pass.flight.to}</span>
+        <span className="text-2xl font-black tracking-tight text-gray-900">{pass.flight.to}</span>
       </div>
 
       {/* Perforation divider */}
-      <div className="relative h-3 bg-primary">
-        <div className="absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-gray-50 shadow-inner" />
-        <div className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-gray-50 shadow-inner" />
+      <div className="relative h-2 bg-primary">
+        <div className="absolute -left-2 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-gray-50 shadow-inner" />
+        <div className="absolute -right-2 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-gray-50 shadow-inner" />
       </div>
 
       {/* Yellow body with dot pattern */}
       <div
-        className="relative bg-primary px-6 py-7 text-gray-900"
+        className="relative bg-primary px-5 pb-4 pt-4 text-gray-900"
         style={{
           backgroundImage:
             'radial-gradient(circle, rgba(255,255,255,0.18) 1.5px, transparent 1.6px)',
-          backgroundSize: '18px 18px',
+          backgroundSize: '16px 16px',
         }}
       >
-        <div className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-gray-900/85 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow">
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-gray-900/85 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white shadow">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
           Checked in
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-y-6">
+        <div className="grid grid-cols-2 gap-y-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Flight</p>
-            <p className="mt-1 text-3xl font-black tracking-tight text-gray-900">{pass.flight.flightNumber}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-900/60">Flight</p>
+            <p className="mt-0.5 text-xl font-black tracking-tight text-gray-900">{pass.flight.flightNumber}</p>
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Seat</p>
-            <p className="mt-1 text-3xl font-black tracking-tight text-gray-900">{pass.seat}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-900/60">Seat</p>
+            <p className="mt-0.5 text-xl font-black tracking-tight text-gray-900">{pass.seat}</p>
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Terminal</p>
-            <p className="mt-1 text-3xl font-black tracking-tight text-gray-900">{pass.flight.terminal}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-900/60">Terminal</p>
+            <p className="mt-0.5 text-xl font-black tracking-tight text-gray-900">{pass.flight.terminal}</p>
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Gate</p>
-            <p className="mt-1 text-3xl font-black tracking-tight text-gray-900">{pass.flight.gate}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-900/60">Gate</p>
+            <p className="mt-0.5 text-xl font-black tracking-tight text-gray-900">{pass.flight.gate}</p>
           </div>
           <div className="col-span-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Boarding at</p>
-            <p className="mt-1 text-5xl font-black tracking-tight text-gray-900">{pass.flight.boardingTime}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-900/60">Boarding at</p>
+            <p className="mt-0.5 text-3xl font-black tracking-tight text-gray-900">{pass.flight.boardingTime}</p>
           </div>
         </div>
 
         {/* Passenger + details strip */}
-        <div className="mt-7 grid grid-cols-2 gap-y-3 border-t border-gray-900/15 pt-5 text-xs">
+        <div className="mt-3 grid grid-cols-2 gap-y-1.5 border-t border-gray-900/15 pt-3 text-xs">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Passenger</p>
-            <p className="mt-0.5 font-bold text-gray-900">{pass.passengerName}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-900/60">Passenger</p>
+            <p className="text-[11px] font-bold text-gray-900">{pass.passengerName}</p>
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Counter</p>
-            <p className="mt-0.5 font-bold text-gray-900">{pass.flight.counter}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-900/60">Counter</p>
+            <p className="text-[11px] font-bold text-gray-900">{pass.flight.counter}</p>
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Booking</p>
-            <p className="mt-0.5 font-bold text-gray-900">{pass.bookingRef}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-900/60">Booking</p>
+            <p className="text-[11px] font-bold text-gray-900">{pass.bookingRef}</p>
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900/60">Route</p>
-            <p className="mt-0.5 font-bold text-gray-900">{pass.flight.depart} → {pass.flight.arrive}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-900/60">Route</p>
+            <p className="text-[11px] font-bold text-gray-900">{pass.flight.depart} → {pass.flight.arrive}</p>
           </div>
-        </div>
-
-        {/* Offline indicator — mobile only */}
-        <div className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-gray-900/85 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-300 md:hidden">
-          <WifiOff className="h-3 w-3" />
-          已離線存取 · Offline
         </div>
 
         {/* Barcode */}
-        <div className="mt-6">
+        <div className="mt-3">
           <Barcode seed={pass.bookingRef + pass.seat} />
-          <p className="mt-2 text-center text-[10px] font-mono tracking-[0.4em] text-gray-900/70">
+          <p className="mt-1 text-center text-[9px] font-mono tracking-[0.4em] text-gray-900/70">
             {pass.bookingRef} · {pass.seat}
           </p>
         </div>
@@ -689,32 +683,30 @@ const TipsHeader = ({ pass, passCount, onAddCheckIn, onOpenAi }) => {
       <div className={`absolute inset-0 bg-gradient-to-b transition-all duration-700 ${open ? 'from-gray-900/35 via-gray-900/20 to-gray-900/55' : 'from-gray-900/85 via-gray-900/80 to-gray-800/90'}`} />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(250,168,54,0.12),transparent_55%)]" />
 
-      <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-5xl px-4 pb-4 pt-4 sm:px-6 sm:pb-8 sm:pt-8 lg:px-8">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-primary">我的登機證</p>
-            <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">Boarding Passes</h1>
-            <p className="mt-2 text-xs text-white/70">共 {passCount} 張登機證 · 已支援離線存取</p>
+            <p className="text-xs font-semibold text-primary">我的登機證</p>
+            <h1 className="mt-0.5 text-lg font-bold text-white sm:text-3xl">Boarding Passes</h1>
+            <p className="mt-1 text-[11px] text-white/70 sm:text-xs">共 {passCount} 張 · 支援離線</p>
           </div>
-          <button type="button" onClick={onAddCheckIn} className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/20">
-            + 新增報到
-          </button>
-        </div>
-
-        {/* Travel tips entry — compact pill matching 地圖搜尋 style */}
-        {pass && (
-          <div className="mt-5 flex justify-center">
-            <button
-              type="button"
-              onClick={() => setOpen((v) => !v)}
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-gray-900/60 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-gray-900/80"
-            >
-              <Umbrella className="h-4 w-4 text-primary" />
-              旅遊小提醒
-              <ChevronDown className={`h-4 w-4 text-white/70 transition-transform ${open ? 'rotate-180' : ''}`} />
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <button type="button" onClick={onAddCheckIn} className="whitespace-nowrap rounded-full bg-white/10 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:px-4 sm:py-2 sm:text-xs">
+              + 新增報到
             </button>
+            {pass && (
+              <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-white/15 bg-gray-900/60 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur transition hover:bg-gray-900/80 sm:px-4 sm:text-xs"
+              >
+                <Umbrella className="h-3.5 w-3.5 text-primary" />
+                旅遊提醒
+                <ChevronDown className={`h-3.5 w-3.5 text-white/70 transition-transform ${open ? 'rotate-180' : ''}`} />
+              </button>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Expanded tip cards — icons (no emojis), backdrop-blur, fewer borders */}
         {open && pass && (
@@ -897,21 +889,23 @@ const BoardingPasses = () => {
         onOpenAi={() => navigate('/my-trips', { state: { destination: activePass?.flight?.to, destinationName: (destinationData[activePass?.flight?.to]?.name || activePass?.flight?.toName), pass: activePass } })}
       />
 
-      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 py-3 sm:px-6 sm:py-6 lg:px-8">
         {passes.length > 1 && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            {passes.map((p, idx) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setActiveIdx(idx)}
-                className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
-                  activeIdx === idx ? 'bg-primary text-white shadow-md' : 'bg-white text-gray-700 ring-1 ring-gray-200 hover:ring-primary'
-                }`}
-              >
-                {p.passengerName} · {p.seat}
-              </button>
-            ))}
+          <div className="mb-3 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex w-max gap-2 whitespace-nowrap">
+              {passes.map((p, idx) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setActiveIdx(idx)}
+                  className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-semibold transition sm:text-xs ${
+                    activeIdx === idx ? 'bg-primary text-white shadow-md' : 'bg-white text-gray-700 ring-1 ring-gray-200 hover:ring-primary'
+                  }`}
+                >
+                  {p.passengerName} · {p.seat}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

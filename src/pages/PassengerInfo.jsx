@@ -472,13 +472,15 @@ const PassengerInfo = () => {
       <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(250,168,54,0.16),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
-          <p className="text-xs font-semibold text-primary sm:text-sm">Step 2 / 4</p>
+          <p className="text-xs font-semibold text-primary">Step 2 / 4</p>
           <h1 className="mt-1 text-xl font-bold text-white sm:text-3xl">填寫旅客資料</h1>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 機票</span>
-            <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-gray-900">2 旅客資料</span>
-            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-bold text-white/70">3 座位</span>
-            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-bold text-white/70">4 加購</span>
+          <div className="mt-3 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex w-max items-center gap-2 whitespace-nowrap">
+              <span className="shrink-0 rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 機票</span>
+              <span className="shrink-0 rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-gray-900">2 旅客資料</span>
+              <span className="shrink-0 rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-bold text-white/70">3 座位</span>
+              <span className="shrink-0 rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-bold text-white/70">4 加購</span>
+            </div>
           </div>
         </div>
       </div>
@@ -628,18 +630,18 @@ const PassengerInfo = () => {
         </aside>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 py-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold text-gray-500">{passengers.length} 位旅客 · 步驟 3 / 4</p>
-            <p className="text-xl font-black text-gray-900"><span className="mr-1 text-xs font-bold">TWD</span>{totalPrice.toLocaleString()}</p>
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 pt-2.5 pb-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur sm:px-6 sm:pt-3 sm:pb-4 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2">
+          <div className="min-w-0 leading-tight">
+            <p className="text-[10px] font-semibold text-gray-500">{'總計'}</p>
+            <p className="whitespace-nowrap text-lg font-black text-gray-900 sm:text-xl"><span className="mr-1 text-[10px] font-bold">TWD</span>{totalPrice.toLocaleString()}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={handleBack} className="rounded-lg border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-primary hover:text-primary">
+          <div className="flex shrink-0 items-center gap-2">
+            <button type="button" onClick={handleBack} className="whitespace-nowrap rounded-lg border border-gray-200 px-3 py-2.5 text-xs font-semibold text-gray-700 transition hover:border-primary hover:text-primary sm:px-4 sm:py-3 sm:text-sm">
               上一步
             </button>
-            <button type="button" onClick={handleNext} className="rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-dark">
-              下一步：選擇座位
+            <button type="button" onClick={handleNext} className="whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white transition hover:bg-primary-dark sm:px-6 sm:py-3">
+              下一步
             </button>
           </div>
         </div>
