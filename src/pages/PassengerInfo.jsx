@@ -472,8 +472,8 @@ const PassengerInfo = () => {
       <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(250,168,54,0.16),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold text-primary">Step 2 / 4</p>
-          <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">填寫旅客資料</h1>
+          <p className="text-xs font-semibold text-primary sm:text-sm">Step 2 / 4</p>
+          <h1 className="mt-1 text-xl font-bold text-white sm:text-3xl">填寫旅客資料</h1>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 機票</span>
             <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-gray-900">2 旅客資料</span>

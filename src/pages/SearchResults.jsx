@@ -346,12 +346,12 @@ const SearchResults = () => {
     const destination = getAirportDisplayName(isReturn ? form.from : form.to);
 
     return (
-      <h3 className="mb-3 flex items-center gap-2 text-base font-bold text-gray-900">
-        <PlaneTakeoff className={isReturn ? 'h-5 w-5 -scale-x-100 text-primary' : 'h-5 w-5 text-primary'} />
+      <h3 className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-bold text-gray-900 sm:text-base">
+        <PlaneTakeoff className={isReturn ? 'h-4 w-4 -scale-x-100 text-primary sm:h-5 sm:w-5' : 'h-4 w-4 text-primary sm:h-5 sm:w-5'} />
         <span>{isReturn ? '\u56de\u7a0b' : '\u53bb\u7a0b'}</span>
-        <span>{origin}</span>
+        <span className="truncate">{origin}</span>
         <span className="text-gray-400">-</span>
-        <span>{destination}</span>
+        <span className="truncate">{destination}</span>
       </h3>
     );
   };
@@ -454,8 +454,8 @@ const SearchResults = () => {
   const toName = getAirportDisplayName(form.to);
   const stepLabels = [
     { key: 'flights', label: '機票' },
-    { key: 'seat', label: '座位' },
     { key: 'passengers', label: '旅客資料' },
+    { key: 'seat', label: '座位' },
     { key: 'addons', label: '加購' },
   ];
   const currentStepIndex = 0;
@@ -472,10 +472,10 @@ const SearchResults = () => {
       <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(250,168,54,0.18),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-5 pt-5 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-white">
-            <span className="text-sm font-semibold text-primary">{'Step 1 / 4'}</span>
-            <h1 className="text-xl font-bold sm:text-2xl">{fromName} → {toName}</h1>
-            <span className="text-sm text-white/70">{tripType === 'oneway' ? '選擇航班' : '選擇去程與回程航班'}</span>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-white sm:gap-x-3">
+            <span className="text-xs font-semibold text-primary sm:text-sm">{'Step 1 / 4'}</span>
+            <h1 className="text-lg font-bold sm:text-2xl">{fromName} → {toName}</h1>
+            <span className="text-xs text-white/70 sm:text-sm">{tripType === 'oneway' ? '選擇航班' : '選擇航班'}</span>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {stepLabels.map((s, idx) => (
@@ -562,9 +562,9 @@ const SearchResults = () => {
                 type="button"
                 onClick={handleNextStep}
                 disabled={!isFlightSelectionComplete}
-                className="rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
+                className="shrink-0 rounded-lg bg-primary px-4 py-3 text-xs font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300 sm:px-6 sm:text-sm"
               >
-                {'下一步：填旅客資料'}
+                {'下一步'}
               </button>
             </div>
           </div>

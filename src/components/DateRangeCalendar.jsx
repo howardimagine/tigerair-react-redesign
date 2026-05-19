@@ -250,15 +250,15 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
         className={`group relative rounded-l-lg border border-gray-200 bg-white/70 backdrop-blur-sm transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${readOnly ? 'cursor-not-allowed bg-gray-50 opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm'}`}
         title={readOnly ? '請使用下方月曆選擇日期' : undefined}
       >
-        <label className="absolute left-9 top-1.5 z-10 text-xs font-semibold text-gray-600">{'\u53bb\u7a0b'}</label>
+        <label className="absolute left-9 top-1.5 z-10 text-xs font-semibold text-gray-600">{'\u51fa\u767c\u65e5'}</label>
         <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-primary" />
         <button
           type="button"
           onClick={() => openCalendar('depart')}
           disabled={readOnly}
-          className="mt-1 w-full rounded-l-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none disabled:cursor-not-allowed"
+          className="mt-1 w-full truncate rounded-l-lg border-0 bg-transparent pb-1.5 pl-9 pr-2 pt-5 text-left text-sm font-medium focus:outline-none disabled:cursor-not-allowed sm:text-base"
         >
-          {formatDisplayDate(depart, '\u9078\u64c7\u51fa\u767c\u65e5')}
+          {formatDisplayDate(depart, '\u9078\u65e5\u671f')}
         </button>
         {readOnly && (
           <div className="pointer-events-none absolute left-1/2 top-full z-50 mt-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:block group-hover:opacity-100">
@@ -271,15 +271,15 @@ const DateRangeCalendar = ({ depart, returnDate, onDepartChange, onReturnChange,
         className={`group relative -ml-px rounded-r-lg border border-gray-200 bg-white/70 backdrop-blur-sm transition focus-within:z-10 focus-within:ring-2 focus-within:ring-primary/30 ${isOneWay || readOnly ? 'opacity-50' : 'hover:z-10 hover:border-primary/60 hover:bg-orange-50/40 hover:shadow-sm'}`}
         title={readOnly ? '請使用下方月曆選擇日期' : undefined}
       >
-        <label className="absolute left-9 top-1.5 z-10 text-xs font-semibold text-gray-600">{'\u56de\u7a0b'}</label>
+        <label className="absolute left-9 top-1.5 z-10 text-xs font-semibold text-gray-600">{'\u56de\u7a0b\u65e5'}</label>
         <CalendarDaysIcon className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-primary" />
         <button
           type="button"
           onClick={() => openCalendar('return')}
           disabled={isOneWay || readOnly}
-          className="mt-1 w-full rounded-r-lg border-0 bg-transparent pb-1.5 pl-9 pr-9 pt-5 text-left text-base font-medium focus:outline-none disabled:cursor-not-allowed"
+          className="mt-1 w-full truncate rounded-r-lg border-0 bg-transparent pb-1.5 pl-9 pr-7 pt-5 text-left text-sm font-medium focus:outline-none disabled:cursor-not-allowed sm:text-base"
         >
-          {isOneWay ? '\u55ae\u7a0b\u4e0d\u9700\u56de\u7a0b' : formatDisplayDate(returnDate, '\u9078\u64c7\u56de\u7a0b\u65e5')}
+          {isOneWay ? '\u55ae\u7a0b' : formatDisplayDate(returnDate, '\u9078\u65e5\u671f')}
         </button>
         {readOnly && !isOneWay && (
           <div className="pointer-events-none absolute left-1/2 top-full z-50 mt-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:block group-hover:opacity-100">

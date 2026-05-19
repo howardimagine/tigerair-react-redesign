@@ -240,9 +240,9 @@ const SeatSelection = () => {
       <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(250,168,54,0.16),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-5 pt-5 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-white">
-            <span className="text-sm font-semibold text-primary">Step 3 / 4</span>
-            <h1 className="text-xl font-bold sm:text-2xl">{'選擇座位 Seat Selection'}</h1>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-white sm:gap-x-3">
+            <span className="text-xs font-semibold text-primary sm:text-sm">Step 3 / 4</span>
+            <h1 className="text-lg font-bold sm:text-2xl">{'選擇座位'}</h1>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {['機票', '旅客資料', '座位', '加購'].map((label, idx) => (
@@ -273,7 +273,7 @@ const SeatSelection = () => {
                     key={d}
                     type="button"
                     onClick={() => setActiveDirection(d)}
-                    className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold transition ${
+                    className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-xs font-bold transition sm:gap-2 sm:px-3 sm:text-sm ${
                       isActive ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >

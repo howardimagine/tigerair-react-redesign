@@ -68,8 +68,8 @@ const StepHeader = ({ stepIndex }) => {
     <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(250,168,54,0.16),transparent_55%)]" />
       <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
-        <p className="text-sm font-semibold text-primary">線上報到</p>
-        <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">Online Check-in</h1>
+        <p className="text-xs font-semibold text-primary sm:text-sm">線上報到</p>
+        <h1 className="mt-1 text-xl font-bold text-white sm:text-3xl">Online Check-in</h1>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {steps.map((s, idx) => (
             <div key={s.label} className="flex items-center gap-2">
@@ -129,7 +129,7 @@ const LookupStep = ({ onSuccess }) => {
           <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-primary">
             <Ticket className="h-7 w-7" />
           </span>
-          <h2 className="mt-3 text-xl font-bold text-gray-900 sm:text-2xl">查詢您的訂位</h2>
+          <h2 className="mt-3 text-lg font-bold text-gray-900 sm:text-2xl">查詢您的訂位</h2>
           <p className="mt-1 text-sm text-gray-500">起飛前 48 小時至 1 小時可線上報到</p>
         </div>
 
@@ -422,7 +422,7 @@ const SuccessStep = ({ selectedPassengerIds, onViewPasses }) => {
         <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white">
           <CheckCircle2 className="h-9 w-9" />
         </span>
-        <h2 className="mt-4 text-2xl font-bold text-gray-900">{selectedPassengers.length} 位旅客報到完成！</h2>
+        <h2 className="mt-4 text-xl font-bold text-gray-900 sm:text-2xl">{selectedPassengers.length} 位旅客報到完成！</h2>
         <p className="mt-2 text-sm text-gray-600">登機證已準備好，請保留至登機門</p>
       </div>
 

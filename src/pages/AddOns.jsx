@@ -279,9 +279,9 @@ const AddOns = () => {
       <div className="relative -mt-14 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 pt-14 md:-mt-16 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(250,168,54,0.16),transparent_55%)]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold text-primary">Step 4 / 4</p>
-          <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">加購行李與餐食</h1>
-          <p className="mt-2 text-sm text-white/70">座位已於上一步選擇 — 行李託運與機上餐食可在這裡額外加購</p>
+          <p className="text-xs font-semibold text-primary sm:text-sm">Step 4 / 4</p>
+          <h1 className="mt-1 text-xl font-bold text-white sm:text-3xl">加購行李與餐食</h1>
+          <p className="mt-2 text-xs text-white/70 sm:text-sm">行李託運與機上餐食可在這裡額外加購</p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 機票</span>
             <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"><Check className="inline h-3 w-3" /> 旅客資料</span>

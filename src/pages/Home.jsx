@@ -145,7 +145,7 @@ const AirportDropdown = ({ value, onChange, label, groups, Icon, roundedClass = 
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className={`mt-1 flex w-full items-center justify-between gap-2 border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none ${buttonRoundedClass}`}
+        className={`mt-1 flex w-full items-center justify-between gap-2 border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-sm font-medium focus:outline-none sm:text-base ${buttonRoundedClass}`}
       >
         <span className="truncate">{selectedAirport?.label || '請選擇'}</span>
         <ChevronDownIcon className={`h-4 w-4 shrink-0 text-gray-600 transition ${isOpen ? 'rotate-180' : ''}`} />
@@ -438,7 +438,7 @@ const Home = () => {
                   <label className="absolute left-9 top-1.5 text-xs font-semibold text-gray-600">航程</label>
                   <ArrowsRightLeftIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
                   <div className="relative mt-1">
-                    <select value={tripType} onChange={e => handleTripTypeChange(e.target.value)} className="w-full rounded-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-base font-medium focus:outline-none">
+                    <select value={tripType} onChange={e => handleTripTypeChange(e.target.value)} className="w-full rounded-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-sm font-medium focus:outline-none sm:text-base">
                       <option value="roundtrip">來回</option>
                       <option value="oneway">單程</option>
                     </select>
@@ -481,7 +481,7 @@ const Home = () => {
                     <button
                       type="button"
                       onClick={() => setIsPassengerOpen((current) => !current)}
-                      className="w-full rounded-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-base font-medium focus:outline-none"
+                      className="w-full rounded-lg border-0 bg-transparent pb-1.5 pl-9 pr-3 pt-5 text-left text-sm font-medium focus:outline-none sm:text-base"
                     >
                       {passengerSummary}
                     </button>
