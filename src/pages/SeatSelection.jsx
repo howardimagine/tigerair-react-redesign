@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plane, Armchair, Check, ArrowRight, Sparkles } from 'lucide-react';
+import { Plane, Armchair, Check, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
 
 const ROWS = 22;
 const COLS_LEFT = ['A', 'B', 'C'];
@@ -210,15 +210,70 @@ const SeatSelection = () => {
   };
   const allSeatsPicked = isDirectionComplete('outbound') && (tripType === 'oneway' || isDirectionComplete('return'));
 
-  const handleNext = () => {
-    if (!allSeatsPicked) return;
-    navigate('/add-ons', {
-      state: {
-        ...incoming,
-        seats: selections,
-        seatSurchargeTotal,
-      },
+  // Demo-friendly auto-fill: 1st 下一步 with incomplete selection shows hint, 2nd auto-picks.
+  const [nextAttempt, setNextAttempt] = useState(0);
+  const [demoFilled, setDemoFilled] = useState(false);
+
+  const autoFillForDirection = (direction) => {
+    const occupied = occupiedByDirection[direction];
+    // Build ordered candidate list: rows 5..(ROWS), columns ABC then DEF
+    const COLS_ALL = [...COLS_LEFT, ...COLS_RIGHT];
+    const candidates = [];
+    for (let r = 5; r <= ROWS; r += 1) {
+      for (const c of COLS_ALL) candidates.push(`${r}${c}`);
+    }
+    const nextSel = Array.from({ length: totalPassengers }, () => null);
+    const nextExtras = Array.from({ length: totalPassengers }, () => 0);
+    const used = new Set();
+    // Assign seats to non-infant passengers
+    seatPassengerIndices.forEach((idx) => {
+      const seat = candidates.find((s) => !occupied.has(s) && !used.has(s));
+      if (seat) {
+        used.add(seat);
+        nextSel[idx] = seat;
+        const row = Number(seat.match(/^\d+/)?.[0] || 0);
+        nextExtras[idx] = seatPrice(row, bundleIncludesSeat);
+      }
     });
+    // Attach each infant to first adult
+    const adultIndices = passengerList.filter((p) => p.type === 'adult').map((p) => p.idx);
+    infantPassengerIndices.forEach((infantIdx, i) => {
+      const adultIdx = adultIndices[i % adultIndices.length];
+      if (adultIdx !== undefined) nextSel[infantIdx] = adultIdx;
+    });
+    return { nextSel, nextExtras };
+  };
+
+  const handleNext = () => {
+    if (allSeatsPicked) {
+      navigate('/add-ons', {
+        state: {
+          ...incoming,
+          seats: selections,
+          seatSurchargeTotal,
+        },
+      });
+      return;
+    }
+
+    // First attempt: just flag the error state
+    if (nextAttempt === 0) {
+      setNextAttempt(1);
+      return;
+    }
+    // Second attempt: auto-fill demo seats for all directions
+    const out = autoFillForDirection('outbound');
+    const ret = tripType === 'oneway' ? null : autoFillForDirection('return');
+    setSelections({
+      outbound: out.nextSel,
+      return: ret ? ret.nextSel : Array.from({ length: totalPassengers }, () => null),
+    });
+    setExtraPrices({
+      outbound: out.nextExtras,
+      return: ret ? ret.nextExtras : Array.from({ length: totalPassengers }, () => 0),
+    });
+    setDemoFilled(true);
+    setNextAttempt(0);
   };
 
   if (!selectedFlights?.outbound) {
@@ -263,6 +318,21 @@ const SeatSelection = () => {
       <div className="mx-auto mt-6 grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-[1fr_340px] lg:px-8">
         {/* Left: seat map */}
         <div className="space-y-5">
+          {nextAttempt === 1 && !allSeatsPicked && (
+            <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <div className="text-xs">
+                <p className="font-bold">尚未完成座位選擇</p>
+                <p className="mt-0.5">再點一次「下一步」可自動帶入 demo 推薦座位。</p>
+              </div>
+            </div>
+          )}
+          {demoFilled && (
+            <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+              <Sparkles className="h-4 w-4 text-emerald-600" />
+              <p className="text-xs font-semibold text-emerald-800">已自動帶入 demo 座位，可直接點「下一步」前往加購</p>
+            </div>
+          )}
           {/* Direction tabs (only if roundtrip) */}
           {tripType === 'roundtrip' && (
             <div className="flex gap-2 rounded-2xl border border-gray-100 bg-white p-2 shadow-sm">
@@ -496,8 +566,7 @@ const SeatSelection = () => {
             <button
               type="button"
               onClick={handleNext}
-              disabled={!allSeatsPicked}
-              className="whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300 sm:px-6 sm:py-3"
+              className="whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white transition hover:bg-primary-dark sm:px-6 sm:py-3"
             >
               下一步
             </button>
