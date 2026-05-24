@@ -221,7 +221,7 @@ const AirportDropdown = ({ value, onChange, label, groups, Icon, roundedClass = 
   );
 };
 
-const Countdown = ({ target, label = '即將開賣' }) => {
+const Countdown = ({ target }) => {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -233,30 +233,19 @@ const Countdown = ({ target, label = '即將開賣' }) => {
   const minutes = Math.floor((diff / (1000 * 60)) % 60);
   const seconds = Math.floor((diff / 1000) % 60);
   const pad = (n) => String(n).padStart(2, '0');
-  const cells = [
-    { label: '天', value: pad(days) },
-    { label: '時', value: pad(hours) },
-    { label: '分', value: pad(minutes) },
-    { label: '秒', value: pad(seconds) },
-  ];
+  const cells = [pad(days), pad(hours), pad(minutes), pad(seconds)];
   return (
-    <div className="inline-flex items-center gap-2 rounded-full bg-black/40 px-3 py-1.5 text-white shadow-lg shadow-black/30 ring-1 ring-white/15 backdrop-blur-md">
-      <span className="flex items-center gap-1.5 border-r border-white/15 pr-2.5">
-        <Timer className="h-3.5 w-3.5 text-primary" />
-        <span className="text-[11px] font-bold tracking-wide text-primary">{label}</span>
-      </span>
-      <span className="flex items-center gap-1.5">
-        {cells.map((c, idx) => (
-          <span key={c.label} className="flex items-center gap-2">
-            <span className="flex items-baseline gap-0.5">
-              <span className="font-mono text-sm font-black tabular-nums">{c.value}</span>
-              <span className="text-[9px] font-medium text-white/65">{c.label}</span>
-            </span>
-            {idx < cells.length - 1 && <span className="h-3 w-px bg-white/15" />}
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-black/45 px-2 py-0.5 align-middle text-white shadow-md shadow-black/30 ring-1 ring-white/15 backdrop-blur-md sm:gap-1.5 sm:px-2.5 sm:py-1">
+      <Timer className="h-3 w-3 text-primary sm:h-3.5 sm:w-3.5" />
+      <span className="flex items-center gap-0.5 font-mono text-sm font-black tabular-nums sm:gap-1 sm:text-base">
+        {cells.map((value, idx) => (
+          <span key={`${idx}-${value}`} className="flex items-center gap-0.5 sm:gap-1">
+            <span className="tick-cell">{value}</span>
+            {idx < cells.length - 1 && <span className="opacity-50">:</span>}
           </span>
         ))}
       </span>
-    </div>
+    </span>
   );
 };
 
@@ -468,16 +457,14 @@ const Home = () => {
 
         <div className={`relative mx-auto max-w-7xl px-12 pt-16 transition-all duration-500 sm:px-20 sm:pt-20 ${isOpeningMap ? 'pointer-events-none -translate-y-4 opacity-0' : ''}`}>
           <div key={activeHeroSlide} className="hero-slide-enter text-white">
-            {activeHeroRoute.countdownTo && (
-              <div className="mb-3">
-                <Countdown target={activeHeroRoute.countdownTo} />
-              </div>
-            )}
             <h1 className="flex flex-wrap items-center gap-x-3 gap-y-2 text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
               <span>跟虎航一起探索</span>
               <MapPinIcon className="h-7 w-7 text-primary sm:h-10 sm:w-10" />
-              <span className="text-primary">
+              <span className="inline-flex items-center gap-2 text-primary sm:gap-3">
                 <FlipBoard text={activeHeroRoute.name} />
+                {activeHeroRoute.countdownTo && (
+                  <Countdown target={activeHeroRoute.countdownTo} />
+                )}
               </span>
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-white/90 sm:text-lg md:text-xl">
