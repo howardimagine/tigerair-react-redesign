@@ -665,34 +665,41 @@ const SearchResults = () => {
         </div>
       </div>
 
-      {/* Also-search-hotels toggle (below the criteria card) */}
+      {/* Also-search-hotels checkbox (below the criteria card) */}
       <div className="mx-auto mt-3 max-w-7xl px-4 sm:px-6 lg:px-8">
         <button
           type="button"
           onClick={toggleHotelEnabled}
-          className={`group flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition sm:px-5 ${
+          aria-pressed={hotelEnabled}
+          className={`group flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition sm:px-5 ${
             hotelEnabled
               ? 'border-primary/40 bg-orange-50 ring-1 ring-primary/20'
               : 'border-dashed border-gray-300 bg-white hover:border-primary/50 hover:bg-orange-50/40'
           }`}
         >
-          <div className="flex items-center gap-3">
-            <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${hotelEnabled ? 'bg-primary text-white' : 'bg-orange-50 text-primary'}`}>
-              <BedDouble className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
-            </span>
-            <div className="min-w-0">
-              <p className="flex items-center gap-1.5 text-sm font-bold text-gray-900 sm:text-base">
-                <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-black tracking-wide ${hotelEnabled ? 'bg-primary text-white' : 'bg-gray-900 text-white'}`}>虎加酒</span>
-                <span>{hotelEnabled ? '已加入飯店搜尋' : '同時搜尋飯店'}</span>
-              </p>
-              <p className="text-[11px] text-gray-500 sm:text-xs">
-                {hotelEnabled ? '可分段選不同飯店，下方查看「飯店」分頁' : '一次搞定機加酒，加購最高折 NT$ 600'}
-              </p>
-            </div>
-          </div>
-          <span className={`relative h-6 w-11 shrink-0 rounded-full transition ${hotelEnabled ? 'bg-primary' : 'bg-gray-300'}`}>
-            <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${hotelEnabled ? 'left-[1.375rem]' : 'left-0.5'}`} />
+          {/* Checkbox */}
+          <span
+            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition ${
+              hotelEnabled ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-white text-transparent'
+            }`}
+            aria-hidden
+          >
+            <Check className="h-3.5 w-3.5" strokeWidth={3} />
           </span>
+
+          <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${hotelEnabled ? 'bg-primary text-white' : 'bg-orange-50 text-primary'}`}>
+            <BedDouble className="h-5 w-5" />
+          </span>
+
+          <div className="min-w-0 flex-1 leading-tight">
+            <p className="flex items-center gap-1.5 text-sm font-bold text-gray-900 sm:text-base">
+              <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-black tracking-wide ${hotelEnabled ? 'bg-primary text-white' : 'bg-gray-900 text-white'}`}>虎加酒</span>
+              <span>同時搜尋飯店</span>
+            </p>
+            <p className="mt-0.5 truncate text-[11px] text-gray-500 sm:text-xs">
+              機+酒一次搞定，加購最高折 NT$ 600
+            </p>
+          </div>
         </button>
       </div>
 
