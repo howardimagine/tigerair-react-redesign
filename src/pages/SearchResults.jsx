@@ -681,7 +681,10 @@ const SearchResults = () => {
               <BedDouble className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-bold text-gray-900 sm:text-base">{hotelEnabled ? '已加入飯店搜尋' : '同時搜尋飯店'}</p>
+              <p className="flex items-center gap-1.5 text-sm font-bold text-gray-900 sm:text-base">
+                <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-black tracking-wide ${hotelEnabled ? 'bg-primary text-white' : 'bg-gray-900 text-white'}`}>虎加酒</span>
+                <span>{hotelEnabled ? '已加入飯店搜尋' : '同時搜尋飯店'}</span>
+              </p>
               <p className="text-[11px] text-gray-500 sm:text-xs">
                 {hotelEnabled ? '可分段選不同飯店，下方查看「飯店」分頁' : '一次搞定機加酒，加購最高折 NT$ 600'}
               </p>
