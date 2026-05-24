@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { PlaneLanding, PlaneTakeoff } from 'lucide-react';
+import { PlaneLanding, PlaneTakeoff, Timer } from 'lucide-react';
 import {
   MagnifyingGlassIcon,
   PaperAirplaneIcon,
@@ -34,7 +34,8 @@ const heroSlides = [
     name: '東京',
     code: 'NRT',
     fare: '4,999',
-    subtitle: '現在就預訂春季賞櫻機票',
+    subtitle: '即將開始搶櫻花季的票',
+    countdownTo: '2026-06-01T10:00:00+08:00',
     img: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1920&h=900&fit=crop',
   },
   {
@@ -217,6 +218,40 @@ const AirportDropdown = ({ value, onChange, label, groups, Icon, roundedClass = 
         document.body
       )}
     </div>
+  );
+};
+
+const Countdown = ({ target }) => {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const diff = Math.max(0, new Date(target).getTime() - now);
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+  const pad = (n) => String(n).padStart(2, '0');
+  const cells = [
+    { label: '天', value: pad(days) },
+    { label: '時', value: pad(hours) },
+    { label: '分', value: pad(minutes) },
+    { label: '秒', value: pad(seconds) },
+  ];
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-black/35 px-2.5 py-1 align-middle backdrop-blur-sm ring-1 ring-white/20 sm:gap-2 sm:px-3 sm:py-1.5">
+      <Timer className="h-3.5 w-3.5 text-primary sm:h-4 sm:w-4" />
+      <span className="flex items-center gap-0.5 text-white sm:gap-1">
+        {cells.map((c, idx) => (
+          <span key={c.label} className="flex items-baseline gap-0.5">
+            <span className="font-mono text-sm font-black tabular-nums tracking-tight sm:text-base">{c.value}</span>
+            <span className="text-[9px] text-white/70 sm:text-[10px]">{c.label}</span>
+            {idx < cells.length - 1 && <span className="ml-0.5 text-white/30 sm:ml-1">:</span>}
+          </span>
+        ))}
+      </span>
+    </span>
   );
 };
 
@@ -434,6 +469,9 @@ const Home = () => {
               <span className="text-primary">
                 <FlipBoard text={activeHeroRoute.name} />
               </span>
+              {activeHeroRoute.countdownTo && (
+                <Countdown target={activeHeroRoute.countdownTo} />
+              )}
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-white/90 sm:text-lg md:text-xl">
               {activeHeroRoute.subtitle}
