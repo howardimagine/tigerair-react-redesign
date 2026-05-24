@@ -693,177 +693,6 @@ const SearchResults = () => {
         </button>
       </div>
 
-      {/* Hotel criteria carousel — swipeable per segment */}
-      {hotelEnabled && (
-        <div className="mx-auto mt-3 max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
-            <div className="mb-2 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <BedDouble className="h-4 w-4 text-primary" />
-                <p className="text-sm font-bold text-gray-900">飯店搜尋條件</p>
-                <span className="rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-bold text-primary">
-                  {hotelSegments.length} 段
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={addHotelSegment}
-                className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-orange-50 px-3 py-1 text-[11px] font-bold text-primary transition hover:bg-primary hover:text-white"
-              >
-                <Plus className="h-3.5 w-3.5" /> 加入分段
-              </button>
-            </div>
-
-            {/* Tab strip for segments (mobile-friendly horizontal scroll) */}
-            {hotelSegments.length > 1 && (
-              <div className="-mx-1 mb-2 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <div className="flex gap-1.5">
-                  {hotelSegments.map((seg, i) => {
-                    const isActive = i === activeSegment;
-                    const picked = Boolean(selectedHotels[i]);
-                    const dateText = seg.checkIn && seg.checkOut
-                      ? `${seg.checkIn.slice(5)} → ${seg.checkOut.slice(5)}`
-                      : '尚未設定';
-                    return (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => setActiveSegment(i)}
-                        className={`group flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition ${
-                          isActive ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                      >
-                        <span className={`flex h-4 w-4 items-center justify-center rounded-full text-[9px] ${isActive ? 'bg-white text-gray-900' : 'bg-white/80 text-gray-700'}`}>{i + 1}</span>
-                        <span>{dateText}</span>
-                        {picked && <Check className={`h-3 w-3 ${isActive ? 'text-emerald-300' : 'text-emerald-500'}`} />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Carousel (snap) of segments — only active one is visually emphasized */}
-            <div className="-mx-3 overflow-x-auto px-3 sm:-mx-4 sm:px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <div className="flex snap-x snap-mandatory gap-3">
-                {hotelSegments.map((seg, i) => {
-                  const isAdvanced = advancedSegment === i;
-                  const nights = segmentNights(seg);
-                  return (
-                    <div
-                      key={i}
-                      className={`relative snap-start shrink-0 rounded-xl border p-3 transition w-[88vw] max-w-[480px] sm:w-[460px] ${
-                        i === activeSegment ? 'border-primary/40 bg-orange-50/40 ring-1 ring-primary/20' : 'border-gray-200 bg-white'
-                      }`}
-                      onClick={() => setActiveSegment(i)}
-                    >
-                      <div className="mb-2 flex items-center justify-between">
-                        <p className="text-xs font-bold text-gray-900">分段 {i + 1}{nights > 0 && ` · ${nights} 晚`}</p>
-                        {hotelSegments.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); removeHotelSegment(i); }}
-                            className="rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-                            aria-label="移除分段"
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <label className="block">
-                          <span className="text-[10px] font-semibold text-gray-500">入住</span>
-                          <input
-                            type="date"
-                            value={seg.checkIn}
-                            onChange={(e) => updateSegment(i, { checkIn: e.target.value })}
-                            className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
-                          />
-                        </label>
-                        <label className="block">
-                          <span className="text-[10px] font-semibold text-gray-500">退房</span>
-                          <input
-                            type="date"
-                            value={seg.checkOut}
-                            onChange={(e) => updateSegment(i, { checkOut: e.target.value })}
-                            className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
-                          />
-                        </label>
-                        <label className="block">
-                          <span className="text-[10px] font-semibold text-gray-500">房數</span>
-                          <select
-                            value={seg.rooms}
-                            onChange={(e) => updateSegment(i, { rooms: Number(e.target.value) })}
-                            className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
-                          >
-                            {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n} 間</option>)}
-                          </select>
-                        </label>
-                        <label className="block">
-                          <span className="text-[10px] font-semibold text-gray-500">大人</span>
-                          <select
-                            value={seg.adults}
-                            onChange={(e) => updateSegment(i, { adults: Number(e.target.value) })}
-                            className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
-                          >
-                            {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n} 人</option>)}
-                          </select>
-                        </label>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); setAdvancedSegment(isAdvanced ? null : i); }}
-                        className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-primary"
-                      >
-                        <Sliders className="h-3 w-3" /> {isAdvanced ? '收合進階條件' : '進階條件'}
-                      </button>
-
-                      {isAdvanced && (
-                        <div className="mt-2 space-y-2 rounded-lg bg-white p-2 ring-1 ring-gray-100">
-                          <label className="block">
-                            <span className="text-[10px] font-semibold text-gray-500">區域偏好</span>
-                            <select
-                              value={seg.area}
-                              onChange={(e) => updateSegment(i, { area: e.target.value })}
-                              className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-medium text-gray-900 focus:border-primary focus:outline-none"
-                            >
-                              <option value="">不限</option>
-                              <option value="新宿">新宿 · 鬧區</option>
-                              <option value="淺草">淺草 · 觀光</option>
-                              <option value="品川">品川 · 商務</option>
-                              <option value="汐留">汐留 · 高樓</option>
-                            </select>
-                          </label>
-                          <div>
-                            <span className="text-[10px] font-semibold text-gray-500">最低星等</span>
-                            <div className="mt-0.5 flex gap-1">
-                              {[0, 3, 4, 5].map((s) => (
-                                <button
-                                  key={s}
-                                  type="button"
-                                  onClick={() => updateSegment(i, { stars: s })}
-                                  className={`flex-1 rounded-md px-2 py-1 text-[11px] font-bold transition ${
-                                    seg.stars === s ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                  }`}
-                                >
-                                  {s === 0 ? '不限' : `${s}★+`}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Tab strip — appears when hotel is enabled */}
         {hotelEnabled && (
@@ -913,6 +742,171 @@ const SearchResults = () => {
         {/* Hotels tab content */}
         {hotelEnabled && resultTab === 'hotels' && (
           <div className="mt-4 space-y-3">
+            {/* Hotel criteria — only visible inside the hotels tab */}
+            <div className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BedDouble className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-bold text-gray-900">飯店搜尋條件</p>
+                  <span className="rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-bold text-primary">
+                    {hotelSegments.length} 段
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={addHotelSegment}
+                  className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-orange-50 px-3 py-1 text-[11px] font-bold text-primary transition hover:bg-primary hover:text-white"
+                >
+                  <Plus className="h-3.5 w-3.5" /> 加入分段
+                </button>
+              </div>
+
+              {hotelSegments.length > 1 && (
+                <div className="-mx-1 mb-2 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="flex gap-1.5">
+                    {hotelSegments.map((seg, i) => {
+                      const isActive = i === activeSegment;
+                      const picked = Boolean(selectedHotels[i]);
+                      const dateText = seg.checkIn && seg.checkOut
+                        ? `${seg.checkIn.slice(5)} → ${seg.checkOut.slice(5)}`
+                        : '尚未設定';
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setActiveSegment(i)}
+                          className={`group flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition ${
+                            isActive ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          <span className={`flex h-4 w-4 items-center justify-center rounded-full text-[9px] ${isActive ? 'bg-white text-gray-900' : 'bg-white/80 text-gray-700'}`}>{i + 1}</span>
+                          <span>{dateText}</span>
+                          {picked && <Check className={`h-3 w-3 ${isActive ? 'text-emerald-300' : 'text-emerald-500'}`} />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div className="-mx-3 overflow-x-auto px-3 sm:-mx-4 sm:px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="flex snap-x snap-mandatory gap-3">
+                  {hotelSegments.map((seg, i) => {
+                    const isAdvanced = advancedSegment === i;
+                    const nights = segmentNights(seg);
+                    return (
+                      <div
+                        key={i}
+                        className={`relative snap-start shrink-0 rounded-xl border p-3 transition w-[88vw] max-w-[480px] sm:w-[460px] ${
+                          i === activeSegment ? 'border-primary/40 bg-orange-50/40 ring-1 ring-primary/20' : 'border-gray-200 bg-white'
+                        }`}
+                        onClick={() => setActiveSegment(i)}
+                      >
+                        <div className="mb-2 flex items-center justify-between">
+                          <p className="text-xs font-bold text-gray-900">分段 {i + 1}{nights > 0 && ` · ${nights} 晚`}</p>
+                          {hotelSegments.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); removeHotelSegment(i); }}
+                              className="rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                              aria-label="移除分段"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <label className="block">
+                            <span className="text-[10px] font-semibold text-gray-500">入住</span>
+                            <input
+                              type="date"
+                              value={seg.checkIn}
+                              onChange={(e) => updateSegment(i, { checkIn: e.target.value })}
+                              className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                            />
+                          </label>
+                          <label className="block">
+                            <span className="text-[10px] font-semibold text-gray-500">退房</span>
+                            <input
+                              type="date"
+                              value={seg.checkOut}
+                              onChange={(e) => updateSegment(i, { checkOut: e.target.value })}
+                              className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                            />
+                          </label>
+                          <label className="block">
+                            <span className="text-[10px] font-semibold text-gray-500">房數</span>
+                            <select
+                              value={seg.rooms}
+                              onChange={(e) => updateSegment(i, { rooms: Number(e.target.value) })}
+                              className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                            >
+                              {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n} 間</option>)}
+                            </select>
+                          </label>
+                          <label className="block">
+                            <span className="text-[10px] font-semibold text-gray-500">大人</span>
+                            <select
+                              value={seg.adults}
+                              onChange={(e) => updateSegment(i, { adults: Number(e.target.value) })}
+                              className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                            >
+                              {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n} 人</option>)}
+                            </select>
+                          </label>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setAdvancedSegment(isAdvanced ? null : i); }}
+                          className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-primary"
+                        >
+                          <Sliders className="h-3 w-3" /> {isAdvanced ? '收合進階條件' : '進階條件'}
+                        </button>
+
+                        {isAdvanced && (
+                          <div className="mt-2 space-y-2 rounded-lg bg-white p-2 ring-1 ring-gray-100">
+                            <label className="block">
+                              <span className="text-[10px] font-semibold text-gray-500">區域偏好</span>
+                              <select
+                                value={seg.area}
+                                onChange={(e) => updateSegment(i, { area: e.target.value })}
+                                className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-medium text-gray-900 focus:border-primary focus:outline-none"
+                              >
+                                <option value="">不限</option>
+                                <option value="新宿">新宿 · 鬧區</option>
+                                <option value="淺草">淺草 · 觀光</option>
+                                <option value="品川">品川 · 商務</option>
+                                <option value="汐留">汐留 · 高樓</option>
+                              </select>
+                            </label>
+                            <div>
+                              <span className="text-[10px] font-semibold text-gray-500">最低星等</span>
+                              <div className="mt-0.5 flex gap-1">
+                                {[0, 3, 4, 5].map((s) => (
+                                  <button
+                                    key={s}
+                                    type="button"
+                                    onClick={() => updateSegment(i, { stars: s })}
+                                    className={`flex-1 rounded-md px-2 py-1 text-[11px] font-bold transition ${
+                                      seg.stars === s ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                                  >
+                                    {s === 0 ? '不限' : `${s}★+`}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 sm:text-base">
                 <BedDouble className="h-4 w-4 text-primary" />
