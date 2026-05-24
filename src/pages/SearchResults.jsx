@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, PlaneLanding, PlaneTakeoff, RefreshCw, Briefcase, UtensilsCrossed, Armchair, ShieldCheck, RefreshCcw, Check, X, Plus } from 'lucide-react';
+import { Plane, PlaneLanding, PlaneTakeoff, RefreshCw, Briefcase, UtensilsCrossed, Armchair, ShieldCheck, RefreshCcw, Check, X, Plus, BedDouble, Sliders, Wifi, Coffee, Sparkles, Star, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   ArrowsRightLeftIcon,
   ChevronDownIcon,
@@ -21,136 +21,194 @@ const fareBundles = [
   {
     key: 'tigerlight',
     name: 'tigerlight',
-    title: '\u8f15\u88dd\u51fa\u767c',
-    tagline: '\u8f15\u4fbf\u8d77\u98db\uff0c\u6309\u9700\u52a0\u503c',
+    title: '輕裝出發',
+    tagline: '輕便起飛，按需加值',
     priceOffset: 0,
     accent: 'border-gray-300',
     items: {
-      carryOn: { included: true, label: '\u624b\u63d0\u884c\u674e 10kg' },
-      checkedBag: { included: false, label: '\u8a17\u904b\u884c\u674e (\u52a0\u8cfc)' },
-      seat: { included: false, label: '\u5ea7\u4f4d (\u96a8\u6a5f\u6307\u5b9a)' },
-      meal: { included: false, label: '\u6a5f\u4e0a\u9910\u98df (\u52a0\u8cfc)' },
-      change: { included: false, label: '\u4e00\u6b21\u514d\u8cbb\u8b8a\u66f4' },
-      priority: { included: false, label: '\u512a\u5148\u767b\u6a5f' },
+      carryOn: { included: true, label: '手提行李 10kg' },
+      checkedBag: { included: false, label: '託運行李 (加購)' },
+      seat: { included: false, label: '座位 (隨機指定)' },
+      meal: { included: false, label: '機上餐食 (加購)' },
+      change: { included: false, label: '一次免費變更' },
+      priority: { included: false, label: '優先登機' },
     },
   },
   {
     key: 'tigersmart',
     name: 'tigersmart',
-    title: '\u8070\u660e\u9996\u9078',
-    tagline: '\u71b1\u8ce3\u65b9\u6848\uff0c\u884c\u674e+\u5ea7\u4f4d\u5168\u5305',
+    title: '聰明首選',
+    tagline: '熱賣方案，行李+座位全包',
     priceOffset: 900,
     accent: 'border-primary ring-2 ring-primary/30',
     recommended: true,
     items: {
-      carryOn: { included: true, label: '\u624b\u63d0\u884c\u674e 10kg' },
-      checkedBag: { included: true, label: '\u8a17\u904b\u884c\u674e 20kg' },
-      seat: { included: true, label: '\u864e\u5ec4\u908a\u5ea7\u4f4d' },
-      meal: { included: false, label: '\u6a5f\u4e0a\u9910\u98df (\u52a0\u8cfc)' },
-      change: { included: false, label: '\u4e00\u6b21\u514d\u8cbb\u8b8a\u66f4' },
-      priority: { included: false, label: '\u512a\u5148\u767b\u6a5f' },
+      carryOn: { included: true, label: '手提行李 10kg' },
+      checkedBag: { included: true, label: '託運行李 20kg' },
+      seat: { included: true, label: '虎廄邊座位' },
+      meal: { included: false, label: '機上餐食 (加購)' },
+      change: { included: false, label: '一次免費變更' },
+      priority: { included: false, label: '優先登機' },
     },
   },
   {
     key: 'tigerpro',
     name: 'tigerpro',
-    title: '\u5f48\u6027\u5b8c\u6574',
-    tagline: '\u884c\u674e\u3001\u9910\u98df\u3001\u8b8a\u66f4\u4e00\u6b21\u5230\u4f4d',
+    title: '彈性完整',
+    tagline: '行李、餐食、變更一次到位',
     priceOffset: 1800,
     accent: 'border-amber-400',
     items: {
-      carryOn: { included: true, label: '\u624b\u63d0\u884c\u674e 10kg' },
-      checkedBag: { included: true, label: '\u8a17\u904b\u884c\u674e 25kg' },
-      seat: { included: true, label: '\u524d\u6392\u512a\u9078\u5ea7\u4f4d' },
-      meal: { included: true, label: '\u6a5f\u4e0a\u71b1\u9910' },
-      change: { included: true, label: '\u4e00\u6b21\u514d\u8cbb\u8b8a\u66f4' },
-      priority: { included: true, label: '\u512a\u5148\u767b\u6a5f' },
+      carryOn: { included: true, label: '手提行李 10kg' },
+      checkedBag: { included: true, label: '託運行李 25kg' },
+      seat: { included: true, label: '前排優選座位' },
+      meal: { included: true, label: '機上熱餐' },
+      change: { included: true, label: '一次免費變更' },
+      priority: { included: true, label: '優先登機' },
     },
   },
 ];
 
 const bundleFeatureRows = [
-  { key: 'carryOn', label: '\u624b\u63d0\u884c\u674e', Icon: Briefcase },
-  { key: 'checkedBag', label: '\u8a17\u904b\u884c\u674e', Icon: Briefcase },
-  { key: 'seat', label: '\u6307\u5b9a\u5ea7\u4f4d', Icon: Armchair },
-  { key: 'meal', label: '\u6a5f\u4e0a\u9910\u98df', Icon: UtensilsCrossed },
-  { key: 'change', label: '\u514d\u8cbb\u8b8a\u66f4', Icon: RefreshCcw },
-  { key: 'priority', label: '\u512a\u5148\u767b\u6a5f', Icon: ShieldCheck },
+  { key: 'carryOn', label: '手提行李', Icon: Briefcase },
+  { key: 'checkedBag', label: '託運行李', Icon: Briefcase },
+  { key: 'seat', label: '指定座位', Icon: Armchair },
+  { key: 'meal', label: '機上餐食', Icon: UtensilsCrossed },
+  { key: 'change', label: '免費變更', Icon: RefreshCcw },
+  { key: 'priority', label: '優先登機', Icon: ShieldCheck },
 ];
 
 
 const airportDisplayNames = {
-  TPE: '\u53f0\u5317',
-  KHH: '\u9ad8\u96c4',
-  RMQ: '\u53f0\u4e2d',
-  TSA: '\u53f0\u5317\u677e\u5c71',
-  NRT: '\u6771\u4eac\u6210\u7530',
-  KIX: '\u95dc\u897f\u56db\u570b\u5730\u5340- \u6240\u6709\u6a5f\u5834',
-  OKA: '\u6c96\u7e69',
-  FUK: '\u798f\u5ca1',
-  ICN: '\u9996\u723e\u4ec1\u5ddd',
-  PUS: '\u91dc\u5c71',
-  CJU: '\u6fdf\u5dde',
-  TAE: '\u5927\u90b1',
-  BKK: '\u66fc\u8c37',
-  DMK: '\u66fc\u8c37\u5eca\u66fc',
-  HKT: '\u666e\u5409',
-  CNX: '\u6e05\u9081',
-  DAD: '\u5cf4\u6e2f',
-  SGN: '\u80e1\u5fd7\u660e\u5e02',
-  HAN: '\u6cb3\u5167',
-  CXR: '\u82bd\u838a',
+  TPE: '台北',
+  KHH: '高雄',
+  RMQ: '台中',
+  TSA: '台北松山',
+  NRT: '東京成田',
+  KIX: '關西四國地區- 所有機場',
+  OKA: '沖繩',
+  FUK: '福岡',
+  ICN: '首爾仁川',
+  PUS: '釜山',
+  CJU: '濟州',
+  TAE: '大邱',
+  BKK: '曼谷',
+  DMK: '曼谷廊曼',
+  HKT: '普吉',
+  CNX: '清邁',
+  DAD: '峴港',
+  SGN: '胡志明市',
+  HAN: '河內',
+  CXR: '芽莊',
 };
 
 const airportGroups = [
   {
-    country: '\u53f0\u7063',
+    country: '台灣',
     airports: [
-      { value: 'TPE', label: '\u53f0\u5317\u6843\u5712 TPE' },
-      { value: 'KHH', label: '\u9ad8\u96c4 KHH' },
-      { value: 'RMQ', label: '\u53f0\u4e2d RMQ' },
-      { value: 'TSA', label: '\u53f0\u5317\u677e\u5c71 TSA' },
+      { value: 'TPE', label: '台北桃園 TPE' },
+      { value: 'KHH', label: '高雄 KHH' },
+      { value: 'RMQ', label: '台中 RMQ' },
+      { value: 'TSA', label: '台北松山 TSA' },
     ],
   },
   {
-    country: '\u65e5\u672c',
+    country: '日本',
     airports: [
-      { value: 'NRT', label: '\u6771\u4eac\u6210\u7530 NRT' },
-      { value: 'KIX', label: '\u95dc\u897f\u56db\u570b\u5730\u5340- \u6240\u6709\u6a5f\u5834 KIX' },
-      { value: 'OKA', label: '\u6c96\u7e69 OKA' },
-      { value: 'FUK', label: '\u798f\u5ca1 FUK' },
+      { value: 'NRT', label: '東京成田 NRT' },
+      { value: 'KIX', label: '關西四國地區- 所有機場 KIX' },
+      { value: 'OKA', label: '沖繩 OKA' },
+      { value: 'FUK', label: '福岡 FUK' },
     ],
   },
   {
-    country: '\u97d3\u570b',
+    country: '韓國',
     airports: [
-      { value: 'ICN', label: '\u9996\u723e\u4ec1\u5ddd ICN' },
-      { value: 'PUS', label: '\u91dc\u5c71 PUS' },
-      { value: 'CJU', label: '\u6fdf\u5dde CJU' },
-      { value: 'TAE', label: '\u5927\u90b1 TAE' },
+      { value: 'ICN', label: '首爾仁川 ICN' },
+      { value: 'PUS', label: '釜山 PUS' },
+      { value: 'CJU', label: '濟州 CJU' },
+      { value: 'TAE', label: '大邱 TAE' },
     ],
   },
   {
-    country: '\u6cf0\u570b',
+    country: '泰國',
     airports: [
-      { value: 'BKK', label: '\u66fc\u8c37 BKK' },
-      { value: 'DMK', label: '\u66fc\u8c37\u5eca\u66fc DMK' },
-      { value: 'HKT', label: '\u666e\u5409 HKT' },
-      { value: 'CNX', label: '\u6e05\u9081 CNX' },
+      { value: 'BKK', label: '曼谷 BKK' },
+      { value: 'DMK', label: '曼谷廊曼 DMK' },
+      { value: 'HKT', label: '普吉 HKT' },
+      { value: 'CNX', label: '清邁 CNX' },
     ],
   },
   {
-    country: '\u8d8a\u5357',
+    country: '越南',
     airports: [
-      { value: 'DAD', label: '\u5cf4\u6e2f DAD' },
-      { value: 'SGN', label: '\u80e1\u5fd7\u660e\u5e02 SGN' },
-      { value: 'HAN', label: '\u6cb3\u5167 HAN' },
-      { value: 'CXR', label: '\u82bd\u838a CXR' },
+      { value: 'DAD', label: '峴港 DAD' },
+      { value: 'SGN', label: '胡志明市 SGN' },
+      { value: 'HAN', label: '河內 HAN' },
+      { value: 'CXR', label: '芽莊 CXR' },
     ],
   },
 ];
 
 
+
+// Mock hotels at the destination — used by the "also search hotels" 機加酒 feature.
+const hotelsByCity = {
+  NRT: [
+    {
+      id: 'h-marriott',
+      name: '東京萬豪酒店',
+      nameEn: 'Tokyo Marriott Hotel',
+      area: '品川 · 御殿山',
+      stars: 5,
+      rating: 4.7,
+      reviews: 1284,
+      pricePerNight: 4280,
+      img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=640&h=400&fit=crop',
+      amenities: ['Wifi', 'Breakfast', 'Spa'],
+      tags: ['免費早餐', '近車站'],
+    },
+    {
+      id: 'h-gracery',
+      name: 'Hotel Gracery 新宿',
+      nameEn: 'Hotel Gracery Shinjuku',
+      area: '新宿 · 歌舞伎町',
+      stars: 4,
+      rating: 4.5,
+      reviews: 3120,
+      pricePerNight: 3180,
+      img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=640&h=400&fit=crop',
+      amenities: ['Wifi', 'Breakfast'],
+      tags: ['鬧區精選', '哥吉拉景'],
+    },
+    {
+      id: 'h-park',
+      name: '東京汐留 Park Hotel',
+      nameEn: 'Park Hotel Tokyo',
+      area: '汐留 · 海景樓層',
+      stars: 4,
+      rating: 4.6,
+      reviews: 982,
+      pricePerNight: 3680,
+      img: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=640&h=400&fit=crop',
+      amenities: ['Wifi', 'Spa'],
+      tags: ['藝術飯店', '高樓層'],
+    },
+    {
+      id: 'h-asakusa',
+      name: '淺草雷門精品酒店',
+      nameEn: 'Asakusa Tokyo Boutique',
+      area: '淺草 · 雷門 3 分鐘',
+      stars: 3,
+      rating: 4.4,
+      reviews: 1567,
+      pricePerNight: 2280,
+      img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=640&h=400&fit=crop',
+      amenities: ['Wifi', 'Breakfast'],
+      tags: ['超值首選', '日式風格'],
+    },
+  ],
+};
 
 const AirportDropdown = ({ value, onChange, label, groups, Icon, roundedClass = 'rounded-lg' }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -241,6 +299,86 @@ const SearchResults = () => {
   const [step, setStep] = useState('outbound');
   const passengerDropdownRef = useRef(null);
 
+  // === Hotel (機加酒) ===
+  const [hotelEnabled, setHotelEnabled] = useState(false);
+  const [resultTab, setResultTab] = useState('flights'); // 'flights' | 'hotels'
+  const [hotelSegments, setHotelSegments] = useState([
+    {
+      checkIn: '2026-06-15',
+      checkOut: '2026-06-18',
+      rooms: 1,
+      adults: 2,
+      children: 0,
+      area: '',
+      stars: 0, // 0 means no filter
+    },
+  ]);
+  const [activeSegment, setActiveSegment] = useState(0);
+  const [advancedSegment, setAdvancedSegment] = useState(null); // index or null
+  const [selectedHotels, setSelectedHotels] = useState({}); // { [segmentIdx]: hotelId }
+
+  const segmentNights = (seg) => {
+    if (!seg?.checkIn || !seg?.checkOut) return 0;
+    const ms = new Date(seg.checkOut).getTime() - new Date(seg.checkIn).getTime();
+    return Math.max(0, Math.round(ms / (1000 * 60 * 60 * 24)));
+  };
+  const hotelList = hotelsByCity[form.to] || hotelsByCity.NRT;
+
+  const hotelTotal = hotelEnabled
+    ? hotelSegments.reduce((sum, seg, idx) => {
+        const id = selectedHotels[idx];
+        if (!id) return sum;
+        const hotel = hotelList.find((h) => h.id === id);
+        if (!hotel) return sum;
+        return sum + hotel.pricePerNight * segmentNights(seg) * seg.rooms;
+      }, 0)
+    : 0;
+
+  const addHotelSegment = () => {
+    setHotelSegments((current) => {
+      const last = current[current.length - 1];
+      const nextStart = last?.checkOut || form.depart || '2026-06-18';
+      const startDate = new Date(nextStart);
+      const endDate = new Date(startDate.getTime() + 2 * 24 * 60 * 60 * 1000);
+      const fmt = (d) => d.toISOString().slice(0, 10);
+      return [
+        ...current,
+        { checkIn: fmt(startDate), checkOut: fmt(endDate), rooms: 1, adults: 2, children: 0, area: '', stars: 0 },
+      ];
+    });
+    setActiveSegment(hotelSegments.length);
+  };
+  const removeHotelSegment = (idx) => {
+    setHotelSegments((current) => current.filter((_, i) => i !== idx));
+    setSelectedHotels((current) => {
+      const next = {};
+      Object.entries(current).forEach(([k, v]) => {
+        const ki = Number(k);
+        if (ki < idx) next[ki] = v;
+        else if (ki > idx) next[ki - 1] = v;
+      });
+      return next;
+    });
+    setActiveSegment((current) => Math.max(0, current >= idx ? current - 1 : current));
+  };
+  const updateSegment = (idx, patch) => {
+    setHotelSegments((current) => current.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
+  };
+  const toggleHotelEnabled = () => {
+    setHotelEnabled((current) => {
+      const next = !current;
+      if (!next) {
+        setResultTab('flights');
+        setSelectedHotels({});
+        setAdvancedSegment(null);
+      }
+      return next;
+    });
+  };
+  const selectHotel = (segIdx, hotelId) => {
+    setSelectedHotels((current) => ({ ...current, [segIdx]: hotelId }));
+  };
+
   const handleSearch = (event) => {
     event.preventDefault();
   };
@@ -267,7 +405,7 @@ const SearchResults = () => {
   };
 
   const passengerTotal = passengerCounts.adult + passengerCounts.child + passengerCounts.infant;
-  const passengerSummary = `${passengerTotal} \u4f4d\u65c5\u5ba2`;
+  const passengerSummary = `${passengerTotal} 位旅客`;
 
   const updatePassengerCount = (type, delta) => {
     setPassengerCounts((current) => {
@@ -296,7 +434,9 @@ const SearchResults = () => {
 
   const filtered = flights;
   const isFlightSelectionComplete = Boolean(selectedFlights.outbound) && (tripType === 'oneway' || Boolean(selectedFlights.return));
-  const selectedTotalPrice = (selectedFlights.outbound?.totalPrice || 0) + ((tripType === 'oneway' ? 0 : selectedFlights.return?.totalPrice) || 0);
+  const flightTotal = (selectedFlights.outbound?.totalPrice || 0) + ((tripType === 'oneway' ? 0 : selectedFlights.return?.totalPrice) || 0);
+  const selectedTotalPrice = flightTotal + hotelTotal;
+  const hotelCount = Object.keys(selectedHotels).length;
 
   const selectFlight = (flight, direction) => {
     setSelectedFlights((current) => {
@@ -348,7 +488,7 @@ const SearchResults = () => {
     return (
       <h3 className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-bold text-gray-900 sm:text-base">
         <PlaneTakeoff className={isReturn ? 'h-4 w-4 -scale-x-100 text-primary sm:h-5 sm:w-5' : 'h-4 w-4 text-primary sm:h-5 sm:w-5'} />
-        <span>{isReturn ? '\u56de\u7a0b' : '\u53bb\u7a0b'}</span>
+        <span>{isReturn ? '回程' : '去程'}</span>
         <span className="truncate">{origin}</span>
         <span className="text-gray-400">-</span>
         <span className="truncate">{destination}</span>
@@ -525,10 +665,233 @@ const SearchResults = () => {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Legacy form removed \u2014 using compact summary bar above */}
+      {/* Also-search-hotels toggle (below the criteria card) */}
+      <div className="mx-auto mt-3 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <button
+          type="button"
+          onClick={toggleHotelEnabled}
+          className={`group flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition sm:px-5 ${
+            hotelEnabled
+              ? 'border-primary/40 bg-orange-50 ring-1 ring-primary/20'
+              : 'border-dashed border-gray-300 bg-white hover:border-primary/50 hover:bg-orange-50/40'
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${hotelEnabled ? 'bg-primary text-white' : 'bg-orange-50 text-primary'}`}>
+              <BedDouble className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-gray-900 sm:text-base">{hotelEnabled ? '已加入飯店搜尋' : '同時搜尋飯店'}</p>
+              <p className="text-[11px] text-gray-500 sm:text-xs">
+                {hotelEnabled ? '可分段選不同飯店，下方查看「飯店」分頁' : '一次搞定機加酒，加購最高折 NT$ 600'}
+              </p>
+            </div>
+          </div>
+          <span className={`relative h-6 w-11 shrink-0 rounded-full transition ${hotelEnabled ? 'bg-primary' : 'bg-gray-300'}`}>
+            <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${hotelEnabled ? 'left-[1.375rem]' : 'left-0.5'}`} />
+          </span>
+        </button>
+      </div>
 
-        {filtered.length > 0 && (
+      {/* Hotel criteria carousel — swipeable per segment */}
+      {hotelEnabled && (
+        <div className="mx-auto mt-3 max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <BedDouble className="h-4 w-4 text-primary" />
+                <p className="text-sm font-bold text-gray-900">飯店搜尋條件</p>
+                <span className="rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-bold text-primary">
+                  {hotelSegments.length} 段
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={addHotelSegment}
+                className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-orange-50 px-3 py-1 text-[11px] font-bold text-primary transition hover:bg-primary hover:text-white"
+              >
+                <Plus className="h-3.5 w-3.5" /> 加入分段
+              </button>
+            </div>
+
+            {/* Tab strip for segments (mobile-friendly horizontal scroll) */}
+            {hotelSegments.length > 1 && (
+              <div className="-mx-1 mb-2 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="flex gap-1.5">
+                  {hotelSegments.map((seg, i) => {
+                    const isActive = i === activeSegment;
+                    const picked = Boolean(selectedHotels[i]);
+                    const dateText = seg.checkIn && seg.checkOut
+                      ? `${seg.checkIn.slice(5)} → ${seg.checkOut.slice(5)}`
+                      : '尚未設定';
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setActiveSegment(i)}
+                        className={`group flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition ${
+                          isActive ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        <span className={`flex h-4 w-4 items-center justify-center rounded-full text-[9px] ${isActive ? 'bg-white text-gray-900' : 'bg-white/80 text-gray-700'}`}>{i + 1}</span>
+                        <span>{dateText}</span>
+                        {picked && <Check className={`h-3 w-3 ${isActive ? 'text-emerald-300' : 'text-emerald-500'}`} />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Carousel (snap) of segments — only active one is visually emphasized */}
+            <div className="-mx-3 overflow-x-auto px-3 sm:-mx-4 sm:px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex snap-x snap-mandatory gap-3">
+                {hotelSegments.map((seg, i) => {
+                  const isAdvanced = advancedSegment === i;
+                  const nights = segmentNights(seg);
+                  return (
+                    <div
+                      key={i}
+                      className={`relative snap-start shrink-0 rounded-xl border p-3 transition w-[88vw] max-w-[480px] sm:w-[460px] ${
+                        i === activeSegment ? 'border-primary/40 bg-orange-50/40 ring-1 ring-primary/20' : 'border-gray-200 bg-white'
+                      }`}
+                      onClick={() => setActiveSegment(i)}
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <p className="text-xs font-bold text-gray-900">分段 {i + 1}{nights > 0 && ` · ${nights} 晚`}</p>
+                        {hotelSegments.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); removeHotelSegment(i); }}
+                            className="rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                            aria-label="移除分段"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <label className="block">
+                          <span className="text-[10px] font-semibold text-gray-500">入住</span>
+                          <input
+                            type="date"
+                            value={seg.checkIn}
+                            onChange={(e) => updateSegment(i, { checkIn: e.target.value })}
+                            className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-[10px] font-semibold text-gray-500">退房</span>
+                          <input
+                            type="date"
+                            value={seg.checkOut}
+                            onChange={(e) => updateSegment(i, { checkOut: e.target.value })}
+                            className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-[10px] font-semibold text-gray-500">房數</span>
+                          <select
+                            value={seg.rooms}
+                            onChange={(e) => updateSegment(i, { rooms: Number(e.target.value) })}
+                            className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                          >
+                            {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n} 間</option>)}
+                          </select>
+                        </label>
+                        <label className="block">
+                          <span className="text-[10px] font-semibold text-gray-500">大人</span>
+                          <select
+                            value={seg.adults}
+                            onChange={(e) => updateSegment(i, { adults: Number(e.target.value) })}
+                            className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                          >
+                            {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n} 人</option>)}
+                          </select>
+                        </label>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setAdvancedSegment(isAdvanced ? null : i); }}
+                        className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-primary"
+                      >
+                        <Sliders className="h-3 w-3" /> {isAdvanced ? '收合進階條件' : '進階條件'}
+                      </button>
+
+                      {isAdvanced && (
+                        <div className="mt-2 space-y-2 rounded-lg bg-white p-2 ring-1 ring-gray-100">
+                          <label className="block">
+                            <span className="text-[10px] font-semibold text-gray-500">區域偏好</span>
+                            <select
+                              value={seg.area}
+                              onChange={(e) => updateSegment(i, { area: e.target.value })}
+                              className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-medium text-gray-900 focus:border-primary focus:outline-none"
+                            >
+                              <option value="">不限</option>
+                              <option value="新宿">新宿 · 鬧區</option>
+                              <option value="淺草">淺草 · 觀光</option>
+                              <option value="品川">品川 · 商務</option>
+                              <option value="汐留">汐留 · 高樓</option>
+                            </select>
+                          </label>
+                          <div>
+                            <span className="text-[10px] font-semibold text-gray-500">最低星等</span>
+                            <div className="mt-0.5 flex gap-1">
+                              {[0, 3, 4, 5].map((s) => (
+                                <button
+                                  key={s}
+                                  type="button"
+                                  onClick={() => updateSegment(i, { stars: s })}
+                                  className={`flex-1 rounded-md px-2 py-1 text-[11px] font-bold transition ${
+                                    seg.stars === s ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                  }`}
+                                >
+                                  {s === 0 ? '不限' : `${s}★+`}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Tab strip — appears when hotel is enabled */}
+        {hotelEnabled && (
+          <div className="mt-4 flex gap-1 rounded-xl border border-gray-100 bg-white p-1 shadow-sm">
+            {[
+              { key: 'flights', label: '機票', count: tripType === 'roundtrip' ? 2 : 1, done: isFlightSelectionComplete },
+              { key: 'hotels', label: '飯店', count: hotelSegments.length, done: hotelCount === hotelSegments.length },
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setResultTab(tab.key)}
+                className={`group flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-bold transition ${
+                  resultTab === tab.key ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {tab.key === 'flights' ? <Plane className="h-4 w-4" /> : <BedDouble className="h-4 w-4" />}
+                <span>{tab.label}</span>
+                <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${resultTab === tab.key ? 'bg-white/15 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                  {tab.done ? '✓' : tab.count}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Flights tab content */}
+        {filtered.length > 0 && (!hotelEnabled || resultTab === 'flights') && (
           <div className={`mt-4 grid gap-4 ${tripType === 'roundtrip' ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
             <section>
               {renderDirectionHeading('outbound')}
@@ -547,15 +910,136 @@ const SearchResults = () => {
           </div>
         )}
 
+        {/* Hotels tab content */}
+        {hotelEnabled && resultTab === 'hotels' && (
+          <div className="mt-4 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 sm:text-base">
+                <BedDouble className="h-4 w-4 text-primary" />
+                <span>分段 {activeSegment + 1} · 為這段選擇飯店</span>
+                {segmentNights(hotelSegments[activeSegment]) > 0 && (
+                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-600">
+                    {segmentNights(hotelSegments[activeSegment])} 晚
+                  </span>
+                )}
+              </h3>
+              {hotelSegments.length > 1 && (
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setActiveSegment((c) => Math.max(0, c - 1))}
+                    disabled={activeSegment === 0}
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition hover:border-primary hover:text-primary disabled:opacity-30"
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveSegment((c) => Math.min(hotelSegments.length - 1, c + 1))}
+                    disabled={activeSegment === hotelSegments.length - 1}
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition hover:border-primary hover:text-primary disabled:opacity-30"
+                  >
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {hotelList
+                .filter((h) => {
+                  const seg = hotelSegments[activeSegment];
+                  return seg.stars === 0 || h.stars >= seg.stars;
+                })
+                .filter((h) => {
+                  const seg = hotelSegments[activeSegment];
+                  return !seg.area || h.area.includes(seg.area);
+                })
+                .map((hotel) => {
+                  const isSelected = selectedHotels[activeSegment] === hotel.id;
+                  const seg = hotelSegments[activeSegment];
+                  const nights = segmentNights(seg);
+                  const subtotal = hotel.pricePerNight * nights * seg.rooms;
+                  return (
+                    <button
+                      key={hotel.id}
+                      type="button"
+                      onClick={() => selectHotel(activeSegment, hotel.id)}
+                      className={`group relative overflow-hidden rounded-xl bg-white text-left shadow-sm ring-1 transition hover:shadow-md ${
+                        isSelected ? 'ring-2 ring-primary' : 'ring-gray-100 hover:ring-gray-200'
+                      }`}
+                    >
+                      {isSelected && (
+                        <span className="absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white">
+                          <Check className="h-3 w-3" /> 已選擇
+                        </span>
+                      )}
+                      <div className="relative h-32 w-full overflow-hidden sm:h-36">
+                        <img src={hotel.img} alt={hotel.name} className="h-full w-full object-cover transition group-hover:scale-105" />
+                        <div className="absolute left-2 top-2 flex gap-1">
+                          {hotel.tags.slice(0, 1).map((t) => (
+                            <span key={t} className="rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">{t}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="p-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-bold text-gray-900">{hotel.name}</p>
+                            <p className="mt-0.5 flex items-center gap-1 text-[11px] text-gray-500">
+                              <MapPin className="h-3 w-3" />
+                              <span className="truncate">{hotel.area}</span>
+                            </p>
+                          </div>
+                          <div className="flex shrink-0 items-center gap-0.5">
+                            {Array.from({ length: hotel.stars }).map((_, i) => (
+                              <Star key={i} className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+                            ))}
+                          </div>
+                        </div>
+                        <div className="mt-2 flex items-end justify-between gap-2">
+                          <div className="flex items-center gap-1 text-[11px] text-gray-600">
+                            <span className="rounded bg-emerald-50 px-1.5 py-0.5 font-bold text-emerald-700">{hotel.rating.toFixed(1)}</span>
+                            <span className="text-gray-400">({hotel.reviews})</span>
+                          </div>
+                          <div className="text-right leading-tight">
+                            <p className="text-[10px] text-gray-400">每晚起</p>
+                            <p className="text-base font-black text-primary">
+                              <span className="text-[10px] font-bold">TWD</span> {hotel.pricePerNight.toLocaleString()}
+                            </p>
+                            {nights > 0 && (
+                              <p className="text-[10px] text-gray-500">小計 {subtotal.toLocaleString()}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+
         {filtered.length > 0 && (
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 pt-2.5 pb-3 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur sm:px-6 sm:pt-3 sm:pb-4 lg:px-8">
             <div className="mx-auto flex max-w-7xl flex-row items-center justify-between gap-2">
               <div className="min-w-0 leading-tight">
-                <p className="text-[10px] font-semibold text-gray-500">{'總計'}</p>
+                <p className="flex items-center gap-1 text-[10px] font-semibold text-gray-500">
+                  <span>{hotelEnabled && hotelTotal > 0 ? '機+酒總計' : '總計'}</span>
+                  {hotelEnabled && hotelTotal > 0 && (
+                    <span className="inline-flex items-center gap-0.5 rounded bg-orange-50 px-1 py-0.5 text-[9px] font-bold text-primary">
+                      <Sparkles className="h-2.5 w-2.5" /> 折 NT$ 600
+                    </span>
+                  )}
+                </p>
                 <p className="whitespace-nowrap text-lg font-black text-gray-900 sm:text-xl">
                   <span className="mr-1 text-[10px] font-bold">TWD</span>
                   {selectedTotalPrice.toLocaleString()}
                 </p>
+                {hotelEnabled && hotelTotal > 0 && (
+                  <p className="whitespace-nowrap text-[10px] text-gray-500">
+                    機票 {flightTotal.toLocaleString()} · 飯店 {hotelTotal.toLocaleString()}
+                  </p>
+                )}
               </div>
               <button
                 type="button"
@@ -563,7 +1047,7 @@ const SearchResults = () => {
                 disabled={!isFlightSelectionComplete}
                 className="shrink-0 whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300 sm:px-6 sm:py-3"
               >
-                {'下一步'}
+                {hotelEnabled && hotelTotal > 0 ? '下一步 機加酒' : '下一步'}
               </button>
             </div>
           </div>
@@ -573,7 +1057,7 @@ const SearchResults = () => {
         {filtered.length === 0 && (
           <div className="rounded-xl bg-white p-12 text-center shadow-sm">
             <Plane className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-            <p className="text-gray-500">{'\u627e\u4e0d\u5230\u7b26\u5408\u689d\u4ef6\u7684\u822a\u73ed'}</p>
+            <p className="text-gray-500">{'找不到符合條件的航班'}</p>
           </div>
         )}
       </div>
@@ -584,10 +1068,10 @@ const SearchResults = () => {
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold text-primary">
-                  {bundleModal.direction === 'return' ? '\u56de\u7a0b' : '\u53bb\u7a0b'} \u00b7 \u822a\u73ed {bundleModal.flight.id} \u00b7 {bundleModal.flight.depart} \u2192 {bundleModal.flight.arrive}
+                  {bundleModal.direction === 'return' ? '回程' : '去程'} · 航班 {bundleModal.flight.id} · {bundleModal.flight.depart} → {bundleModal.flight.arrive}
                 </p>
-                <h2 className="mt-1 text-2xl font-bold text-gray-900">{'\u9078\u64c7\u7968\u50f9\u65b9\u6848'}</h2>
-                <p className="mt-1 text-sm text-gray-500">{'\u6311\u4e00\u500b\u6700\u9069\u5408\u4f60\u65c5\u7a0b\u7684\u7968\u50f9\u7d44\u5408 \u2014 \u884c\u674e\u3001\u5ea7\u4f4d\u3001\u9910\u98df\u3001\u5f48\u6027\u4e00\u6b21\u770b\u6e05\u695a'}</p>
+                <h2 className="mt-1 text-2xl font-bold text-gray-900">{'選擇票價方案'}</h2>
+                <p className="mt-1 text-sm text-gray-500">{'挑一個最適合你旅程的票價組合 — 行李、座位、餐食、彈性一次看清楚'}</p>
               </div>
               <button
                 type="button"
@@ -609,7 +1093,7 @@ const SearchResults = () => {
                   >
                     {bundle.recommended && (
                       <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow">
-                        {'\u2605 \u71b1\u8ce3\u63a8\u85a6'}
+                        {'★ 熱賣推薦'}
                       </span>
                     )}
                     <p className="text-xs font-bold uppercase tracking-wide text-primary">{bundle.name}</p>
@@ -620,7 +1104,7 @@ const SearchResults = () => {
                       <span className="text-3xl font-black text-gray-900">{totalPrice.toLocaleString()}</span>
                     </div>
                     {bundle.priceOffset > 0 && (
-                      <p className="text-xs font-semibold text-primary">{'+ NT$ '}{bundle.priceOffset.toLocaleString()}{' \u52a0\u503c'}</p>
+                      <p className="text-xs font-semibold text-primary">{'+ NT$ '}{bundle.priceOffset.toLocaleString()}{' 加值'}</p>
                     )}
 
                     <ul className="mt-5 space-y-2.5 border-t border-gray-100 pt-4 text-sm">
@@ -650,7 +1134,7 @@ const SearchResults = () => {
                           : 'border border-gray-200 bg-white text-gray-800 hover:border-primary hover:text-primary'
                       }`}
                     >
-                      {'\u9078\u64c7 '}{bundle.title}
+                      {'選擇 '}{bundle.title}
                     </button>
                   </div>
                 );
