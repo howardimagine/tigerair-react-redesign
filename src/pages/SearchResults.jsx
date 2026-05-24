@@ -469,12 +469,25 @@ const SearchResults = () => {
 
   const handleNextStep = () => {
     if (!isFlightSelectionComplete) return;
+    // Compose hotel payload (only if user enabled 虎加酒 and selected at least one)
+    const hotelPayload = hotelEnabled && hotelCount > 0
+      ? {
+          segments: hotelSegments.map((seg, idx) => ({
+            ...seg,
+            hotelId: selectedHotels[idx] || null,
+            hotel: selectedHotels[idx] ? hotelList.find((h) => h.id === selectedHotels[idx]) : null,
+            nights: segmentNights(seg),
+          })),
+          total: hotelTotal,
+        }
+      : null;
     navigate('/passengers', {
       state: {
         selectedFlights,
         tripType,
         passengerCounts,
         form,
+        hotel: hotelPayload,
       },
     });
   };

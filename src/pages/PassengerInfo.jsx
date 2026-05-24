@@ -433,6 +433,7 @@ const PassengerInfo = () => {
     }
     navigate('/seat', {
       state: {
+        ...incoming,
         selectedFlights,
         tripType,
         passengerCounts,

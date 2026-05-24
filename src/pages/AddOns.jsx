@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plane, Briefcase, UtensilsCrossed, Check, Edit3, Sparkles, User } from 'lucide-react';
+import { Plane, Briefcase, UtensilsCrossed, Check, Edit3, Sparkles, User, BedDouble, Star, MapPin, Sliders, X } from 'lucide-react';
 
 const baggageOptions = [
   {
@@ -96,6 +96,16 @@ const mealOptions = [
     tags: ['輕食'],
   },
 ];
+
+// Mock hotels at destination — mirrors SearchResults; used for the last-step 虎加酒 upsell.
+const hotelsByCity = {
+  NRT: [
+    { id: 'h-marriott', name: '東京萬豪酒店', area: '品川 · 御殿山', stars: 5, rating: 4.7, reviews: 1284, pricePerNight: 4280, img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=640&h=400&fit=crop', tags: ['免費早餐', '近車站'] },
+    { id: 'h-gracery', name: 'Hotel Gracery 新宿', area: '新宿 · 歌舞伎町', stars: 4, rating: 4.5, reviews: 3120, pricePerNight: 3180, img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=640&h=400&fit=crop', tags: ['鬧區精選', '哥吉拉景'] },
+    { id: 'h-park', name: '東京汐留 Park Hotel', area: '汐留 · 海景樓層', stars: 4, rating: 4.6, reviews: 982, pricePerNight: 3680, img: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=640&h=400&fit=crop', tags: ['藝術飯店', '高樓層'] },
+    { id: 'h-asakusa', name: '淺草雷門精品酒店', area: '淺草 · 雷門 3 分鐘', stars: 3, rating: 4.4, reviews: 1567, pricePerNight: 2280, img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=640&h=400&fit=crop', tags: ['超值首選', '日式風格'] },
+  ],
+};
 
 const BaggageCard = ({ option, value, onChange, label }) => {
   const selected = value === option.key;
@@ -226,7 +236,30 @@ const AddOns = () => {
   );
 
   const flightsTotal = (selectedFlights?.outbound?.totalPrice || 0) + (tripType === 'oneway' ? 0 : selectedFlights?.return?.totalPrice || 0);
-  const grandTotal = flightsTotal + baggageTotal + mealTotal;
+
+  // === 虎加酒 last-step upsell ===
+  const hotelList = hotelsByCity[form.to] || hotelsByCity.NRT;
+  const fmt = (d) => d.toISOString().slice(0, 10);
+  const today = new Date();
+  const defaultCheckIn = form.depart || fmt(today);
+  const defaultCheckOut = form.returnDate || fmt(new Date(new Date(defaultCheckIn).getTime() + 3 * 86400000));
+  const incomingHotelSeg = incoming.hotel?.segments?.[0];
+  const [hotelOpen, setHotelOpen] = useState(Boolean(incomingHotelSeg));
+  const [hotelSeg, setHotelSeg] = useState(() => ({
+    checkIn: incomingHotelSeg?.checkIn || defaultCheckIn,
+    checkOut: incomingHotelSeg?.checkOut || defaultCheckOut,
+    rooms: incomingHotelSeg?.rooms || 1,
+    adults: incomingHotelSeg?.adults || (passengerCounts.adult || 2),
+    area: incomingHotelSeg?.area || '',
+    stars: incomingHotelSeg?.stars || 0,
+  }));
+  const [selectedHotelId, setSelectedHotelId] = useState(incomingHotelSeg?.hotelId || null);
+  const [advancedHotel, setAdvancedHotel] = useState(false);
+  const hotelNights = Math.max(0, Math.round((new Date(hotelSeg.checkOut).getTime() - new Date(hotelSeg.checkIn).getTime()) / 86400000));
+  const selectedHotel = hotelList.find((h) => h.id === selectedHotelId) || null;
+  const hotelTotal = selectedHotel && hotelOpen ? selectedHotel.pricePerNight * hotelNights * hotelSeg.rooms : 0;
+
+  const grandTotal = flightsTotal + baggageTotal + mealTotal + hotelTotal;
 
   const updateBaggage = (i, key) => {
     setBaggagePerPassenger((current) => current.map((v, idx) => (idx === i ? key : v)));
@@ -247,10 +280,17 @@ const AddOns = () => {
     (mealPerPassenger[i] && mealPerPassenger[i] !== 'none');
 
   const handleNext = () => {
+    const hotelPayload = hotelOpen && selectedHotel
+      ? {
+          segments: [{ ...hotelSeg, hotelId: selectedHotel.id, hotel: selectedHotel, nights: hotelNights }],
+          total: hotelTotal,
+        }
+      : null;
     navigate('/confirmation', {
       state: {
         ...incoming,
-        addOns: { baggagePerPassenger, mealPerPassenger, baggageTotal, mealTotal, grandTotal },
+        hotel: hotelPayload,
+        addOns: { baggagePerPassenger, mealPerPassenger, baggageTotal, mealTotal, hotelTotal, grandTotal },
       },
     });
   };
@@ -377,6 +417,203 @@ const AddOns = () => {
           </section>
 
           {/* Seat already selected reminder */}
+          {/* 虎加酒 last-chance upsell — appears after baggage / meal */}
+          <section className={`overflow-hidden rounded-2xl border ${hotelOpen ? 'border-primary/30 bg-orange-50/40' : 'border-gray-100 bg-white'} shadow-sm`}>
+            <div className="flex items-start gap-3 p-5 sm:p-6">
+              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${hotelOpen ? 'bg-primary text-white' : 'bg-orange-50 text-primary'}`}>
+                <BedDouble className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-md bg-gray-900 px-1.5 py-0.5 text-[10px] font-black tracking-wide text-white">虎加酒</span>
+                  <h2 className="text-base font-bold text-gray-900">
+                    {incomingHotelSeg ? '飯店已加入' : '最後加購機會'}
+                  </h2>
+                </div>
+                <p className="mt-1 text-xs text-gray-600 sm:text-sm">
+                  {incomingHotelSeg
+                    ? '可以更換飯店或日期，加購最高折 NT$ 600'
+                    : '同時段熱門飯店推薦，現在加上可享機加酒 NT$ 600 折扣'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHotelOpen((c) => !c)}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition ${
+                  hotelOpen ? 'border border-gray-300 bg-white text-gray-700 hover:border-primary hover:text-primary' : 'bg-primary text-white hover:bg-primary-dark'
+                }`}
+              >
+                {hotelOpen ? '收合' : '查看飯店'}
+              </button>
+            </div>
+
+            {hotelOpen && (
+              <div className="border-t border-orange-100 bg-white p-4 sm:p-5">
+                {/* Hotel criteria */}
+                <div className="rounded-xl border border-gray-200 p-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="block">
+                      <span className="text-[10px] font-semibold text-gray-500">入住</span>
+                      <input
+                        type="date"
+                        value={hotelSeg.checkIn}
+                        onChange={(e) => setHotelSeg((c) => ({ ...c, checkIn: e.target.value }))}
+                        className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-[10px] font-semibold text-gray-500">退房</span>
+                      <input
+                        type="date"
+                        value={hotelSeg.checkOut}
+                        onChange={(e) => setHotelSeg((c) => ({ ...c, checkOut: e.target.value }))}
+                        className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-[10px] font-semibold text-gray-500">房數</span>
+                      <select
+                        value={hotelSeg.rooms}
+                        onChange={(e) => setHotelSeg((c) => ({ ...c, rooms: Number(e.target.value) }))}
+                        className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                      >
+                        {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n} 間</option>)}
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="text-[10px] font-semibold text-gray-500">大人</span>
+                      <select
+                        value={hotelSeg.adults}
+                        onChange={(e) => setHotelSeg((c) => ({ ...c, adults: Number(e.target.value) }))}
+                        className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-bold text-gray-900 focus:border-primary focus:outline-none"
+                      >
+                        {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n} 人</option>)}
+                      </select>
+                    </label>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setAdvancedHotel((c) => !c)}
+                    className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-primary"
+                  >
+                    <Sliders className="h-3 w-3" /> {advancedHotel ? '收合進階條件' : '進階條件'}
+                  </button>
+
+                  {advancedHotel && (
+                    <div className="mt-2 space-y-2 rounded-lg bg-gray-50 p-2">
+                      <label className="block">
+                        <span className="text-[10px] font-semibold text-gray-500">區域偏好</span>
+                        <select
+                          value={hotelSeg.area}
+                          onChange={(e) => setHotelSeg((c) => ({ ...c, area: e.target.value }))}
+                          className="mt-0.5 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-medium text-gray-900 focus:border-primary focus:outline-none"
+                        >
+                          <option value="">不限</option>
+                          <option value="新宿">新宿 · 鬧區</option>
+                          <option value="淺草">淺草 · 觀光</option>
+                          <option value="品川">品川 · 商務</option>
+                          <option value="汐留">汐留 · 高樓</option>
+                        </select>
+                      </label>
+                      <div>
+                        <span className="text-[10px] font-semibold text-gray-500">最低星等</span>
+                        <div className="mt-0.5 flex gap-1">
+                          {[0, 3, 4, 5].map((s) => (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => setHotelSeg((c) => ({ ...c, stars: s }))}
+                              className={`flex-1 rounded-md px-2 py-1 text-[11px] font-bold transition ${
+                                hotelSeg.stars === s ? 'bg-primary text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-100'
+                              }`}
+                            >
+                              {s === 0 ? '不限' : `${s}★+`}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Hotel result list */}
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
+                    <BedDouble className="h-3.5 w-3.5 text-primary" />
+                    同時段飯店推薦{hotelNights > 0 && <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-600">{hotelNights} 晚</span>}
+                  </p>
+                  {selectedHotelId && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedHotelId(null)}
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-500 hover:text-primary"
+                    >
+                      <X className="h-3 w-3" /> 取消選擇
+                    </button>
+                  )}
+                </div>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  {hotelList
+                    .filter((h) => hotelSeg.stars === 0 || h.stars >= hotelSeg.stars)
+                    .filter((h) => !hotelSeg.area || h.area.includes(hotelSeg.area))
+                    .map((hotel) => {
+                      const isSel = selectedHotelId === hotel.id;
+                      const subtotal = hotel.pricePerNight * hotelNights * hotelSeg.rooms;
+                      return (
+                        <button
+                          key={hotel.id}
+                          type="button"
+                          onClick={() => setSelectedHotelId(hotel.id)}
+                          className={`group relative overflow-hidden rounded-xl bg-white text-left shadow-sm ring-1 transition hover:shadow-md ${
+                            isSel ? 'ring-2 ring-primary' : 'ring-gray-100 hover:ring-gray-200'
+                          }`}
+                        >
+                          {isSel && (
+                            <span className="absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white">
+                              <Check className="h-3 w-3" /> 已選
+                            </span>
+                          )}
+                          <div className="relative h-24 w-full overflow-hidden">
+                            <img src={hotel.img} alt={hotel.name} className="h-full w-full object-cover transition group-hover:scale-105" />
+                            <span className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold text-white">{hotel.tags[0]}</span>
+                          </div>
+                          <div className="p-2.5">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="truncate text-xs font-bold text-gray-900">{hotel.name}</p>
+                                <p className="mt-0.5 flex items-center gap-1 text-[10px] text-gray-500">
+                                  <MapPin className="h-2.5 w-2.5" />
+                                  <span className="truncate">{hotel.area}</span>
+                                </p>
+                              </div>
+                              <div className="flex shrink-0 items-center gap-0.5">
+                                {Array.from({ length: hotel.stars }).map((_, i) => (
+                                  <Star key={i} className="h-2 w-2 fill-amber-400 text-amber-400" />
+                                ))}
+                              </div>
+                            </div>
+                            <div className="mt-1.5 flex items-end justify-between gap-2">
+                              <span className="rounded bg-emerald-50 px-1 py-0.5 text-[10px] font-bold text-emerald-700">{hotel.rating.toFixed(1)}</span>
+                              <div className="text-right leading-tight">
+                                <p className="text-base font-black text-primary">
+                                  <span className="text-[9px] font-bold">TWD</span> {hotel.pricePerNight.toLocaleString()}
+                                  <span className="text-[9px] text-gray-400">/晚</span>
+                                </p>
+                                {hotelNights > 0 && (
+                                  <p className="text-[9px] text-gray-500">小計 {subtotal.toLocaleString()}</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+          </section>
+
           {incoming.seats && (
             <section className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5 sm:p-6">
               <div className="flex items-start gap-3">
@@ -431,6 +668,15 @@ const AddOns = () => {
                 <span>機上餐食</span>
                 <span>NT$ {mealTotal.toLocaleString()}</span>
               </div>
+              {hotelOpen && selectedHotel && (
+                <div className="mt-1 flex justify-between text-gray-600">
+                  <span className="flex items-center gap-1">
+                    <span className="rounded bg-gray-900 px-1 py-px text-[9px] font-bold text-white">虎加酒</span>
+                    <span className="truncate">{selectedHotel.name}</span>
+                  </span>
+                  <span>NT$ {hotelTotal.toLocaleString()}</span>
+                </div>
+              )}
             </div>
 
             <div className="rounded-xl bg-gray-900 p-4 text-white">
