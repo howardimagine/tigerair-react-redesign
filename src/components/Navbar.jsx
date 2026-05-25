@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRightOnRectangleIcon,
@@ -257,13 +258,12 @@ const Navbar = () => {
 
       </div>
 
-      {/* Mobile full-screen drawer — covers the entire viewport including navbar */}
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-white md:hidden">
+      {/* Mobile full-screen drawer — portaled to body so navbar's backdrop-blur containing-block doesn't trap it */}
+      {isOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed left-0 right-0 top-0 bottom-0 z-[100] flex h-screen w-screen flex-col bg-white md:hidden">
           {/* Top bar inside drawer with close button */}
-          <div className="flex h-14 shrink-0 items-center justify-between border-b border-gray-100 px-4">
+          <div className="flex h-14 w-full shrink-0 items-center justify-between border-b border-gray-100 px-4">
             <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center">
-              <img src={`${import.meta.env.BASE_URL}tigerair-logo.svg`} alt="Tigerair" className="h-8" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
               <span className="text-xl font-black text-primary">tigerair</span>
             </Link>
             <button
@@ -286,7 +286,7 @@ const Navbar = () => {
                 >
                   <span className="flex items-center gap-2.5">
                     <UserIcon className="h-5 w-5" />
-                    {user.name || '會員'}
+                    會員中心
                   </span>
                   <ChevronDownIcon className={`h-5 w-5 transition duration-200 ${memberOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -370,7 +370,8 @@ const Navbar = () => {
               {localeControls}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </nav>
   );
