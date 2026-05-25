@@ -257,43 +257,52 @@ const Navbar = () => {
 
       </div>
 
-      {/* Mobile overlay drawer — covers content instead of pushing it */}
+      {/* Mobile full-screen drawer — covers the entire viewport including navbar */}
       {isOpen && (
-        <div className="md:hidden">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 top-14 z-40 bg-black/40 backdrop-blur-sm"
-            onClick={() => setIsOpen(false)}
-            aria-hidden="true"
-          />
-          {/* Panel */}
-          <div className="fixed inset-x-0 top-14 z-50 max-h-[calc(100vh-3.5rem)] overflow-y-auto border-t border-gray-100 bg-white px-4 pt-4 pb-8 shadow-xl">
+        <div className="fixed inset-0 z-[100] flex flex-col bg-white md:hidden">
+          {/* Top bar inside drawer with close button */}
+          <div className="flex h-14 shrink-0 items-center justify-between border-b border-gray-100 px-4">
+            <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center">
+              <img src={`${import.meta.env.BASE_URL}tigerair-logo.svg`} alt="Tigerair" className="h-8" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              <span className="text-xl font-black text-primary">tigerair</span>
+            </Link>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="rounded-lg p-2 text-gray-600 transition hover:bg-orange-50 hover:text-primary"
+              aria-label="關閉選單"
+            >
+              <XMarkIcon className="h-7 w-7" />
+            </button>
+          </div>
+
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto px-4 pt-4 pb-10">
             {/* Member section first when logged in */}
             {user && (
-              <div className="mb-3 overflow-hidden rounded-lg border border-gray-100 bg-white">
+              <div className="mb-3 overflow-hidden rounded-xl border border-gray-100 bg-white">
                 <button
                   onClick={() => setMemberOpen((c) => !c)}
-                  className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold transition ${memberOpen ? 'bg-orange-50 text-primary' : 'text-gray-700 hover:bg-gray-50 hover:text-primary'}`}
+                  className={`flex w-full items-center justify-between px-5 py-4 text-left text-base font-bold transition ${memberOpen ? 'bg-orange-50 text-primary' : 'text-gray-800 hover:bg-gray-50 hover:text-primary'}`}
                 >
-                  <span className="flex items-center gap-2">
-                    <UserIcon className="h-4 w-4" />
+                  <span className="flex items-center gap-2.5">
+                    <UserIcon className="h-5 w-5" />
                     {user.name || '會員'}
                   </span>
-                  <ChevronDownIcon className={`h-4 w-4 transition duration-200 ${memberOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDownIcon className={`h-5 w-5 transition duration-200 ${memberOpen ? 'rotate-180' : ''}`} />
                 </button>
                 <div className={`grid transition-all duration-200 ease-out ${memberOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                   <div className="overflow-hidden">
                     <div className="space-y-1 border-t border-gray-100 bg-gray-50/70 px-3 py-3">
-                      <Link to="/member" onClick={() => setIsOpen(false)} className="block rounded-md px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-primary">會員中心</Link>
-                      <Link to="/tasks" onClick={() => setIsOpen(false)} className="block rounded-md px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-primary">會員任務</Link>
-                      <Link to="/member/travelers" onClick={() => setIsOpen(false)} className="block rounded-md px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-primary">常用旅客</Link>
-                      <Link to="/orders" onClick={() => setIsOpen(false)} className="block rounded-md px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-primary">我的訂單</Link>
-                      <Link to="/boarding-passes" onClick={() => setIsOpen(false)} className="block rounded-md px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-primary">我的登機證</Link>
-                      <Link to="/my-trips" onClick={() => setIsOpen(false)} className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-primary">
+                      <Link to="/member" onClick={() => setIsOpen(false)} className="block rounded-md px-3 py-2.5 text-[15px] text-gray-700 transition hover:bg-white hover:text-primary">會員中心</Link>
+                      <Link to="/tasks" onClick={() => setIsOpen(false)} className="block rounded-md px-3 py-2.5 text-[15px] text-gray-700 transition hover:bg-white hover:text-primary">會員任務</Link>
+                      <Link to="/member/travelers" onClick={() => setIsOpen(false)} className="block rounded-md px-3 py-2.5 text-[15px] text-gray-700 transition hover:bg-white hover:text-primary">常用旅客</Link>
+                      <Link to="/orders" onClick={() => setIsOpen(false)} className="block rounded-md px-3 py-2.5 text-[15px] text-gray-700 transition hover:bg-white hover:text-primary">我的訂單</Link>
+                      <Link to="/boarding-passes" onClick={() => setIsOpen(false)} className="block rounded-md px-3 py-2.5 text-[15px] text-gray-700 transition hover:bg-white hover:text-primary">我的登機證</Link>
+                      <Link to="/my-trips" onClick={() => setIsOpen(false)} className="flex items-center gap-1.5 rounded-md px-3 py-2.5 text-[15px] text-gray-700 transition hover:bg-white hover:text-primary">
                         我的行程
-                        <span className="rounded-full bg-gradient-to-r from-primary to-violet-600 px-1.5 py-0.5 text-[9px] font-bold text-white">AI</span>
+                        <span className="rounded-full bg-gradient-to-r from-primary to-violet-600 px-1.5 py-0.5 text-[10px] font-bold text-white">AI</span>
                       </Link>
-                      <button onClick={() => { handleLogout(); }} className="block w-full rounded-md px-3 py-2 text-left text-sm text-gray-600 transition hover:bg-white hover:text-primary">登出</button>
+                      <button onClick={() => { handleLogout(); }} className="block w-full rounded-md px-3 py-2.5 text-left text-[15px] text-gray-700 transition hover:bg-white hover:text-primary">登出</button>
                     </div>
                   </div>
                 </div>
@@ -302,20 +311,20 @@ const Navbar = () => {
 
             <div className="space-y-2">
               {navLinks.map((link, idx) => (
-                <div key={idx} className="overflow-hidden rounded-lg border border-gray-100 bg-white">
+                <div key={idx} className="overflow-hidden rounded-xl border border-gray-100 bg-white">
                   <button
                     onClick={() => setOpenDropdown(openDropdown === idx ? null : idx)}
-                    className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold transition ${openDropdown === idx ? 'bg-orange-50 text-primary' : 'text-gray-700 hover:bg-gray-50 hover:text-primary'}`}
+                    className={`flex w-full items-center justify-between px-5 py-4 text-left text-base font-bold transition ${openDropdown === idx ? 'bg-orange-50 text-primary' : 'text-gray-800 hover:bg-gray-50 hover:text-primary'}`}
                   >
                     {link.category}
-                    <ChevronDownIcon className={`h-4 w-4 transition duration-200 ${openDropdown === idx ? 'rotate-180' : ''}`} />
+                    <ChevronDownIcon className={`h-5 w-5 transition duration-200 ${openDropdown === idx ? 'rotate-180' : ''}`} />
                   </button>
                   <div className={`grid transition-all duration-200 ease-out ${openDropdown === idx ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                     <div className="overflow-hidden">
                       <div className="space-y-3 border-t border-gray-100 bg-gray-50/70 px-4 py-3">
                         {link.subcategories.map((sub, sidx) => (
                           <div key={sidx}>
-                            <div className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            <div className="mb-1.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wide text-gray-500">
                               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                               {sub.name}
                             </div>
@@ -324,7 +333,7 @@ const Navbar = () => {
                                 <div key={iidx}>
                                   {renderMenuItem(
                                     item,
-                                    'block rounded-md px-3 py-2 text-sm text-gray-600 transition hover:bg-white hover:text-primary',
+                                    'block rounded-md px-3 py-2.5 text-[15px] text-gray-700 transition hover:bg-white hover:text-primary',
                                     () => setIsOpen(false)
                                   )}
                                 </div>
@@ -340,24 +349,24 @@ const Navbar = () => {
             </div>
 
             {!user && (
-              <div className="mt-4 border-t border-gray-100 pt-4">
+              <div className="mt-5 grid grid-cols-2 gap-2">
                 <Link
                   to="/login"
-                  className="block rounded-md px-4 py-2 text-sm text-gray-600 transition hover:bg-orange-50 hover:text-primary"
+                  className="block rounded-lg border border-gray-200 px-4 py-3 text-center text-base font-bold text-gray-700 transition hover:border-primary hover:text-primary"
                   onClick={() => setIsOpen(false)}
                 >
                   登入
                 </Link>
                 <Link
                   to="/register"
-                  className="mt-2 block rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-primary-dark"
+                  className="block rounded-lg bg-primary px-4 py-3 text-center text-base font-bold text-white transition hover:bg-primary-dark"
                   onClick={() => setIsOpen(false)}
                 >
                   註冊
                 </Link>
               </div>
             )}
-            <div className="mt-4 border-t border-gray-100 pt-4">
+            <div className="mt-5 border-t border-gray-100 pt-4">
               {localeControls}
             </div>
           </div>
