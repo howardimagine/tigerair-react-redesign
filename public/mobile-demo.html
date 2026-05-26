@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tigerair Mobile Demo</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+    font-family: "PingFang TC", "Microsoft JhengHei", "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+    gap: 24px;
+  }
+
+  /* Header */
+  .demo-header {
+    text-align: center;
+    max-width: 480px;
+  }
+  .demo-header h1 {
+    font-size: 28px;
+    font-weight: 900;
+    color: #1a1a1a;
+    margin: 0 0 6px;
+    letter-spacing: -0.5px;
+  }
+  .demo-header .brand-tag {
+    display: inline-block;
+    background: #faa836;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+  .demo-header p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+  }
+  .demo-header a {
+    color: #faa836;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .demo-header a:hover { text-decoration: underline; }
+
+  /* iPhone frame */
+  .phone {
+    width: 380px;
+    height: 800px;
+    background: #1a1a1a;
+    border-radius: 56px;
+    padding: 12px;
+    position: relative;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.25), 0 0 0 2px #2a2a2a;
+    flex-shrink: 0;
+  }
+  .phone::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 56px;
+    box-shadow: inset 0 0 0 4px #3a3a3a;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .screen {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Dynamic island */
+  .island {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 116px;
+    height: 32px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  /* iframe holds the actual React app */
+  .screen iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    border-radius: 44px;
+  }
+
+  /* Home indicator */
+  .home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 134px;
+    height: 5px;
+    background: #1a1a1a;
+    border-radius: 3px;
+    z-index: 50;
+    pointer-events: none;
+  }
+
+  /* Controls bar */
+  .controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1a1a1a;
+    color: #fff;
+    padding: 8px 8px 8px 14px;
+    border-radius: 24px;
+    font-size: 12px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  }
+  .controls .label {
+    color: #aaa;
+    margin-right: 4px;
+    letter-spacing: 0.5px;
+  }
+  .controls button {
+    background: #2a2a2a;
+    color: #fff;
+    border: 1px solid #3a3a3a;
+    border-radius: 16px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.15s;
+  }
+  .controls button:hover { background: #3a3a3a; }
+  .controls button.active { background: #faa836; border-color: #faa836; color: #1a1a1a; }
+  .controls .divider {
+    width: 1px;
+    height: 18px;
+    background: #3a3a3a;
+    margin: 0 2px;
+  }
+
+  /* Quick links */
+  .quick {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    max-width: 480px;
+  }
+  .quick button {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    color: #444;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .quick button:hover { border-color: #faa836; color: #faa836; }
+  .quick button.active { background: #faa836; border-color: #faa836; color: #fff; }
+
+  /* Smaller phone on mobile devices */
+  @media (max-width: 480px) {
+    body { padding: 20px 10px 60px; gap: 16px; }
+    .phone {
+      width: 100%;
+      max-width: 380px;
+      height: auto;
+      aspect-ratio: 380 / 800;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-header">
+  <span class="brand-tag">DEMO PREVIEW</span>
+  <h1>tigerair 行動端體驗</h1>
+  <p>用手機外框預覽 React 重設計案，可切換頁面與裝置尺寸。完整版 <a href="./" target="_blank">在新分頁開啟</a></p>
+</div>
+
+<div class="controls">
+  <span class="label">SIZE</span>
+  <button data-size="375" class="active">iPhone 15</button>
+  <button data-size="414">iPhone Pro Max</button>
+  <button data-size="360">Android</button>
+  <span class="divider"></span>
+  <button id="reload-btn" title="重新載入">↻ Reload</button>
+</div>
+
+<div class="phone" id="phone">
+  <div class="island"></div>
+  <div class="screen">
+    <iframe id="app-frame" src="./" title="tigerair mobile preview" loading="lazy"></iframe>
+  </div>
+  <div class="home-indicator"></div>
+</div>
+
+<div class="quick">
+  <button data-path="/" class="active">首頁 Home</button>
+  <button data-path="/search">航班搜尋 Search</button>
+  <button data-path="/passengers">旅客資料 Passenger</button>
+  <button data-path="/seat">座位 Seat</button>
+  <button data-path="/add-ons">加購 Add-ons</button>
+  <button data-path="/checkin">線上報到 Check-in</button>
+  <button data-path="/boarding-passes">登機證 Boarding</button>
+  <button data-path="/my-trips">AI 行程 Trips</button>
+  <button data-path="/tasks">會員任務 Tasks</button>
+  <button data-path="/member">會員中心 Member</button>
+</div>
+
+<script>
+  // Determine base URL (works both for / and /tigerair-react-redesign/)
+  const basePath = (() => {
+    const p = location.pathname;
+    // strip the trailing filename if any
+    return p.endsWith('.html') ? p.substring(0, p.lastIndexOf('/') + 1) : (p.endsWith('/') ? p : p + '/');
+  })();
+
+  const frame = document.getElementById('app-frame');
+  const phone = document.getElementById('phone');
+
+  function setPath(path) {
+    frame.src = basePath + path.replace(/^\//, '');
+  }
+
+  // Quick link buttons
+  document.querySelectorAll('.quick button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.quick button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      setPath(btn.dataset.path);
+    });
+  });
+
+  // Size switcher
+  document.querySelectorAll('.controls button[data-size]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.controls button[data-size]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const w = parseInt(btn.dataset.size, 10);
+      // Map to phone outer width (inner screen is w + 24 padding)
+      const map = { 360: 372, 375: 380, 414: 420 };
+      const heightMap = { 360: 780, 375: 800, 414: 880 };
+      phone.style.width = (map[w] || 380) + 'px';
+      phone.style.height = (heightMap[w] || 800) + 'px';
+    });
+  });
+
+  document.getElementById('reload-btn').addEventListener('click', () => {
+    frame.src = frame.src;
+  });
+</script>
+
+</body>
+</html>
