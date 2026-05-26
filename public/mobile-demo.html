@@ -92,7 +92,9 @@
     flex-direction: column;
   }
 
-  /* Status bar — time, signal, battery (sits above the iframe so the dynamic island has breathing room) */
+  /* Status bar — visually merges with the React app's navbar below
+     (navbar is bg-white/65 + backdrop-blur sitting over the hero/page,
+      so it reads as a soft warm gray over the hero; matching that tone here). */
   .status-bar {
     height: 54px;
     flex-shrink: 0;
@@ -103,7 +105,9 @@
     color: #1a1a1a;
     font-size: 15px;
     font-weight: 600;
-    background: #fff;
+    background: rgba(229, 231, 235, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     position: relative;
     z-index: 5;
   }
