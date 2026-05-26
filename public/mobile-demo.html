@@ -88,6 +88,62 @@
     border-radius: 44px;
     overflow: hidden;
     position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Status bar — time, signal, battery (sits above the iframe so the dynamic island has breathing room) */
+  .status-bar {
+    height: 54px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 28px;
+    color: #1a1a1a;
+    font-size: 15px;
+    font-weight: 600;
+    background: #fff;
+    position: relative;
+    z-index: 5;
+  }
+  .status-bar .left {
+    /* push time slightly down so it visually balances under the island */
+    padding-top: 6px;
+  }
+  .status-bar .right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 6px;
+  }
+  .status-bar .right .net {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .battery {
+    width: 24px;
+    height: 12px;
+    border: 1px solid #1a1a1a;
+    border-radius: 3px;
+    position: relative;
+    padding: 1px;
+  }
+  .battery::after {
+    content: "";
+    position: absolute;
+    right: -3px;
+    top: 3px;
+    width: 2px;
+    height: 4px;
+    background: #1a1a1a;
+    border-radius: 0 1px 1px 0;
+  }
+  .battery .fill {
+    width: 90%;
+    height: 100%;
+    background: #34c759;
+    border-radius: 1px;
   }
 
   /* Dynamic island */
@@ -107,10 +163,10 @@
   /* iframe holds the actual React app */
   .screen iframe {
     width: 100%;
-    height: 100%;
+    flex: 1;
     border: 0;
     display: block;
-    border-radius: 44px;
+    background: #fff;
   }
 
   /* Home indicator */
@@ -223,6 +279,19 @@
 <div class="phone" id="phone">
   <div class="island"></div>
   <div class="screen">
+    <div class="status-bar">
+      <div class="left" id="status-time">9:41</div>
+      <div class="right">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="#1a1a1a" aria-hidden="true">
+          <rect x="0" y="7" width="3" height="4" rx="0.5"/>
+          <rect x="4.5" y="5" width="3" height="6" rx="0.5"/>
+          <rect x="9" y="2.5" width="3" height="8.5" rx="0.5"/>
+          <rect x="13.5" y="0" width="3" height="11" rx="0.5"/>
+        </svg>
+        <span class="net">5G</span>
+        <div class="battery"><div class="fill"></div></div>
+      </div>
+    </div>
     <iframe id="app-frame" src="./" title="tigerair mobile preview" loading="lazy"></iframe>
   </div>
   <div class="home-indicator"></div>
@@ -282,6 +351,15 @@
   document.getElementById('reload-btn').addEventListener('click', () => {
     frame.src = frame.src;
   });
+
+  // Live clock in the status bar
+  const timeEl = document.getElementById('status-time');
+  function updateTime() {
+    const d = new Date();
+    timeEl.textContent = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+  updateTime();
+  setInterval(updateTime, 1000 * 30);
 </script>
 
 </body>
