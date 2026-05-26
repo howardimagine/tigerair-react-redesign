@@ -114,6 +114,11 @@ select::-ms-expand {
   animation: hero-slide-in 0.6s ease-out both;
 }
 
+/* Embed mode (phone-frame demo): make the sticky navbar sit below the 54px status bar */
+html.embed-phone nav.sticky {
+  top: 54px !important;
+}
+
 @keyframes tick-down {
   0% { transform: translateY(-55%); opacity: 0; }
   60% { opacity: 1; }

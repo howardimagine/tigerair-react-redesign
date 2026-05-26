@@ -283,20 +283,10 @@
 <div class="phone" id="phone">
   <div class="island"></div>
   <div class="screen">
-    <div class="status-bar">
-      <div class="left" id="status-time">9:41</div>
-      <div class="right">
-        <svg width="17" height="11" viewBox="0 0 17 11" fill="#1a1a1a" aria-hidden="true">
-          <rect x="0" y="7" width="3" height="4" rx="0.5"/>
-          <rect x="4.5" y="5" width="3" height="6" rx="0.5"/>
-          <rect x="9" y="2.5" width="3" height="8.5" rx="0.5"/>
-          <rect x="13.5" y="0" width="3" height="11" rx="0.5"/>
-        </svg>
-        <span class="net">5G</span>
-        <div class="battery"><div class="fill"></div></div>
-      </div>
-    </div>
-    <iframe id="app-frame" src="./" title="tigerair mobile preview" loading="lazy"></iframe>
+    <!-- iframe is full-height; the iOS-style status bar is rendered INSIDE the React app
+         (Layout.jsx) when ?embed=phone is present, so the status bar and navbar share
+         the same backdrop-blur context and look like one continuous translucent strip. -->
+    <iframe id="app-frame" src="./?embed=phone" title="tigerair mobile preview" loading="lazy"></iframe>
   </div>
   <div class="home-indicator"></div>
 </div>
@@ -326,7 +316,9 @@
   const phone = document.getElementById('phone');
 
   function setPath(path) {
-    frame.src = basePath + path.replace(/^\//, '');
+    const clean = path.replace(/^\//, '');
+    // React Router uses hash-less BrowserRouter; keep ?embed=phone so the status bar stays
+    frame.src = basePath + clean + (clean.includes('?') ? '&' : '?') + 'embed=phone';
   }
 
   // Quick link buttons
@@ -355,15 +347,6 @@
   document.getElementById('reload-btn').addEventListener('click', () => {
     frame.src = frame.src;
   });
-
-  // Live clock in the status bar
-  const timeEl = document.getElementById('status-time');
-  function updateTime() {
-    const d = new Date();
-    timeEl.textContent = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
-  }
-  updateTime();
-  setInterval(updateTime, 1000 * 30);
 </script>
 
 </body>
