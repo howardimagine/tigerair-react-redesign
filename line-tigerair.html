@@ -3,24 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>tigerair Line 報到通知</title>
+<title>tigerair Line Demo Flow</title>
 <style>
   * { box-sizing: border-box; }
   body {
     margin: 0;
     padding: 40px 20px;
-    background: #e5e7eb;
+    background: #ffffff;
     font-family: "PingFang TC", "Microsoft JhengHei", "Helvetica Neue", Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    gap: 24px;
     min-height: 100vh;
   }
+
+  /* Keyboard hint */
+  .kb-hint {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    z-index: 9999;
+  }
+  .kb-hint .key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .kb-hint .step-indicator {
+    margin-left: 8px;
+    padding-left: 10px;
+    border-left: 1px solid #444;
+    color: #ff944d;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .hint {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    z-index: 9999;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .hint.hidden { opacity: 0; }
 
   /* iPhone frame */
   .phone {
     width: 380px;
-    height: 780px;
+    height: 800px;
     background: #1a1a1a;
     border-radius: 56px;
     padding: 12px;
@@ -38,11 +94,12 @@
     border-radius: 56px;
     box-shadow: inset 0 0 0 4px #3a3a3a;
     pointer-events: none;
+    z-index: 100;
   }
   .screen {
     width: 100%;
     height: 100%;
-    background: #a8c5e3;
+    background: #fff;
     border-radius: 44px;
     overflow: hidden;
     position: relative;
@@ -53,28 +110,30 @@
   /* Dynamic island */
   .island {
     position: absolute;
-    top: 12px;
+    top: 14px;
     left: 50%;
     transform: translateX(-50%);
-    width: 120px;
-    height: 34px;
+    width: 116px;
+    height: 32px;
     background: #000;
     border-radius: 20px;
     z-index: 10;
+    pointer-events: none;
   }
 
   /* Status bar */
   .status-bar {
-    height: 50px;
+    height: 60px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 28px 0;
+    padding: 0 28px;
     color: #000;
     font-size: 15px;
     font-weight: 600;
     position: relative;
     z-index: 5;
+    flex-shrink: 0;
   }
   .status-bar .right {
     display: flex;
@@ -106,14 +165,124 @@
     border-radius: 1px;
   }
 
+  /* ===== Screen states ===== */
+  .stage { display: none; flex: 1; flex-direction: column; min-height: 0; }
+  .stage.active { display: flex; }
+
+  /* ===== Add Friend Screen ===== */
+  .add-friend {
+    background: #fff;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 24px 30px;
+  }
+  .add-friend .line-logo {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 50px;
+  }
+  .add-friend .line-logo .word {
+    font-size: 36px;
+    font-weight: 900;
+    color: #06c755;
+    letter-spacing: 2px;
+  }
+  .friend-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .friend-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: #ff6e14;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 12px rgba(255,110,20,0.3);
+  }
+  .friend-avatar .t-mark {
+    color: #fff;
+    font-size: 48px;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -2px;
+  }
+  .friend-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .friend-name .verified-badge {
+    width: 18px;
+    height: 18px;
+    background: #1a1a1a;
+    color: #fff;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .friend-sub {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 30px;
+  }
+  .friend-actions {
+    width: 100%;
+    margin-top: auto;
+  }
+  .btn-add-friend {
+    display: block;
+    width: 100%;
+    background: #06c755;
+    color: #fff;
+    text-align: center;
+    padding: 14px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-add-friend:hover { background: #05b34c; }
+  .btn-cancel {
+    display: block;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-top: 14px;
+    text-decoration: none;
+  }
+
+  /* ===== Chat Screen ===== */
+  .chat-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
   /* Line header */
   .line-header {
-    background: rgba(255,255,255,0.0);
     padding: 6px 14px 10px;
     display: flex;
     align-items: center;
     gap: 8px;
     color: #1a1a1a;
+    background: rgba(255,255,255,0.0);
+    flex-shrink: 0;
   }
   .line-header .icon-btn {
     width: 28px;
@@ -132,7 +301,6 @@
     font-weight: 600;
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
   }
   .verified {
     width: 16px;
@@ -143,78 +311,484 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 9px;
     flex-shrink: 0;
   }
 
-  /* Chat area (sky background) */
+  /* Chat area */
   .chat-area {
     flex: 1;
     background:
       radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.6) 0%, transparent 50%),
       radial-gradient(ellipse at 20% 90%, rgba(255,255,255,0.5) 0%, transparent 50%),
       linear-gradient(180deg, #a8c5e3 0%, #c5d9ec 70%, #d8e5f0 100%);
-    padding: 8px 14px 0;
+    padding: 8px 14px 10px;
     overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
   }
-  .chat-area::after {
-    content: "";
-    position: absolute;
-    bottom: 60px;
-    left: 0;
-    right: 0;
-    height: 80px;
-    background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.4) 0%, transparent 60%);
+  .chat-area .tap-hint {
+    position: sticky;
+    bottom: 8px;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 11px;
+    color: #4a5a6c;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(4px);
+    padding: 5px 12px;
+    border-radius: 12px;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bob 1.5s ease-in-out infinite;
     pointer-events: none;
+  }
+  .tap-hint-wrap {
+    position: sticky;
+    bottom: 8px;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  /* Welcome banner */
+  .system-banner {
+    text-align: center;
+    margin: 10px auto 14px;
+    font-size: 11px;
+    color: #4a5a6c;
+    background: rgba(255,255,255,0.5);
+    padding: 4px 14px;
+    border-radius: 12px;
+    width: fit-content;
   }
 
   /* Message group */
   .msg-group {
     display: flex;
     gap: 8px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     align-items: flex-start;
+    animation: fadeUp 0.4s ease-out;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   .avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #fff;
+    background: #ff6e14;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    overflow: hidden;
-  }
-  .avatar .logo-mark {
-    width: 28px;
-    height: 28px;
-    background: #ff6e14;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     color: #fff;
-    font-size: 10px;
+    font-size: 18px;
     font-weight: 900;
     font-style: italic;
+    letter-spacing: -1px;
   }
 
-  /* Message card */
   .msg-content {
     flex: 1;
     min-width: 0;
+    max-width: calc(100% - 48px);
   }
-  .card {
+  .timestamp {
+    font-size: 10px;
+    color: #5a6b7d;
+    margin-top: 2px;
+    margin-left: 4px;
+  }
+
+  /* Typing indicator */
+  .typing {
     background: #fff;
-    border-radius: 14px;
+    border-radius: 16px;
+    padding: 12px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+  .typing .dot {
+    width: 8px;
+    height: 8px;
+    background: #999;
+    border-radius: 50%;
+    animation: typingDot 1.4s infinite;
+  }
+  .typing .dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingDot {
+    0%, 60%, 100% { transform: scale(0.7); opacity: 0.5; }
+    30% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Text bubble */
+  .text-bubble {
+    background: #fff;
+    border-radius: 4px 16px 16px 16px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #1a1a1a;
+    line-height: 1.5;
+    display: inline-block;
+    max-width: 100%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    word-wrap: break-word;
+  }
+
+  /* Rich card (for 搶票通知) */
+  .rich-card {
+    background: #fff;
+    border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 1px 2px rgba(0,0,0,0.08);
     max-width: 260px;
   }
-  .card .banner {
+  .rich-card .hero {
+    height: 130px;
+    background:
+      linear-gradient(135deg, rgba(255,110,20,0.85) 0%, rgba(220,60,20,0.85) 100%),
+      linear-gradient(180deg, #ff944d, #c74f00);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 16px;
+    color: #fff;
+    overflow: hidden;
+  }
+  .rich-card .hero::before {
+    content: "";
+    position: absolute;
+    right: -30px;
+    bottom: -30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+  }
+  .rich-card .hero::after {
+    content: "";
+    position: absolute;
+    right: 30px;
+    top: -20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+  }
+  .rich-card .hero .tag {
+    background: #fff;
+    color: #ff6e14;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 3px;
+    align-self: flex-start;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .rich-card .hero .h1 {
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 1px;
+  }
+  .rich-card .hero .h2 {
+    font-size: 12px;
+    opacity: 0.95;
+    margin-top: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .rich-card .body {
+    padding: 14px;
+  }
+  .rich-card .route-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .rich-card .route-line .city {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  .rich-card .route-line .arr {
+    color: #ff6e14;
+  }
+  .rich-card .price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  .rich-card .price-row .label {
+    font-size: 11px;
+    color: #888;
+  }
+  .rich-card .price-row .currency {
+    font-size: 13px;
+    color: #ff6e14;
+    font-weight: 700;
+  }
+  .rich-card .price-row .price {
+    font-size: 26px;
+    color: #ff6e14;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .rich-card .price-row .qi {
+    font-size: 12px;
+    color: #888;
+  }
+  .rich-card .desc {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .rich-card .btn-primary {
+    display: block;
+    background: #1a1a1a;
+    color: #fff;
+    text-align: center;
+    padding: 11px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* ===== Price Alert Card (step 2) ===== */
+  .alert-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    max-width: 260px;
+    border: 1px solid #f0f0f0;
+  }
+  .alert-head {
+    background: #0f172a;
+    color: #fff;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    letter-spacing: 0.5px;
+  }
+  .alert-head-l {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .alert-pulse {
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(34,197,94,0.7);
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.7); }
+    70% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+  }
+  .alert-time {
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 10px;
+  }
+  .alert-body {
+    padding: 14px;
+  }
+  .alert-personal {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 8px;
+  }
+  .alert-route {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .alert-sub {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #e5e7eb;
+  }
+  .alert-route .ar-city {
+    font-size: 18px;
+    font-weight: 900;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+  }
+  .alert-route .ar-date {
+    margin-left: auto;
+    background: #fff3eb;
+    color: #ff6e14;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+  .alert-pricewrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .alert-now { flex: 1; }
+  .alert-was { flex: 1; text-align: right; }
+  .alert-now .al, .alert-was .al {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-bottom: 2px;
+  }
+  .alert-now .av {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+  }
+  .alert-now .av .cur {
+    font-size: 12px;
+    color: #ff6e14;
+    font-weight: 700;
+  }
+  .alert-now .av .num {
+    font-size: 26px;
+    color: #ff6e14;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .alert-was .av-was {
+    font-size: 14px;
+    color: #94a3b8;
+    text-decoration: line-through;
+    font-weight: 600;
+  }
+  .alert-drop {
+    background: #dcfce7;
+    color: #15803d;
+    padding: 4px 6px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    gap: 1px;
+  }
+
+  /* Chart */
+  .chart {
+    background: #f8fafc;
+    border-radius: 6px;
+    padding: 10px 10px 6px;
+    margin-bottom: 12px;
+  }
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 50px;
+  }
+  .chart-bars .bar {
+    flex: 1;
+    background: #e2e8f0;
+    border-radius: 2px 2px 0 0;
+    position: relative;
+    min-height: 4px;
+  }
+  .chart-bars .bar.active {
+    background: #ff6e14;
+  }
+  .chart-bars .bdot {
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background: #ff6e14;
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px #ff6e14;
+  }
+  .chart-axis {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: #94a3b8;
+    margin-top: 6px;
+  }
+  .alert-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .meta-pill {
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .meta-pill .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .meta-pill .dot-low { background: #22c55e; }
+  .meta-pill .dot-fire { background: #ef4444; }
+  .alert-btn {
+    display: block;
+    background: #ff6e14;
+    color: #fff;
+    text-align: center;
+    padding: 11px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* Check-in card */
+  .checkin-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    max-width: 260px;
+  }
+  .checkin-card .banner {
     background: #ff6e14;
     color: #fff;
     padding: 9px 14px;
@@ -224,64 +798,57 @@
     align-items: center;
     justify-content: space-between;
   }
-  .card .banner .bell {
-    opacity: 0.9;
+  .checkin-card .body {
+    padding: 14px;
   }
-  .card .body {
-    padding: 14px 14px 12px;
-  }
-  .card .subtitle {
+  .checkin-card .subtitle {
     font-size: 13px;
     color: #1a1a1a;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
-  .card .title {
+  .checkin-card .title {
     font-size: 17px;
     font-weight: 800;
     color: #1a1a1a;
     line-height: 1.35;
     margin-bottom: 10px;
   }
-  .card .title .accent {
-    color: #ff6e14;
-  }
-  .divider {
+  .checkin-card .title .accent { color: #ff6e14; }
+  .checkin-card .divider {
     height: 1px;
     background: #ececec;
     margin: 8px 0 10px;
   }
-  .card .meta {
+  .checkin-card .meta {
     font-size: 11px;
     color: #999;
     margin-bottom: 2px;
   }
-  .card .meta-val {
+  .checkin-card .meta-val {
     font-size: 13px;
     color: #1a1a1a;
     font-weight: 600;
     margin-bottom: 8px;
   }
-  .card .info {
+  .checkin-card .info {
     font-size: 12px;
     color: #555;
     line-height: 1.6;
     margin-bottom: 12px;
   }
-  .card .info strong {
-    color: #1a1a1a;
-  }
-  .card .btn {
+  .checkin-card .info strong { color: #1a1a1a; }
+  .checkin-card .btn {
     display: block;
-    background: #f2f2f2;
-    color: #1a1a1a;
+    background: #1a1a1a;
+    color: #fff;
     text-align: center;
     padding: 11px;
-    border-radius: 8px;
+    border-radius: 6px;
     text-decoration: none;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
   }
-  .card .footer-note {
+  .checkin-card .footer-note {
     background: #fafafa;
     color: #999;
     font-size: 11px;
@@ -289,12 +856,102 @@
     line-height: 1.5;
   }
 
-  .timestamp {
-    font-size: 10px;
-    color: #5a6b7d;
-    text-align: right;
-    margin-top: 2px;
-    margin-right: 4px;
+  /* Carousel */
+  .carousel-wrap {
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .carousel-label {
+    font-size: 12px;
+    color: #1a1a1a;
+    font-weight: 600;
+    margin-bottom: 8px;
+    padding-left: 2px;
+  }
+  .carousel {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .carousel::-webkit-scrollbar { height: 4px; }
+  .carousel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 2px; }
+  .ccard {
+    flex: 0 0 200px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+  }
+  .ccard .cimg {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ccard .cimg svg {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 4px;
+  }
+  .ccard .cimg-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    position: relative;
+  }
+  .ccard .cimg.c1 { background: linear-gradient(135deg, #ff6e14, #ff944d); }
+  .ccard .cimg.c2 { background: linear-gradient(135deg, #4ba3d9, #7dc8eb); }
+  .ccard .cimg.c3 { background: linear-gradient(135deg, #5c3aa8, #8c63d4); }
+  .ccard .cimg.c4 { background: linear-gradient(135deg, #2d8c5e, #5ec18a); }
+  .ccard .cimg.c5 { background: linear-gradient(135deg, #c74f00, #ff6e14); }
+  .ccard .cbody {
+    padding: 12px 12px 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .ccard .ctitle {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+  .ccard .cdesc {
+    font-size: 11px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    flex: 1;
+  }
+  .ccard .cdesc ul {
+    margin: 4px 0 0;
+    padding-left: 14px;
+  }
+  .ccard .cdesc li { margin-bottom: 2px; }
+  .ccard .cbtn {
+    display: block;
+    background: #f2f2f2;
+    color: #1a1a1a;
+    text-align: center;
+    padding: 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
   }
 
   /* Bottom input bar */
@@ -305,6 +962,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
   }
   .input-bar .kb {
     width: 28px;
@@ -320,11 +978,6 @@
     color: #1a1a1a;
     font-weight: 500;
   }
-  .input-bar .menu .arrow-up {
-    font-size: 10px;
-    color: #1a1a1a;
-    margin-left: 4px;
-  }
 
   /* Home indicator */
   .home-indicator {
@@ -336,6 +989,24 @@
     height: 5px;
     background: #1a1a1a;
     border-radius: 3px;
+    z-index: 50;
+    pointer-events: none;
+  }
+
+  /* Restart button */
+  .restart-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #1a1a1a;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 24px;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-family: inherit;
   }
 </style>
 </head>
@@ -345,131 +1016,583 @@
   <div class="island"></div>
   <div class="screen">
 
-    <!-- Status bar -->
+    <!-- Status bar (shared) -->
     <div class="status-bar">
       <div class="left">9:41</div>
       <div class="right">
-        <!-- signal -->
         <svg width="17" height="11" viewBox="0 0 17 11" fill="#000"><rect x="0" y="7" width="3" height="4" rx="0.5"/><rect x="4.5" y="5" width="3" height="6" rx="0.5"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.5"/><rect x="13.5" y="0" width="3" height="11" rx="0.5"/></svg>
-        <!-- 4G -->
         <span style="font-size:13px;font-weight:600;">4G</span>
-        <!-- battery -->
         <div class="battery"><div class="fill"></div></div>
       </div>
     </div>
 
-    <!-- LINE Header -->
-    <div class="line-header">
-      <div class="icon-btn">
-        <svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 2 2 9 9 16"/></svg>
-      </div>
-      <div class="title">
-        <span class="verified">
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="#fff"><path d="M12 1l3 5 6 1-4 4 1 6-6-3-6 3 1-6-4-4 6-1z"/></svg>
-        </span>
-        tigerair 台灣虎航
-      </div>
-      <div class="icon-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </div>
-      <div class="icon-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg>
-      </div>
-      <div class="icon-btn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+    <!-- ===== STAGE 1: Add Friend ===== -->
+    <div class="stage active" id="stage-add">
+      <div class="add-friend">
+        <div class="line-logo">
+          <div class="word">LINE</div>
+        </div>
+        <div class="friend-card">
+          <div class="friend-avatar">
+            <span class="t-mark">t</span>
+          </div>
+          <div class="friend-name">
+            <span class="verified-badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </span>
+            tigerair 台灣虎航
+          </div>
+          <div class="friend-sub">官方帳號 · 約 158,432 位好友</div>
+        </div>
+        <div class="friend-actions">
+          <button class="btn-add-friend" onclick="startChat()">加入好友</button>
+          <a href="#" class="btn-cancel">取消</a>
+        </div>
       </div>
     </div>
 
-    <!-- Chat area -->
-    <div class="chat-area">
-
-      <div class="msg-group">
-        <div class="avatar">
-          <div class="logo-mark">t</div>
-        </div>
-        <div class="msg-content">
-          <div class="card">
-            <div class="banner">
-              <span>官方帳號個人服務通知</span>
-              <span class="bell">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a7 7 0 0 0-7 7v4l-2 3v1h18v-1l-2-3V9a7 7 0 0 0-7-7zm0 20a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22z"/></svg>
-              </span>
-            </div>
-            <div class="body">
-              <div class="subtitle">航班報到通知</div>
-              <div class="title">您的航班即將於 <span class="accent">24小時內</span> 起飛，請準時報到</div>
-
-              <div class="divider"></div>
-
-              <div class="meta">航班 / 訂位代號</div>
-              <div class="meta-val">IT505　·　TGW88K</div>
-
-              <div class="info">
-                <strong>桃園 TPE</strong> → <strong>普吉島 HKT</strong><br>
-                2026/05/20 (三) 起飛 14:55<br>
-                線上報到開放至 起飛前 90 分鐘
-              </div>
-
-              <a href="#" class="btn">查看報到通知單</a>
-            </div>
-            <div class="footer-note">
-              此訊息作為個人服務之通知，您可以點擊以參考相關說明。
-            </div>
+    <!-- ===== STAGE 2+: Chat ===== -->
+    <div class="stage" id="stage-chat">
+      <div class="chat-screen">
+        <!-- LINE Header -->
+        <div class="line-header">
+          <div class="icon-btn">
+            <svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 2 2 9 9 16"/></svg>
           </div>
-          <div class="timestamp">下午 2:30</div>
-        </div>
-      </div>
-
-      <div class="msg-group" style="margin-top: 10px;">
-        <div class="avatar">
-          <div class="logo-mark">t</div>
-        </div>
-        <div class="msg-content">
-          <div class="card">
-            <div class="banner">
-              <span>官方帳號個人服務通知</span>
-              <span class="bell">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a7 7 0 0 0-7 7v4l-2 3v1h18v-1l-2-3V9a7 7 0 0 0-7-7zm0 20a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22z"/></svg>
-              </span>
-            </div>
-            <div class="body">
-              <div class="subtitle">行前小提醒</div>
-              <div class="title">別忘了 <span class="accent">託運行李</span> 加購及預選座位</div>
-
-              <div class="divider"></div>
-
-              <div class="info">
-                行李加購：起飛前 4 小時截止<br>
-                預選座位：起飛前 48 小時截止<br>
-                預訂餐點：起飛前 24 小時截止
-              </div>
-
-              <a href="#" class="btn">前往管理行程</a>
-            </div>
-            <div class="footer-note">
-              此訊息作為個人服務之通知，您可以點擊以參考相關說明。
-            </div>
+          <div class="title">
+            <span class="verified">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="#fff"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </span>
+            tigerair 台灣虎航
           </div>
-          <div class="timestamp">下午 2:31</div>
+          <div class="icon-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <div class="icon-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg>
+          </div>
+          <div class="icon-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+          </div>
         </div>
-      </div>
 
-    </div>
+        <!-- Chat scroll area -->
+        <div class="chat-area" id="chatArea">
+          <div class="system-banner">您已加入 tigerair 台灣虎航 為好友</div>
+        </div>
 
-    <!-- Input bar -->
-    <div class="input-bar">
-      <div class="kb">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6.01" y2="10"/><line x1="10" y1="10" x2="10.01" y2="10"/><line x1="14" y1="10" x2="14.01" y2="10"/><line x1="18" y1="10" x2="18.01" y2="10"/><line x1="7" y1="14" x2="17" y2="14"/></svg>
-      </div>
-      <div class="menu">
-        選單 <span class="arrow-up">▲</span>
+        <!-- Input bar -->
+        <div class="input-bar">
+          <div class="kb">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6.01" y2="10"/><line x1="10" y1="10" x2="10.01" y2="10"/><line x1="14" y1="10" x2="14.01" y2="10"/><line x1="18" y1="10" x2="18.01" y2="10"/><line x1="7" y1="14" x2="17" y2="14"/></svg>
+          </div>
+          <div class="menu">選單 <span style="font-size:10px;">▲</span></div>
+        </div>
       </div>
     </div>
 
     <div class="home-indicator"></div>
-
   </div>
 </div>
+
+<!-- Keyboard hint -->
+<div class="kb-hint">
+  <span class="key">←</span> 上一步 ・ <span class="key">→</span> 下一步 ・ <span class="step-indicator" id="stepInd">0 / 5</span>
+</div>
+
+<script>
+  const chatArea = document.getElementById('chatArea');
+  let step = 0;
+  let waiting = false;
+
+  function showHint() {}
+  function hideHint() {}
+
+  function scrollDown() {
+    requestAnimationFrame(() => {
+      chatArea.scrollTop = chatArea.scrollHeight;
+    });
+  }
+
+  // Add typing indicator, returns promise resolved after delay then removes itself
+  function addTyping(duration = 2500) {
+    return new Promise(resolve => {
+      const group = document.createElement('div');
+      group.className = 'msg-group';
+      group.innerHTML = `
+        <div class="avatar">t</div>
+        <div class="msg-content">
+          <div class="typing">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+        </div>
+      `;
+      chatArea.appendChild(group);
+      scrollDown();
+      setTimeout(() => {
+        group.remove();
+        resolve();
+      }, duration);
+    });
+  }
+
+  function addMessage(html, time = '上午 9:41') {
+    const group = document.createElement('div');
+    group.className = 'msg-group';
+    group.innerHTML = `
+      <div class="avatar">t</div>
+      <div class="msg-content">
+        ${html}
+        <div class="timestamp">${time}</div>
+      </div>
+    `;
+    chatArea.appendChild(group);
+    scrollDown();
+  }
+
+  function addTapHint() {
+    const existing = document.querySelector('.tap-hint-wrap');
+    if (existing) existing.remove();
+    const wrap = document.createElement('div');
+    wrap.className = 'tap-hint-wrap';
+    wrap.innerHTML = '<div class="tap-hint">點擊任一處繼續 ▾</div>';
+    chatArea.appendChild(wrap);
+    scrollDown();
+  }
+  function removeTapHint() {
+    const existing = document.querySelector('.tap-hint-wrap');
+    if (existing) existing.remove();
+  }
+
+  // ========= FLOW =========
+  let currentStep = 0;
+  let isRunning = false;
+  const TOTAL = 5;
+  const stepInd = document.getElementById('stepInd');
+
+  function updateInd() {
+    stepInd.textContent = currentStep + ' / ' + TOTAL;
+  }
+
+  // Render a step instantly (no typing animation) — for rebuilding state
+  function renderInstant(n) {
+    if (n === 1) {
+      document.getElementById('stage-add').classList.remove('active');
+      document.getElementById('stage-chat').classList.add('active');
+    } else if (n === 2) {
+      runStep1Instant();
+    } else if (n === 3) {
+      runStep2Instant();
+    } else if (n === 4) {
+      runStep3Instant();
+    } else if (n === 5) {
+      runStep4Instant();
+    }
+  }
+
+  // Forward — advance one step (with typing animation)
+  async function nextStep() {
+    if (isRunning) return;
+    if (currentStep >= TOTAL) return;
+    isRunning = true;
+    const n = currentStep + 1;
+
+    if (n === 1) {
+      document.getElementById('stage-add').classList.remove('active');
+      document.getElementById('stage-chat').classList.add('active');
+    } else if (n === 2) {
+      await runStep1();
+    } else if (n === 3) {
+      await runStep2();
+    } else if (n === 4) {
+      await runStep3();
+    } else if (n === 5) {
+      await runStep4();
+    }
+    currentStep = n;
+    updateInd();
+    isRunning = false;
+  }
+
+  // Backward — go back one step (clear chat + replay instantly to target)
+  function prevStep() {
+    if (isRunning) return;
+    if (currentStep <= 0) return;
+    const target = currentStep - 1;
+
+    if (target === 0) {
+      // Back to add-friend stage
+      document.getElementById('stage-chat').classList.remove('active');
+      document.getElementById('stage-add').classList.add('active');
+      chatArea.innerHTML = '<div class="system-banner">您已加入 tigerair 台灣虎航 為好友</div>';
+    } else {
+      // Reset chat and re-render up to target
+      chatArea.innerHTML = '<div class="system-banner">您已加入 tigerair 台灣虎航 為好友</div>';
+      document.getElementById('stage-add').classList.remove('active');
+      document.getElementById('stage-chat').classList.add('active');
+      for (let i = 2; i <= target; i++) {
+        renderInstant(i);
+      }
+    }
+    currentStep = target;
+    updateInd();
+  }
+
+  // For "加入好友" button click
+  function startChat() {
+    nextStep();
+  }
+
+  // Keyboard control
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') {
+      e.preventDefault();
+      nextStep();
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      prevStep();
+    } else if (e.key === 'r' || e.key === 'R') {
+      location.reload();
+    }
+  });
+
+  // Step 1: 搶票通知 rich card
+  async function runStep1() {
+    await addTyping(2800);
+    addMessage(`
+      <div class="rich-card">
+        <div class="hero">
+          <div class="tag">限時搶票</div>
+          <div class="h1">首爾 SEOUL</div>
+          <div class="h2">5月限定 · 雙人同行更划算</div>
+        </div>
+        <div class="body">
+          <div class="route-line">
+            <div class="city">桃園 TPE</div>
+            <div class="arr">
+              <svg width="24" height="12" viewBox="0 0 28 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h24M20 2l6 5-6 5"/></svg>
+            </div>
+            <div class="city">首爾 ICN</div>
+          </div>
+          <div class="price-row">
+            <span class="label">單程含稅</span>
+            <span class="currency">NT$</span>
+            <span class="price">2,988</span>
+            <span class="qi">起</span>
+          </div>
+          <div class="desc">5/15 – 5/30 限定優惠，名額有限，售完為止。</div>
+          <a href="#" class="btn-primary">立即搶票</a>
+        </div>
+      </div>
+    `, '上午 9:41');
+  }
+
+  // Step 2: 降價提醒 Rich Card
+  async function runStep2() {
+    await addTyping(2200);
+    addMessage(`
+      <div class="alert-card">
+        <div class="alert-head">
+          <div class="alert-head-l">
+            <div class="alert-pulse"></div>
+            <span>PRICE ALERT 降價提醒</span>
+          </div>
+          <span class="alert-time">剛剛</span>
+        </div>
+        <div class="alert-body">
+          <div class="alert-personal">嗨 Howard，您追蹤的航線降價了！</div>
+          <div class="alert-route">
+            <span class="ar-city">TPE</span>
+            <svg width="20" height="10" viewBox="0 0 28 14" fill="none" stroke="#ff6e14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h24M20 2l6 5-6 5"/></svg>
+            <span class="ar-city">NRT</span>
+            <span class="ar-date">6月出發</span>
+          </div>
+          <div class="alert-sub">東京 成田國際機場 · 06/01 – 06/30</div>
+
+          <div class="alert-pricewrap">
+            <div class="alert-now">
+              <div class="al">目前最低</div>
+              <div class="av"><span class="cur">NT$</span><span class="num">3,488</span></div>
+            </div>
+            <div class="alert-drop">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              <span>-42%</span>
+            </div>
+            <div class="alert-was">
+              <div class="al">過去 30 天均價</div>
+              <div class="av-was">NT$ 6,020</div>
+            </div>
+          </div>
+
+          <!-- 迷你價格趨勢圖 -->
+          <div class="chart">
+            <div class="chart-bars">
+              <div class="bar" style="height:78%"><div class="bv"></div></div>
+              <div class="bar" style="height:88%"><div class="bv"></div></div>
+              <div class="bar" style="height:72%"><div class="bv"></div></div>
+              <div class="bar" style="height:95%"><div class="bv"></div></div>
+              <div class="bar" style="height:82%"><div class="bv"></div></div>
+              <div class="bar" style="height:90%"><div class="bv"></div></div>
+              <div class="bar" style="height:65%"><div class="bv"></div></div>
+              <div class="bar" style="height:58%"><div class="bv"></div></div>
+              <div class="bar active" style="height:30%"><div class="bv"></div><div class="bdot"></div></div>
+            </div>
+            <div class="chart-axis">
+              <span>4/22</span><span>今日</span>
+            </div>
+          </div>
+
+          <div class="alert-meta">
+            <div class="meta-pill"><span class="dot dot-low"></span>歷史新低</div>
+            <div class="meta-pill"><span class="dot dot-fire"></span>過去 7 天 89 人搜尋</div>
+          </div>
+
+          <a href="#" class="alert-btn">查看 6 月東京航班 →</a>
+        </div>
+      </div>
+    `, '上午 9:41');
+  }
+
+  // Step 3: 航班報到通知
+  async function runStep3() {
+    await addTyping(2500);
+    addMessage(`
+      <div class="checkin-card">
+        <div class="banner">
+          <span>官方帳號個人服務通知</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a7 7 0 0 0-7 7v4l-2 3v1h18v-1l-2-3V9a7 7 0 0 0-7-7zm0 20a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22z"/></svg>
+        </div>
+        <div class="body">
+          <div class="subtitle">航班報到通知</div>
+          <div class="title">您的首爾航班即將於 <span class="accent">24 小時內</span> 起飛</div>
+          <div class="divider"></div>
+          <div class="meta">航班 / 訂位代號</div>
+          <div class="meta-val">IT602　·　TGW7K9P</div>
+          <div class="info">
+            <strong>桃園 TPE</strong> → <strong>首爾 ICN</strong><br>
+            2026/05/20 (三) 起飛 09:25<br>
+            線上報到截止 起飛前 90 分鐘
+          </div>
+          <a href="#" class="btn">前往報到</a>
+        </div>
+        <div class="footer-note">
+          此訊息作為個人服務之通知，您可以點擊以參考相關說明。
+        </div>
+      </div>
+    `, '下午 1:30');
+  }
+
+  // Step 4: 旅遊小叮嚀 - 橫滑卡片
+  async function runStep4() {
+    await addTyping(2500);
+
+    const carouselHTML = `
+      <div class="carousel-wrap" style="max-width:280px;">
+        <div class="carousel-label">📌 首爾旅遊小叮嚀</div>
+        <div class="carousel">
+          <!-- 1. 登機資訊卡 -->
+          <div class="ccard">
+            <div class="cimg c1">
+              <div class="cimg-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                登機資訊
+              </div>
+            </div>
+            <div class="cbody">
+              <div class="ctitle">登機資訊卡</div>
+              <div class="cdesc">
+                Gate B7 · Seat 14A<br>
+                登機時間 08:55<br>
+                第一航廈 D 區報到
+              </div>
+              <a href="#" class="cbtn">查看登機證</a>
+            </div>
+          </div>
+
+          <!-- 2. 當地天氣 -->
+          <div class="ccard">
+            <div class="cimg c2">
+              <div class="cimg-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                Weather
+              </div>
+            </div>
+            <div class="cbody">
+              <div class="ctitle">首爾天氣</div>
+              <div class="cdesc">
+                抵達日 15°–22°C 晴<br>
+                本週多日晴朗<br>
+                建議攜帶薄外套
+              </div>
+              <a href="#" class="cbtn">7 日預報</a>
+            </div>
+          </div>
+
+          <!-- 3. 當地交通 -->
+          <div class="ccard">
+            <div class="cimg c3">
+              <div class="cimg-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16M8 15h.01M16 15h.01M8 19l-2 3M16 19l2 3"/></svg>
+                Transport
+              </div>
+            </div>
+            <div class="cbody">
+              <div class="ctitle">當地交通</div>
+              <div class="cdesc">
+                <ul>
+                  <li>機場快線 AREX</li>
+                  <li>T-money 交通卡</li>
+                  <li>市區地鐵全攻略</li>
+                </ul>
+              </div>
+              <a href="#" class="cbtn">查看路線</a>
+            </div>
+          </div>
+
+          <!-- 4. 當地住宿 -->
+          <div class="ccard">
+            <div class="cimg c4">
+              <div class="cimg-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l9-6 9 6v11"/><path d="M9 21v-6h6v6"/></svg>
+                Hotel
+              </div>
+            </div>
+            <div class="cbody">
+              <div class="ctitle">合作住宿</div>
+              <div class="cdesc">
+                明洞、弘大、江南<br>
+                精選飯店 85 折起<br>
+                訂房即享機加酒優惠
+              </div>
+              <a href="#" class="cbtn">看訂房</a>
+            </div>
+          </div>
+
+          <!-- 5. eSIM -->
+          <div class="ccard">
+            <div class="cimg c5">
+              <div class="cimg-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/><path d="M9 7h6M9 11h6"/></svg>
+                eSIM
+              </div>
+            </div>
+            <div class="cbody">
+              <div class="ctitle">韓國 eSIM</div>
+              <div class="cdesc">
+                5 日吃到飽 NT$299<br>
+                掃 QR 立即開通<br>
+                落地即可上網
+              </div>
+              <a href="#" class="cbtn">購買 eSIM</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    addMessage(carouselHTML, '下午 1:31');
+  }
+
+  // ===== Instant render variants (for backward navigation) =====
+  function _step1HTML() {
+    return `
+      <div class="rich-card">
+        <div class="hero">
+          <div class="tag">限時搶票</div>
+          <div class="h1">首爾 SEOUL</div>
+          <div class="h2">5月限定 · 雙人同行更划算</div>
+        </div>
+        <div class="body">
+          <div class="route-line">
+            <div class="city">桃園 TPE</div>
+            <div class="arr"><svg width="24" height="12" viewBox="0 0 28 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h24M20 2l6 5-6 5"/></svg></div>
+            <div class="city">首爾 ICN</div>
+          </div>
+          <div class="price-row">
+            <span class="label">單程含稅</span>
+            <span class="currency">NT$</span>
+            <span class="price">2,988</span>
+            <span class="qi">起</span>
+          </div>
+          <div class="desc">5/15 – 5/30 限定優惠，名額有限，售完為止。</div>
+          <a href="#" class="btn-primary">立即搶票</a>
+        </div>
+      </div>`;
+  }
+  function _step2HTML() {
+    return `
+      <div class="alert-card">
+        <div class="alert-head">
+          <div class="alert-head-l"><div class="alert-pulse"></div><span>PRICE ALERT 降價提醒</span></div>
+          <span class="alert-time">剛剛</span>
+        </div>
+        <div class="alert-body">
+          <div class="alert-personal">嗨 Howard，您追蹤的航線降價了！</div>
+          <div class="alert-route">
+            <span class="ar-city">TPE</span>
+            <svg width="20" height="10" viewBox="0 0 28 14" fill="none" stroke="#ff6e14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h24M20 2l6 5-6 5"/></svg>
+            <span class="ar-city">NRT</span>
+            <span class="ar-date">6月出發</span>
+          </div>
+          <div class="alert-sub">東京 成田國際機場 · 06/01 – 06/30</div>
+          <div class="alert-pricewrap">
+            <div class="alert-now"><div class="al">目前最低</div><div class="av"><span class="cur">NT$</span><span class="num">3,488</span></div></div>
+            <div class="alert-drop"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg><span>-42%</span></div>
+            <div class="alert-was"><div class="al">過去 30 天均價</div><div class="av-was">NT$ 6,020</div></div>
+          </div>
+          <div class="chart">
+            <div class="chart-bars">
+              <div class="bar" style="height:78%"></div><div class="bar" style="height:88%"></div><div class="bar" style="height:72%"></div>
+              <div class="bar" style="height:95%"></div><div class="bar" style="height:82%"></div><div class="bar" style="height:90%"></div>
+              <div class="bar" style="height:65%"></div><div class="bar" style="height:58%"></div>
+              <div class="bar active" style="height:30%"><div class="bdot"></div></div>
+            </div>
+            <div class="chart-axis"><span>4/22</span><span>今日</span></div>
+          </div>
+          <div class="alert-meta">
+            <div class="meta-pill"><span class="dot dot-low"></span>歷史新低</div>
+            <div class="meta-pill"><span class="dot dot-fire"></span>過去 7 天 89 人搜尋</div>
+          </div>
+          <a href="#" class="alert-btn">查看 6 月東京航班 →</a>
+        </div>
+      </div>`;
+  }
+  function _step3HTML() {
+    return `
+      <div class="checkin-card">
+        <div class="banner"><span>官方帳號個人服務通知</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a7 7 0 0 0-7 7v4l-2 3v1h18v-1l-2-3V9a7 7 0 0 0-7-7zm0 20a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22z"/></svg>
+        </div>
+        <div class="body">
+          <div class="subtitle">航班報到通知</div>
+          <div class="title">您的首爾航班即將於 <span class="accent">24 小時內</span> 起飛</div>
+          <div class="divider"></div>
+          <div class="meta">航班 / 訂位代號</div>
+          <div class="meta-val">IT602　·　TGW7K9P</div>
+          <div class="info"><strong>桃園 TPE</strong> → <strong>首爾 ICN</strong><br>2026/05/20 (三) 起飛 09:25<br>線上報到截止 起飛前 90 分鐘</div>
+          <a href="#" class="btn">前往報到</a>
+        </div>
+        <div class="footer-note">此訊息作為個人服務之通知，您可以點擊以參考相關說明。</div>
+      </div>`;
+  }
+  function _step4HTML() {
+    return `
+      <div class="carousel-wrap" style="max-width:280px;">
+        <div class="carousel-label">📌 首爾旅遊小叮嚀</div>
+        <div class="carousel">
+          <div class="ccard"><div class="cimg c1"><div class="cimg-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>登機資訊</div></div><div class="cbody"><div class="ctitle">登機資訊卡</div><div class="cdesc">Gate B7 · Seat 14A<br>登機時間 08:55<br>第一航廈 D 區報到</div><a href="#" class="cbtn">查看登機證</a></div></div>
+          <div class="ccard"><div class="cimg c2"><div class="cimg-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>Weather</div></div><div class="cbody"><div class="ctitle">首爾天氣</div><div class="cdesc">抵達日 15°–22°C 晴<br>本週多日晴朗<br>建議攜帶薄外套</div><a href="#" class="cbtn">7 日預報</a></div></div>
+          <div class="ccard"><div class="cimg c3"><div class="cimg-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16M8 15h.01M16 15h.01M8 19l-2 3M16 19l2 3"/></svg>Transport</div></div><div class="cbody"><div class="ctitle">當地交通</div><div class="cdesc"><ul><li>機場快線 AREX</li><li>T-money 交通卡</li><li>市區地鐵全攻略</li></ul></div><a href="#" class="cbtn">查看路線</a></div></div>
+          <div class="ccard"><div class="cimg c4"><div class="cimg-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l9-6 9 6v11"/><path d="M9 21v-6h6v6"/></svg>Hotel</div></div><div class="cbody"><div class="ctitle">合作住宿</div><div class="cdesc">明洞、弘大、江南<br>精選飯店 85 折起<br>訂房即享機加酒優惠</div><a href="#" class="cbtn">看訂房</a></div></div>
+          <div class="ccard"><div class="cimg c5"><div class="cimg-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/><path d="M9 7h6M9 11h6"/></svg>eSIM</div></div><div class="cbody"><div class="ctitle">韓國 eSIM</div><div class="cdesc">5 日吃到飽 NT$299<br>掃 QR 立即開通<br>落地即可上網</div><a href="#" class="cbtn">購買 eSIM</a></div></div>
+        </div>
+      </div>`;
+  }
+  function runStep1Instant() { addMessage(_step1HTML(), '上午 9:41'); }
+  function runStep2Instant() { addMessage(_step2HTML(), '上午 9:41'); }
+  function runStep3Instant() { addMessage(_step3HTML(), '下午 1:30'); }
+  function runStep4Instant() { addMessage(_step4HTML(), '下午 1:31'); }
+
+</script>
 
 </body>
 </html>
